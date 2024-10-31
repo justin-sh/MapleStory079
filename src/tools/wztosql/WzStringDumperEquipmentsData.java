@@ -6,7 +6,7 @@ import provider.MapleDataProviderFactory;
 
 import java.io.*;
 
-public class WzStringDumper装备数据 {
+public class WzStringDumperEquipmentsData {
     public static void main(final String[] args) throws FileNotFoundException, IOException {
         final File stringFile = MapleDataProviderFactory.fileInwzPath("string.wz");
         final MapleDataProvider stringProvider = MapleDataProviderFactory.getDataProvider(stringFile);

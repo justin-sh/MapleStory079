@@ -1,13 +1,13 @@
 package tools.wztosql;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import server.MapleItemInformationProvider;
 import tools.Pair;
 
-public class ChairDump
-{
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+public class ChairDump {
     public static void main(final String[] args) throws FileNotFoundException, IOException {
         final FileOutputStream out = new FileOutputStream("ChairDump.txt", false);
         final StringBuilder sb = new StringBuilder();

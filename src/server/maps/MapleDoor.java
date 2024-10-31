@@ -2,17 +2,17 @@ package server.maps;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import java.awt.Point;
+import server.MaplePortal;
+import tools.MaplePacketCreator;
+
+import java.awt.*;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import server.MaplePortal;
-import tools.MaplePacketCreator;
 
-public class MapleDoor extends AbstractMapleMapObject
-{
+public class MapleDoor extends AbstractMapleMapObject {
     private WeakReference<MapleCharacter> owner;
     private MapleMap town;
     private MaplePortal townPortal;
@@ -20,7 +20,7 @@ public class MapleDoor extends AbstractMapleMapObject
     private int skillId;
     private int ownerId;
     private Point targetPosition;
-    
+
     public MapleDoor(final MapleCharacter owner, final Point targetPosition, final int skillId) {
         this.owner = new WeakReference<>(owner);
         this.ownerId = owner.getId();
@@ -30,7 +30,7 @@ public class MapleDoor extends AbstractMapleMapObject
         this.townPortal = this.getFreePortal();
         this.skillId = skillId;
     }
-    
+
     public MapleDoor(final MapleDoor origDoor) {
         this.owner = new WeakReference<>(origDoor.owner.get());
         this.town = origDoor.town;
@@ -42,15 +42,15 @@ public class MapleDoor extends AbstractMapleMapObject
         this.ownerId = origDoor.ownerId;
         this.setPosition(this.townPortal.getPosition());
     }
-    
+
     public int getSkill() {
         return this.skillId;
     }
-    
+
     public int getOwnerId() {
         return this.ownerId;
     }
-    
+
     private MaplePortal getFreePortal() {
         final List<MaplePortal> freePortals = new ArrayList<MaplePortal>();
         for (final MaplePortal port : this.town.getPortals()) {
@@ -71,7 +71,7 @@ public class MapleDoor extends AbstractMapleMapObject
             }
         });
         for (final MapleMapObject obj : this.town.getAllDoorsThreadsafe()) {
-            final MapleDoor door = (MapleDoor)obj;
+            final MapleDoor door = (MapleDoor) obj;
             if (door.getOwner() != null && door.getOwner().getParty() != null && this.getOwner() != null && this.getOwner().getParty() != null && this.getOwner().getParty().getMemberById(door.getOwnerId()) != null) {
                 freePortals.remove(door.getTownPortal());
             }
@@ -81,7 +81,7 @@ public class MapleDoor extends AbstractMapleMapObject
         }
         return freePortals.iterator().next();
     }
-    
+
     @Override
     public void sendSpawnData(final MapleClient client) {
         if (this.getOwner() == null) {
@@ -95,7 +95,7 @@ public class MapleDoor extends AbstractMapleMapObject
             client.getSession().write(MaplePacketCreator.spawnPortal(this.town.getId(), this.target.getId(), this.skillId, this.targetPosition));
         }
     }
-    
+
     @Override
     public void sendDestroyData(final MapleClient client) {
         if (this.getOwner() == null) {
@@ -109,41 +109,39 @@ public class MapleDoor extends AbstractMapleMapObject
             client.getSession().write(MaplePacketCreator.removeDoor(this.getOwnerId(), true));
         }
     }
-    
+
     public void warp(final MapleCharacter chr, final boolean toTown) {
         if (chr.getId() == this.getOwnerId() || (this.getOwner() != null && this.getOwner().getParty() != null && this.getOwner().getParty().getMemberById(chr.getId()) != null)) {
             if (!toTown) {
                 chr.changeMap(this.target, this.targetPosition);
-            }
-            else {
+            } else {
                 chr.changeMap(this.town, this.townPortal);
             }
-        }
-        else {
+        } else {
             chr.getClient().getSession().write(MaplePacketCreator.enableActions());
         }
     }
-    
+
     public MapleCharacter getOwner() {
         return this.owner.get();
     }
-    
+
     public MapleMap getTown() {
         return this.town;
     }
-    
+
     public MaplePortal getTownPortal() {
         return this.townPortal;
     }
-    
+
     public MapleMap getTarget() {
         return this.target;
     }
-    
+
     public Point getTargetPosition() {
         return this.targetPosition;
     }
-    
+
     @Override
     public MapleMapObjectType getType() {
         return MapleMapObjectType.DOOR;

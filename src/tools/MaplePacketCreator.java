@@ -1,23 +1,7 @@
 package tools;
 
-import client.BuddyEntry;
-import client.MapleBuffStat;
-import client.MapleCharacter;
-import client.MapleClient;
-import client.MapleDisease;
-import client.MapleKeyLayout;
-import client.MapleQuestStatus;
-import client.MapleStat;
-import client.SkillMacro;
-import client.inventory.IEquip;
-import client.inventory.IItem;
-import client.inventory.Item;
-import client.inventory.MapleInventory;
-import client.inventory.MapleInventoryType;
-import client.inventory.MapleMount;
-import client.inventory.MaplePet;
-import client.inventory.MapleRing;
-import client.inventory.ModifyInventory;
+import client.*;
+import client.inventory.*;
 import constants.GameConstants;
 import constants.ServerConstants;
 import handling.ByteArrayMaplePacket;
@@ -33,40 +17,12 @@ import handling.world.guild.MapleBBSThread;
 import handling.world.guild.MapleGuild;
 import handling.world.guild.MapleGuildAlliance;
 import handling.world.guild.MapleGuildCharacter;
-import java.awt.Point;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import server.MapleDueyActions;
-import server.MapleItemInformationProvider;
-import server.MapleShopItem;
-import server.MapleStatEffect;
-import server.MapleTrade;
-import server.Randomizer;
-import server.ServerProperties;
+import server.*;
 import server.events.MapleSnowball;
 import server.life.MapleNPC;
 import server.life.PlayerNPC;
 import server.life.SummonAttackEntry;
-import server.maps.MapleMap;
-import server.maps.MapleMapItem;
-import server.maps.MapleMist;
-import server.maps.MapleNodes;
-import server.maps.MapleReactor;
-import server.maps.MapleSummon;
+import server.maps.*;
 import server.movement.LifeMovementFragment;
 import server.shops.HiredMerchant;
 import server.shops.MaplePlayerShopItem;
@@ -74,12 +30,20 @@ import tools.data.output.LittleEndianWriter;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.PacketHelper;
 
-public class MaplePacketCreator
-{
+import java.awt.*;
+import java.io.*;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.*;
+
+public class MaplePacketCreator {
     public static List<Pair<MapleStat, Integer>> EMPTY_STATUPDATE;
     private static final byte[] CHAR_INFO_MAGIC;
     private static final boolean showPacket = false;
-    
+
     public static MaplePacket getServerIP(final int port, final int clientId) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -89,20 +53,19 @@ public class MaplePacketCreator
         mplew.writeShort(0);
         try {
             mplew.write(InetAddress.getByName(ServerProperties.getProperty("RoyMS.IP")).getAddress());
-        }
-        catch (UnknownHostException e) {
+        } catch (UnknownHostException e) {
             System.out.println("登录服务器IP：" + e);
         }
         mplew.writeShort(port);
         mplew.writeInt(clientId);
-        mplew.write(new byte[] { 1, 0, 0, 0, 0 });
+        mplew.write(new byte[]{1, 0, 0, 0, 0});
         if (ServerConstants.PACKET_ERROR_OFF) {
             final ServerConstants ERROR = new ServerConstants();
             ERROR.setPACKET_ERROR(" 暂未定义 ：\r\n" + mplew.getPacket() + "\r\n\r\n");
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getChannelChange(final InetAddress inetAddr, final int port) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -112,8 +75,8 @@ public class MaplePacketCreator
         mplew.write(1);
         try {
             mplew.write(InetAddress.getByName(ServerProperties.getProperty("RoyMS.IP")).getAddress());
+        } catch (UnknownHostException ex) {
         }
-        catch (UnknownHostException ex) {}
         mplew.writeShort(port);
         if (ServerConstants.PACKET_ERROR_OFF) {
             final ServerConstants ERROR = new ServerConstants();
@@ -121,7 +84,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getCharInfo(final MapleCharacter chr) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -142,21 +105,21 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket enableActions() {
         if (ServerConstants.调试输出封包) {
             System.out.println("enableActions--------------------");
         }
         return updatePlayerStats(MaplePacketCreator.EMPTY_STATUPDATE, true, 0);
     }
-    
+
     public static MaplePacket updatePlayerStats(final List<Pair<MapleStat, Integer>> stats, final int evan) {
         if (ServerConstants.调试输出封包) {
             System.out.println("updatePlayerStatsA--------------------");
         }
         return updatePlayerStats(stats, false, evan);
     }
-    
+
     public static MaplePacket updatePlayerStats(final List<Pair<MapleStat, Integer>> stats, final boolean itemReaction, final int evan) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -184,17 +147,13 @@ public class MaplePacketCreator
             if (statupdate2.getLeft().getValue() >= 1) {
                 if (statupdate2.getLeft().getValue() == 1) {
                     mplew.writeShort(statupdate2.getRight().shortValue());
-                }
-                else if (statupdate2.getLeft().getValue() <= 4) {
+                } else if (statupdate2.getLeft().getValue() <= 4) {
                     mplew.writeInt(statupdate2.getRight());
-                }
-                else if (statupdate2.getLeft().getValue() < 128) {
+                } else if (statupdate2.getLeft().getValue() < 128) {
                     mplew.write(statupdate2.getRight().shortValue());
-                }
-                else if (statupdate2.getLeft().getValue() < 262144) {
+                } else if (statupdate2.getLeft().getValue() < 262144) {
                     mplew.writeShort(statupdate2.getRight().shortValue());
-                }
-                else {
+                } else {
                     mplew.writeInt(statupdate2.getRight());
                 }
             }
@@ -206,7 +165,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket blockedPortal() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -221,7 +180,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket weirdStatUpdate() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -242,14 +201,14 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket updateSp(final MapleCharacter chr, final boolean itemReaction) {
         if (ServerConstants.调试输出封包) {
             System.out.println("updateSpA--------------------");
         }
         return updateSp(chr, itemReaction, false);
     }
-    
+
     public static MaplePacket updateSp(final MapleCharacter chr, final boolean itemReaction, final boolean overrideJob) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -262,7 +221,7 @@ public class MaplePacketCreator
         mplew.writeShort(0);
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getWarpToMap(final MapleMap to, final int spawnPoint, final MapleCharacter chr) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -284,7 +243,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket spawnPortal(final int townId, final int targetId, final int skillId, final Point pos) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -302,7 +261,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket spawnDoor(final int oid, final Point pos, final boolean town) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -318,7 +277,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket removeDoor(final int oid, final boolean town) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -328,8 +287,7 @@ public class MaplePacketCreator
             mplew.writeShort(SendPacketOpcode.SPAWN_PORTAL.getValue());
             mplew.writeInt(999999999);
             mplew.writeInt(999999999);
-        }
-        else {
+        } else {
             mplew.writeShort(SendPacketOpcode.REMOVE_DOOR.getValue());
             mplew.write(0);
             mplew.writeInt(oid);
@@ -340,7 +298,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket spawnSummon(final MapleSummon summon, final boolean animated) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -364,7 +322,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket removeSummon(final MapleSummon summon, final boolean animated) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -380,35 +338,35 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket serverMessage(final String message) {
         if (ServerConstants.调试输出封包) {
             System.out.println("serverMessageA--------------------");
         }
         return serverMessage(4, 0, message, false);
     }
-    
+
     public static MaplePacket serverNotice(final int type, final String message) {
         if (ServerConstants.调试输出封包) {
             System.out.println("serverNoticeA--------------------");
         }
         return serverMessage(type, 0, message, false);
     }
-    
+
     public static MaplePacket serverNotice(final int type, final int channel, final String message) {
         if (ServerConstants.调试输出封包) {
             System.out.println("serverNoticeB--------------------");
         }
         return serverMessage(type, channel, message, false);
     }
-    
+
     public static MaplePacket serverNotice(final int type, final int channel, final String message, final boolean smegaEar) {
         if (ServerConstants.调试输出封包) {
             System.out.println("serverNoticeC--------------------");
         }
         return serverMessage(type, channel, message, smegaEar);
     }
-    
+
     private static MaplePacket serverMessage(final int type, final int channel, final String message, final boolean megaEar) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -442,7 +400,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getGachaponMega(final String name, final String message, final IItem item, final byte rareness, final int channel) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -459,7 +417,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket tripleSmega(final List<String> message, final boolean ear, final int channel) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -484,7 +442,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getAvatarMega(final MapleCharacter chr, final int channel, final int itemId, final String message, final boolean ear) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -503,7 +461,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket itemMegaphone(final String msg, final boolean whisper, final int channel, final IItem item) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -516,8 +474,7 @@ public class MaplePacketCreator
         mplew.write(whisper ? 1 : 0);
         if (item == null) {
             mplew.write(0);
-        }
-        else {
+        } else {
             PacketHelper.addItemInfo(mplew, item, false, false, true);
         }
         if (ServerConstants.PACKET_ERROR_OFF) {
@@ -526,7 +483,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket spawnNPC(final MapleNPC life, final boolean show) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -548,7 +505,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket removeNPCController(final int objectid) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.SPAWN_NPC_REQUEST_CONTROLLER.getValue());
@@ -560,7 +517,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket removeNPC(final int objectid) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -574,7 +531,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket spawnNPCRequestController(final MapleNPC life, final boolean MiniMap) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -597,7 +554,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket spawnPlayerNPC(final PlayerNPC npc) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -616,18 +573,16 @@ public class MaplePacketCreator
         final Map<Byte, Integer> myEquip = new LinkedHashMap<Byte, Integer>();
         final Map<Byte, Integer> maskedEquip = new LinkedHashMap<Byte, Integer>();
         for (final Map.Entry<Byte, Integer> position : equip.entrySet()) {
-            byte pos = (byte)(position.getKey() * -1);
+            byte pos = (byte) (position.getKey() * -1);
             if (pos < 100 && myEquip.get(pos) == null) {
                 myEquip.put(pos, position.getValue());
-            }
-            else if ((pos > 100 || pos == -128) && pos != 111) {
-                pos = (byte)((pos == -128) ? 28 : (pos - 100));
+            } else if ((pos > 100 || pos == -128) && pos != 111) {
+                pos = (byte) ((pos == -128) ? 28 : (pos - 100));
                 if (myEquip.get(pos) != null) {
                     maskedEquip.put(pos, myEquip.get(pos));
                 }
                 myEquip.put(pos, position.getValue());
-            }
-            else {
+            } else {
                 if (myEquip.get(pos) == null) {
                     continue;
                 }
@@ -647,8 +602,7 @@ public class MaplePacketCreator
         final Integer cWeapon = equip.get(-111);
         if (cWeapon != null) {
             mplew.writeInt(cWeapon);
-        }
-        else {
+        } else {
             mplew.writeInt(0);
         }
         for (int i = 0; i < 3; ++i) {
@@ -660,7 +614,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getChatText(final int cidfrom, final String text, final boolean whiteBG, final int show) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -677,7 +631,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket GameMaster_Func(final int value) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -692,14 +646,14 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getPacketFromHexString(final String hex) {
         if (ServerConstants.调试输出封包) {
             System.out.println("getPacketFromHexString--------------------");
         }
         return new ByteArrayMaplePacket(HexTool.getByteArrayFromHexString(hex));
     }
-    
+
     public static MaplePacket GainEXP_Monster(final int gain, final boolean white, final int 结婚奖励经验值, final int 组队经验值, final int Class_Bonus_EXP, final int 道具佩戴附加经验值, final int 网吧特别经验) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -723,7 +677,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket GainEXP_Others(final int gain, final boolean inChat, final boolean white) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -739,8 +693,7 @@ public class MaplePacketCreator
         mplew.writeZeroBytes(4);
         if (inChat) {
             mplew.writeZeroBytes(13);
-        }
-        else {
+        } else {
             mplew.writeZeroBytes(13);
         }
         if (ServerConstants.PACKET_ERROR_OFF) {
@@ -749,7 +702,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getShowFameGain(final int gain) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -764,7 +717,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showMesoGain(final int gain, final boolean inChat) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -775,8 +728,7 @@ public class MaplePacketCreator
             mplew.write(0);
             mplew.write(1);
             mplew.write(0);
-        }
-        else {
+        } else {
             mplew.write(5);
         }
         mplew.writeInt(gain);
@@ -787,14 +739,14 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getShowItemGain(final int itemId, final short quantity) {
         if (ServerConstants.调试输出封包) {
             System.out.println("getShowItemGainA--------------------");
         }
         return getShowItemGain(itemId, quantity, false);
     }
-    
+
     public static MaplePacket getShowItemGain(final int itemId, final short quantity, final boolean inChat) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -806,8 +758,7 @@ public class MaplePacketCreator
             mplew.write(1);
             mplew.writeInt(itemId);
             mplew.writeInt(quantity);
-        }
-        else {
+        } else {
             mplew.writeShort(SendPacketOpcode.SHOW_STATUS_INFO.getValue());
             mplew.writeShort(0);
             mplew.writeInt(itemId);
@@ -821,7 +772,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showRewardItemAnimation(final int itemId, final String effect) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -840,7 +791,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showRewardItemAnimation(final int itemId, final String effect, final int from_playerid) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -860,7 +811,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket dropItemFromMapObject(final MapleMapItem drop, final Point dropfrom, final Point dropto, final byte mod) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -892,7 +843,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket spawnPlayerMapobject(final MapleCharacter chr) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -905,12 +856,10 @@ public class MaplePacketCreator
         if (chr.isAriantPQMap()) {
             mplew.writeMapleAsciiString("1st");
             mplew.write(new byte[6]);
-        }
-        else if (chr.getGuildId() <= 0) {
+        } else if (chr.getGuildId() <= 0) {
             mplew.writeMapleAsciiString("");
             mplew.write(new byte[6]);
-        }
-        else {
+        } else {
             final MapleGuild gs = World.Guild.getGuild(chr.getGuildId());
             if (gs != null) {
                 mplew.writeMapleAsciiString(gs.getName());
@@ -918,8 +867,7 @@ public class MaplePacketCreator
                 mplew.write(gs.getLogoBGColor());
                 mplew.writeShort(gs.getLogo());
                 mplew.write(gs.getLogoColor());
-            }
-            else {
+            } else {
                 mplew.writeMapleAsciiString("");
                 mplew.write(new byte[6]);
             }
@@ -931,8 +879,7 @@ public class MaplePacketCreator
         mplew.write(0);
         if (chr.getBuffedValue(MapleBuffStat.变身) != null) {
             mplew.writeInt(2);
-        }
-        else {
+        } else {
             mplew.writeInt(0);
         }
         long buffmask = 0L;
@@ -953,17 +900,16 @@ public class MaplePacketCreator
         if (chr.getBuffedValue(MapleBuffStat.变身) != null) {
             buffvalue = chr.getBuffedValue(MapleBuffStat.变身);
         }
-        mplew.writeInt((int)(buffmask >> 32 & -1L));
+        mplew.writeInt((int) (buffmask >> 32 & -1L));
         if (buffvalue != null) {
             if (chr.getBuffedValue(MapleBuffStat.变身) != null) {
                 mplew.writeShort(buffvalue);
-            }
-            else {
+            } else {
                 mplew.write(buffvalue.byteValue());
             }
         }
         final int CHAR_MAGIC_SPAWN = Randomizer.nextInt();
-        mplew.writeInt((int)(buffmask & -1L));
+        mplew.writeInt((int) (buffmask & -1L));
         mplew.write(new byte[6]);
         mplew.writeInt(CHAR_MAGIC_SPAWN);
         mplew.writeLong(0L);
@@ -976,14 +922,13 @@ public class MaplePacketCreator
         mplew.writeInt(CHAR_MAGIC_SPAWN);
         mplew.writeShort(0);
         mplew.write(0);
-        final IItem mount = chr.getInventory(MapleInventoryType.EQUIPPED).getItem((short)(-18));
+        final IItem mount = chr.getInventory(MapleInventoryType.EQUIPPED).getItem((short) (-18));
         if (chr.getBuffedValue(MapleBuffStat.骑兽技能) != null && mount != null) {
             mplew.writeInt(mount.getItemId());
             mplew.writeInt(1004);
             mplew.writeInt(19275520);
             mplew.write(0);
-        }
-        else {
+        } else {
             mplew.writeInt(CHAR_MAGIC_SPAWN);
             mplew.writeLong(0L);
             mplew.write(0);
@@ -1036,8 +981,7 @@ public class MaplePacketCreator
         mplew.writeShort(0);
         if (chr.getCarnivalParty() != null) {
             mplew.write(chr.getCoconutTeam());
-        }
-        else if (chr.getMapId() == 109080000 || chr.getMapId() == 109080010) {
+        } else if (chr.getMapId() == 109080000 || chr.getMapId() == 109080010) {
             mplew.write(chr.getCoconutTeam());
         }
         if (ServerConstants.PACKET_ERROR_OFF) {
@@ -1046,7 +990,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket removePlayerFromMap(final int cid, final MapleCharacter chr) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1061,7 +1005,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket facialExpression(final MapleCharacter from, final int expression) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1076,7 +1020,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket movePlayer(final int cid, final List<LifeMovementFragment> moves, final Point startPos) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.MOVE_PLAYER.getValue());
@@ -1085,7 +1029,7 @@ public class MaplePacketCreator
         PacketHelper.serializeMovementList(mplew, moves);
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket moveSummon(final int cid, final int oid, final Point startPos, final List<LifeMovementFragment> moves) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1103,7 +1047,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket summonAttack(final int cid, final int summonSkillId, final int newStance, final List<SummonAttackEntry> allDamage) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1126,7 +1070,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket closeRangeAttack(final int cid, final int tbyte, final int skill, final int level, final byte display, final byte animation, final byte speed, final List<AttackPair> damage, final boolean energy, final int lvl, final byte mastery, final byte unk, final int charge) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1139,8 +1083,7 @@ public class MaplePacketCreator
         if (skill > 0) {
             mplew.write(level);
             mplew.writeInt(skill);
-        }
-        else {
+        } else {
             mplew.write(0);
         }
         mplew.write(unk);
@@ -1160,8 +1103,7 @@ public class MaplePacketCreator
                     }
                 }
             }
-        }
-        else {
+        } else {
             for (final AttackPair oned : damage) {
                 if (oned.attack != null) {
                     mplew.writeInt(oned.objectid);
@@ -1169,8 +1111,7 @@ public class MaplePacketCreator
                     for (final Pair<Integer, Boolean> eachd : oned.attack) {
                         if (eachd.right) {
                             mplew.writeInt(eachd.left + Integer.MIN_VALUE);
-                        }
-                        else {
+                        } else {
                             mplew.writeInt(eachd.left);
                         }
                     }
@@ -1183,7 +1124,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket rangedAttack(final int cid, final byte tbyte, final int skill, final int level, final byte display, final byte animation, final byte speed, final int itemid, final List<AttackPair> damage, final Point pos, final int lvl, final byte mastery, final byte unk) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1196,8 +1137,7 @@ public class MaplePacketCreator
         if (skill > 0) {
             mplew.write(level);
             mplew.writeInt(skill);
-        }
-        else {
+        } else {
             mplew.write(0);
         }
         mplew.write(unk);
@@ -1213,8 +1153,7 @@ public class MaplePacketCreator
                 for (final Pair<Integer, Boolean> eachd : oned.attack) {
                     if (eachd.right) {
                         mplew.writeInt(eachd.left + Integer.MIN_VALUE);
-                    }
-                    else {
+                    } else {
                         mplew.writeInt(eachd.left);
                     }
                 }
@@ -1227,7 +1166,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket magicAttack(final int cid, final int tbyte, final int skill, final int level, final byte display, final byte animation, final byte speed, final List<AttackPair> damage, final int charge, final int lvl, final byte unk) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1252,8 +1191,7 @@ public class MaplePacketCreator
                 for (final Pair<Integer, Boolean> eachd : oned.attack) {
                     if (eachd.right) {
                         mplew.writeInt(eachd.left + Integer.MIN_VALUE);
-                    }
-                    else {
+                    } else {
                         mplew.writeInt(eachd.left);
                     }
                 }
@@ -1268,7 +1206,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getNPCShop(final MapleClient c, final int sid, final List<MapleShopItem> items) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         final MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
@@ -1284,8 +1222,7 @@ public class MaplePacketCreator
             if (!GameConstants.is飞镖道具(item.getItemId()) && !GameConstants.is子弹道具(item.getItemId())) {
                 mplew.writeShort(1);
                 mplew.writeShort(item.getBuyable());
-            }
-            else {
+            } else {
                 mplew.writeZeroBytes(6);
                 mplew.writeShort(BitTools.doubleToShortBits(ii.getPrice(item.getItemId())));
                 mplew.writeShort(ii.getSlotMax(c, item.getItemId()));
@@ -1297,7 +1234,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket confirmShopTransaction(final byte code) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1311,14 +1248,14 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket addInventorySlot(final MapleInventoryType type, final IItem item) {
         if (ServerConstants.调试输出封包) {
             System.out.println("addInventorySlotA--------------------");
         }
         return addInventorySlot(type, item, false);
     }
-    
+
     public static MaplePacket addInventorySlot(final MapleInventoryType type, final IItem item, final boolean fromDrop) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1336,7 +1273,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket pet_updateInventorySlot(final MapleInventoryType type, final IItem item, final boolean fromDrop) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1355,7 +1292,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket updateInventorySlot(final MapleInventoryType type, final IItem item, final boolean fromDrop) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1374,14 +1311,14 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket moveInventoryItem(final MapleInventoryType type, final short src, final short dst) {
         if (ServerConstants.调试输出封包) {
             System.out.println("moveInventoryItemA--------------------");
         }
-        return moveInventoryItem(type, src, dst, (short)(-1));
+        return moveInventoryItem(type, src, dst, (short) (-1));
     }
-    
+
     public static MaplePacket loveEffect() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(72);
@@ -1392,7 +1329,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket moveInventoryItem(final MapleInventoryType type, final short src, final short dst, final short equipIndicator) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1412,7 +1349,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket moveAndMergeInventoryItem(final MapleInventoryType type, final short src, final short dst, final short total) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1432,7 +1369,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket moveAndMergeWithRestInventoryItem(final MapleInventoryType type, final short src, final short dst, final short srcQ, final short dstQ) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1453,7 +1390,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket clearInventoryItem(final MapleInventoryType type, final short slot, final boolean fromDrop) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1470,14 +1407,14 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket updateSpecialItemUse(final IItem item, final byte invType) {
         if (ServerConstants.调试输出封包) {
             System.out.println("updateSpecialItemUseA--------------------");
         }
         return updateSpecialItemUse(item, invType, item.getPosition());
     }
-    
+
     public static MaplePacket updateSpecialItemUse(final IItem item, final byte invType, final short pos) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1493,8 +1430,7 @@ public class MaplePacketCreator
         mplew.write(invType);
         if (item.getType() == 1) {
             mplew.writeShort(pos);
-        }
-        else {
+        } else {
             mplew.write(pos);
         }
         PacketHelper.addItemInfo(mplew, item, true, true);
@@ -1507,14 +1443,14 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket updateSpecialItemUse_(final IItem item, final byte invType) {
         if (ServerConstants.调试输出封包) {
             System.out.println("updateSpecialItemUse_A--------------------");
         }
         return updateSpecialItemUse_(item, invType, item.getPosition());
     }
-    
+
     public static MaplePacket updateSpecialItemUse_(final IItem item, final byte invType, final short pos) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1527,8 +1463,7 @@ public class MaplePacketCreator
         mplew.write(invType);
         if (item.getType() == 1) {
             mplew.writeShort(pos);
-        }
-        else {
+        } else {
             mplew.write(pos);
         }
         PacketHelper.addItemInfo(mplew, item, true, true);
@@ -1541,7 +1476,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket scrolledItem(final IItem scroll, final IItem item, final boolean destroyed, final boolean potential) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1576,7 +1511,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getScrollEffect(final int chr, final IEquip.ScrollResult scrollSuccess, final boolean legendarySpirit) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1609,7 +1544,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket ItemMaker_Success() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1624,7 +1559,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket ItemMaker_Success_3rdParty(final int from_playerid) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1640,7 +1575,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket explodeDrop(final int oid) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1656,14 +1591,14 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket removeItemFromMap(final int oid, final int animation, final int cid) {
         if (ServerConstants.调试输出封包) {
             System.out.println("removeItemFromMapA--------------------");
         }
         return removeItemFromMap(oid, animation, cid, 0);
     }
-    
+
     public static MaplePacket removeItemFromMap(final int oid, final int animation, final int cid, final int slot) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1684,7 +1619,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket updateCharLook(final MapleCharacter chr) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1707,16 +1642,16 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     private static void addMarriageRingLook(final MaplePacketLittleEndianWriter mplew, final MapleCharacter chr) {
-        mplew.write((byte)((chr.getMarriageRing(false) != null) ? 1 : 0));
+        mplew.write((byte) ((chr.getMarriageRing(false) != null) ? 1 : 0));
         if (chr.getMarriageRing(false) != null) {
             mplew.writeInt(chr.getId());
             mplew.writeInt(chr.getMarriageRing(false).getPartnerChrId());
             mplew.writeInt(chr.getMarriageRing(false).getRingId());
         }
     }
-    
+
     public static void addRingInfo(final MaplePacketLittleEndianWriter mplew, final List<MapleRing> rings) {
         if (ServerConstants.调试输出封包) {
             System.out.println("addRingInfo--------------------");
@@ -1729,7 +1664,7 @@ public class MaplePacketCreator
             mplew.writeInt(ring.getItemId());
         }
     }
-    
+
     public static MaplePacket dropInventoryItem(final MapleInventoryType type, final short src) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1748,7 +1683,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket dropInventoryItemUpdate(final MapleInventoryType type, final IItem item) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1765,7 +1700,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket damagePlayer(final int skill, final int monsteridfrom, final int cid, final int damage, final int fake, final byte direction, final int reflect, final boolean is_pg, final int oid, final int pos_x, final int pos_y) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1785,8 +1720,7 @@ public class MaplePacketCreator
             mplew.writeShort(pos_x);
             mplew.writeShort(pos_y);
             mplew.write(0);
-        }
-        else {
+        } else {
             mplew.writeShort(0);
         }
         mplew.writeInt(damage);
@@ -1799,7 +1733,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket updateQuest(final MapleQuestStatus quest) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1829,7 +1763,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket updateInfoQuest(final int quest, final String data) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1845,7 +1779,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket updateQuestInfo(final MapleCharacter c, final int quest, final int npc, final byte progress) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1862,7 +1796,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket updateQuestFinish(final int quest, final int npc, final int nextquest) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1879,7 +1813,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket charInfo(final MapleCharacter chr, final boolean isSelf) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1905,11 +1839,11 @@ public class MaplePacketCreator
         }
         mplew.writeMapleAsciiString(guildName);
         mplew.writeMapleAsciiString(allianceName);
-        final IItem inv = chr.getInventory(MapleInventoryType.EQUIPPED).getItem((short)(-114));
+        final IItem inv = chr.getInventory(MapleInventoryType.EQUIPPED).getItem((short) (-114));
         final int peteqid = (inv != null) ? inv.getItemId() : 0;
-        final IItem inv2 = chr.getInventory(MapleInventoryType.EQUIPPED).getItem((short)(-122));
+        final IItem inv2 = chr.getInventory(MapleInventoryType.EQUIPPED).getItem((short) (-122));
         final int peteqid2 = (inv2 != null) ? inv2.getItemId() : 0;
-        final IItem inv3 = chr.getInventory(MapleInventoryType.EQUIPPED).getItem((short)(-124));
+        final IItem inv3 = chr.getInventory(MapleInventoryType.EQUIPPED).getItem((short) (-124));
         final int peteqid3 = (inv3 != null) ? inv3.getItemId() : 0;
         for (final MaplePet pet : chr.getPets()) {
             if (pet.getSummoned()) {
@@ -1924,21 +1858,20 @@ public class MaplePacketCreator
             }
         }
         mplew.write(0);
-        if (chr.getInventory(MapleInventoryType.EQUIPPED).getItem((short)(-18)) != null) {
-            final int itemid = chr.getInventory(MapleInventoryType.EQUIPPED).getItem((short)(-18)).getItemId();
+        if (chr.getInventory(MapleInventoryType.EQUIPPED).getItem((short) (-18)) != null) {
+            final int itemid = chr.getInventory(MapleInventoryType.EQUIPPED).getItem((short) (-18)).getItemId();
             final MapleMount mount = chr.getMount();
             final boolean canwear = MapleItemInformationProvider.getInstance().getReqLevel(itemid) <= chr.getLevel();
             mplew.write(canwear ? 1 : 0);
             mplew.writeInt(mount.getLevel());
             mplew.writeInt(mount.getExp());
             mplew.writeInt(mount.getFatigue());
-        }
-        else {
+        } else {
             mplew.write(0);
         }
         mplew.write(0);
         chr.getMonsterBook().addCharInfoPacket(chr.getMonsterBookCover(), mplew);
-        final IItem medal = chr.getInventory(MapleInventoryType.EQUIPPED).getItem((short)(-49));
+        final IItem medal = chr.getInventory(MapleInventoryType.EQUIPPED).getItem((short) (-49));
         mplew.writeInt((medal == null) ? 0 : medal.getItemId());
         final List<Integer> medalQuests = new ArrayList<Integer>();
         final List<MapleQuestStatus> completed = chr.getCompletedQuests();
@@ -1955,7 +1888,7 @@ public class MaplePacketCreator
         final List<Item> chairItems = new ArrayList<Item>();
         for (final IItem item : iv.list()) {
             if (item.getItemId() >= 3010000 && item.getItemId() <= 3020001) {
-                chairItems.add((Item)item);
+                chairItems.add((Item) item);
             }
         }
         mplew.writeInt(chairItems.size());
@@ -1966,7 +1899,7 @@ public class MaplePacketCreator
         final List<Item> 勋章列表Items = new ArrayList<Item>();
         for (final IItem item2 : 勋章列表.list()) {
             if (item2.getItemId() >= 1142000 && item2.getItemId() <= 1142999) {
-                勋章列表Items.add((Item)item2);
+                勋章列表Items.add((Item) item2);
             }
         }
         mplew.writeInt(勋章列表Items.size());
@@ -1979,7 +1912,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     private static void writeLongMask(final MaplePacketLittleEndianWriter mplew, final List<Pair<MapleBuffStat, Integer>> statups) {
         if (ServerConstants.调试输出封包) {
             System.out.println("writeLongMask--------------------");
@@ -1989,15 +1922,14 @@ public class MaplePacketCreator
         for (final Pair<MapleBuffStat, Integer> statup : statups) {
             if (statup.getLeft().isFirst()) {
                 firstmask |= statup.getLeft().getValue();
-            }
-            else {
+            } else {
                 secondmask |= statup.getLeft().getValue();
             }
         }
         mplew.writeLong(firstmask);
         mplew.writeLong(secondmask);
     }
-    
+
     private static void writeLongDiseaseMask(final MaplePacketLittleEndianWriter mplew, final List<Pair<MapleDisease, Integer>> statups) {
         if (ServerConstants.调试输出封包) {
             System.out.println("writeLongDiseaseMask--------------------");
@@ -2007,15 +1939,14 @@ public class MaplePacketCreator
         for (final Pair<MapleDisease, Integer> statup : statups) {
             if (statup.getLeft().isFirst()) {
                 firstmask |= statup.getLeft().getValue();
-            }
-            else {
+            } else {
                 secondmask |= statup.getLeft().getValue();
             }
         }
         mplew.writeLong(firstmask);
         mplew.writeLong(secondmask);
     }
-    
+
     private static void writeLongMaskFromListM(final MaplePacketLittleEndianWriter mplew, final List<MapleBuffStat> statups) {
         if (ServerConstants.调试输出封包) {
             System.out.println("writeLongMaskFromList--------------------");
@@ -2026,8 +1957,7 @@ public class MaplePacketCreator
         for (final MapleBuffStat statup : statups) {
             if (statup.isFirst()) {
                 firstmask |= statup.getValue();
-            }
-            else {
+            } else {
                 secondmask |= statup.getValue();
             }
         }
@@ -2035,7 +1965,7 @@ public class MaplePacketCreator
         mplew.writeInt(0);
         mplew.writeZeroBytes(3);
     }
-    
+
     private static void writeLongMaskFromList(final MaplePacketLittleEndianWriter mplew, final List<MapleBuffStat> statups) {
         if (ServerConstants.调试输出封包) {
             System.out.println("writeLongMaskFromList--------------------");
@@ -2045,8 +1975,7 @@ public class MaplePacketCreator
         for (final MapleBuffStat statup : statups) {
             if (statup.isFirst()) {
                 firstmask |= statup.getValue();
-            }
-            else {
+            } else {
                 secondmask |= statup.getValue();
             }
         }
@@ -2062,8 +1991,8 @@ public class MaplePacketCreator
         mplew.write(0);
         writeLongMask(mplew, statups);
         for (Pair<MapleBuffStat, Integer> statup : statups) {
-            if (((Integer)statup.getRight()).shortValue() >= 1000 && ((Integer)statup.getRight()).shortValue() != 1002) {
-                mplew.writeShort(((Integer)statup.getRight()).shortValue() + c.getGender() * 100);
+            if (((Integer) statup.getRight()).shortValue() >= 1000 && ((Integer) statup.getRight()).shortValue() != 1002) {
+                mplew.writeShort(((Integer) statup.getRight()).shortValue() + c.getGender() * 100);
             } else {
                 mplew.write(0);
             }
@@ -2147,7 +2076,7 @@ public class MaplePacketCreator
         }
         return a;
     }
-    
+
     public static MaplePacket givePirate(final List<Pair<MapleBuffStat, Integer>> statups, final int duration, final int skillid) {
         final boolean infusion = skillid == 5121009 || skillid == 15111005;
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
@@ -2169,7 +2098,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket giveForeignPirate(final List<Pair<MapleBuffStat, Integer>> statups, final int duration, final int cid, final int skillid) {
         final boolean infusion = skillid == 5121009 || skillid == 15111005;
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
@@ -2193,7 +2122,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket giveHoming(final int skillid, final int mobid, final int x) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2214,7 +2143,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket giveEnergyChargeTest(final int bar, final int bufflength) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2242,7 +2171,7 @@ public class MaplePacketCreator
         mplew.writeLong(0L);
         mplew.writeShort(0);
         for (Pair<MapleBuffStat, Integer> statup : statups) {
-            mplew.writeShort(((Integer)statup.getRight()).shortValue());
+            mplew.writeShort(((Integer) statup.getRight()).shortValue());
             mplew.writeShort(0);
             mplew.writeInt(buffid);
             mplew.writeInt(0);
@@ -2266,7 +2195,7 @@ public class MaplePacketCreator
         mplew.writeLong(0L);
         mplew.write(0);
         for (Pair<MapleBuffStat, Integer> stat : statups) {
-            mplew.writeInt(((Integer)stat.getRight()).shortValue());
+            mplew.writeInt(((Integer) stat.getRight()).shortValue());
             mplew.writeInt(0);
             mplew.writeInt(0);
             mplew.write(0);
@@ -2286,7 +2215,7 @@ public class MaplePacketCreator
         mplew.writeLong(0L);
         mplew.write(0);
         for (Pair<MapleBuffStat, Integer> stat : statups) {
-            mplew.writeInt(((Integer)stat.getRight()).shortValue());
+            mplew.writeInt(((Integer) stat.getRight()).shortValue());
             mplew.writeInt(0);
             mplew.writeInt(0);
             mplew.write(0);
@@ -2320,7 +2249,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket giveBuff(final int buffid, final int bufflength, final List<Pair<MapleBuffStat, Integer>> statups, final MapleStatEffect effect) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2344,7 +2273,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket giveDebuff(final List<Pair<MapleDisease, Integer>> statups, final int skillid, final int level, final int duration) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2367,7 +2296,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket giveForeignDebuff(final int cid, final List<Pair<MapleDisease, Integer>> statups, final int skillid, final int level) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2387,7 +2316,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket cancelForeignDebuff(final int cid, final long mask, final boolean first) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2403,7 +2332,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showMonsterRiding(final int cid, final List<Pair<MapleBuffStat, Integer>> statups, final int itemId, final int skillId) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2434,15 +2363,15 @@ public class MaplePacketCreator
         mplew.writeInt(cid);
         writeLongMask(mplew, statups);
         for (Pair<MapleBuffStat, Integer> statup : statups) {
-            if (effect.isMorph() && ((Integer)statup.getRight()).intValue() <= 255) {
-                mplew.write(((Integer)statup.getRight()).byteValue());
+            if (effect.isMorph() && ((Integer) statup.getRight()).intValue() <= 255) {
+                mplew.write(((Integer) statup.getRight()).byteValue());
                 continue;
             }
             if (effect.isPirateMorph()) {
-                mplew.writeShort(((Integer)statup.getRight()).shortValue() + c.getGender() * 100);
+                mplew.writeShort(((Integer) statup.getRight()).shortValue() + c.getGender() * 100);
                 continue;
             }
-            mplew.writeShort(((Integer)statup.getRight()).shortValue());
+            mplew.writeShort(((Integer) statup.getRight()).shortValue());
         }
         mplew.writeShort(0);
         if (effect.isMorph() && !effect.isPirateMorph())
@@ -2470,7 +2399,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket cancelForeignBuffMONSTER(final int cid, final List<MapleBuffStat> statups) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2485,7 +2414,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket cancelBuffMONSTER(final List<MapleBuffStat> statups) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2500,7 +2429,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket cancelBuff(final List<MapleBuffStat> statups) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2515,7 +2444,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket cancelHoming() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2530,7 +2459,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket cancelDebuff(final long mask, final boolean first) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2546,7 +2475,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket updateMount(final MapleCharacter chr, final boolean levelup) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2564,7 +2493,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket mountInfo(final MapleCharacter chr) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2582,7 +2511,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getPlayerShopNewVisitor(final MapleCharacter c, final int slot) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2598,7 +2527,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getPlayerShopRemoveVisitor(final int slot) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2612,7 +2541,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getTradePartnerAdd(final MapleCharacter c) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2629,7 +2558,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getTradeInvite(final MapleCharacter c, final boolean 现金交易) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2646,7 +2575,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getTradeMesoSet(final byte number, final int meso) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2662,7 +2591,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getTradeItemAdd(final byte number, final IItem item) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2678,7 +2607,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getTradeStart(final MapleClient c, final MapleTrade trade, final byte number, final boolean 现金交易) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2704,7 +2633,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getTradeConfirmation() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2718,7 +2647,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket TradeMessage(final byte UserSlot, final byte message) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2734,7 +2663,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getTradeCancel(final byte UserSlot, final int unsuccessful) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2750,7 +2679,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getNPCTalk(final int npc, final byte msgType, final String talk, final String endBytes, final byte type) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2769,7 +2698,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getMapSelection(final int npcid, final String sel) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2788,7 +2717,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getNPCTalkStyle(final int npc, final String talk, final int card, final int[] args) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2810,7 +2739,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getNPCTalkNum(final int npc, final String talk, final int def, final int min, final int max) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2831,7 +2760,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getNPCTalkText(final int npc, final String talk) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2850,7 +2779,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showForeignEffect(final int cid, final int effect) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2865,14 +2794,14 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showBuffeffect(final int cid, final int skillid, final int effectid) {
         if (ServerConstants.调试输出封包) {
             System.out.println("showBuffeffect--------------------");
         }
-        return showBuffeffect(cid, skillid, effectid, (byte)3);
+        return showBuffeffect(cid, skillid, effectid, (byte) 3);
     }
-    
+
     public static MaplePacket showBuffeffect(final int cid, final int skillid, final int effectid, final byte direction) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2893,14 +2822,14 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showOwnBuffEffect(final int skillid, final int effectid) {
         if (ServerConstants.调试输出封包) {
             System.out.println("showOwnBuffEffectA--------------------");
         }
-        return showOwnBuffEffect(skillid, effectid, (byte)3);
+        return showOwnBuffEffect(skillid, effectid, (byte) 3);
     }
-    
+
     public static MaplePacket showOwnBuffEffect(final int skillid, final int effectid, final byte direction) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2920,33 +2849,33 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showItemLevelupEffect() {
         if (ServerConstants.调试输出封包) {
             System.out.println("showItemLevelupEffect--------------------");
         }
         return showSpecialEffect(17);
     }
-    
+
     public static MaplePacket showMonsterBookPickup() {
         return showSpecialEffect(14);
     }
-    
+
     public static MaplePacket showEquipmentLevelUp() {
         return showSpecialEffect(17);
     }
-    
+
     public static MaplePacket showItemLevelup() {
         return showSpecialEffect(17);
     }
-    
+
     public static MaplePacket showForeignItemLevelupEffect(final int cid) {
         if (ServerConstants.调试输出封包) {
             System.out.println("showForeignItemLevelupEffect--------------------");
         }
         return showSpecialEffect(cid, 17);
     }
-    
+
     public static MaplePacket showSpecialEffect(final int effect) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2960,7 +2889,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showSpecialEffect(final int cid, final int effect) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2975,7 +2904,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket updateSkill(final int skillid, final int level, final int masterlevel, final long expiration) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -2994,7 +2923,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket updateQuestMobKills(final MapleQuestStatus status) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3016,7 +2945,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket 游戏屏幕中间黄色字体(final String status) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3034,7 +2963,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket 游戏屏幕中间黄色字体(final String status, final int id) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3052,7 +2981,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getShowQuestCompletion(final int id) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3066,7 +2995,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getKeymap(final MapleKeyLayout layout) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3081,7 +3010,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getWhisper(final String sender, final int channel, final String text) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3098,7 +3027,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getWhisperReply(final String target, final byte reply) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3114,7 +3043,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getFindReplyWithMap(final String target, final int mapid, final boolean buddy) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3132,7 +3061,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getFindReply(final String target, final int channel, final boolean buddy) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3149,7 +3078,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getInventoryFull() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3164,21 +3093,21 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getShowInventoryFull() {
         if (ServerConstants.调试输出封包) {
             System.out.println("getShowInventoryFull--------------------");
         }
         return getShowInventoryStatus(255);
     }
-    
+
     public static MaplePacket showItemUnavailable() {
         if (ServerConstants.调试输出封包) {
             System.out.println("showItemUnavailable--------------------");
         }
         return getShowInventoryStatus(254);
     }
-    
+
     public static MaplePacket getShowInventoryStatus(final int mode) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3195,7 +3124,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getStorage(final int npcId, final byte slots, final Collection<IItem> items, final int meso) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3209,12 +3138,11 @@ public class MaplePacketCreator
         mplew.writeShort(0);
         mplew.writeInt(0);
         mplew.writeInt(meso);
-        mplew.write((byte)items.size());
+        mplew.write((byte) items.size());
         for (final IItem item : items) {
             if (GameConstants.is豆豆装备(item.getItemId())) {
                 PacketHelper.addDDItemInfo(mplew, item, true, true, false);
-            }
-            else {
+            } else {
                 PacketHelper.addItemInfo(mplew, item, true, true);
             }
         }
@@ -3226,7 +3154,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getStorageFull() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3241,7 +3169,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket mesoStorage(final byte slots, final int meso) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3260,7 +3188,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket storeStorage(final byte slots, final MapleInventoryType type, final Collection<IItem> items) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3282,7 +3210,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket takeOutStorage(final byte slots, final MapleInventoryType type, final Collection<IItem> items) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3304,7 +3232,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket fairyPendantMessage(final int type, final int percent) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3322,7 +3250,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket giveFameResponse(final int mode, final String charname, final int newfame) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3340,7 +3268,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket giveFameErrorResponse(final int status) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3354,7 +3282,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket receiveFame(final int mode, final String charnameFrom) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3370,7 +3298,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket partyCreated(final int partyid) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3388,7 +3316,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket partyInvite(final MapleCharacter from) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3405,7 +3333,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket partyStatusMessage(final int message) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3419,7 +3347,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket partyStatusMessage(final int message, final String charname) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3434,7 +3362,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     private static void addPartyStatus(final int forchannel, final MapleParty party, final LittleEndianWriter lew, final boolean leaving) {
         if (ServerConstants.调试输出封包) {
             System.out.println("addPartyStatus--------------------");
@@ -3458,8 +3386,7 @@ public class MaplePacketCreator
         for (final MaplePartyCharacter partychar : partymembers) {
             if (partychar.isOnline()) {
                 lew.writeInt(partychar.getChannel() - 1);
-            }
-            else {
+            } else {
                 lew.writeInt(-2);
             }
         }
@@ -3467,8 +3394,7 @@ public class MaplePacketCreator
         for (final MaplePartyCharacter partychar : partymembers) {
             if (partychar.getChannel() == forchannel) {
                 lew.writeInt(partychar.getMapid());
-            }
-            else {
+            } else {
                 lew.writeInt(0);
             }
         }
@@ -3478,8 +3404,7 @@ public class MaplePacketCreator
                 lew.writeInt(partychar.getDoorTarget());
                 lew.writeInt(partychar.getDoorPosition().x);
                 lew.writeInt(partychar.getDoorPosition().y);
-            }
-            else {
+            } else {
                 lew.writeInt(0);
                 lew.writeInt(0);
                 lew.writeInt(0);
@@ -3487,7 +3412,7 @@ public class MaplePacketCreator
             }
         }
     }
-    
+
     public static MaplePacket updateParty(final int forChannel, final MapleParty party, final PartyOperation op, final MaplePartyCharacter target) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3538,7 +3463,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket partyPortal(final int townId, final int targetId, final int skillId, final Point position) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3555,7 +3480,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket updatePartyMemberHP(final int cid, final int curhp, final int maxhp) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3571,7 +3496,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket multiChat(final String name, final String chattext, final int mode) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3587,7 +3512,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getClock(final int time) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3602,7 +3527,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getClockTime(final int hour, final int min, final int sec) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3619,7 +3544,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket spawnMist(final MapleMist mist) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3631,8 +3556,7 @@ public class MaplePacketCreator
         mplew.writeInt(mist.getOwnerId());
         if (mist.getMobSkill() == null) {
             mplew.writeInt(mist.getSourceSkill().getId());
-        }
-        else {
+        } else {
             mplew.writeInt(mist.getMobSkill().getSkillId());
         }
         mplew.write(mist.getSkillLevel());
@@ -3648,7 +3572,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket removeMist(final int oid, final boolean eruption) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3662,7 +3586,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket damageSummon(final int cid, final int summonSkillId, final int damage, final int unkByte, final int monsterIdFrom) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3681,7 +3605,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket buddylistMessage(final byte message) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3695,7 +3619,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket updateBuddylist(final Collection<BuddyEntry> buddylist) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3722,7 +3646,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket requestBuddylistAdd(final int cidFrom, final String nameFrom, final int levelFrom, final int jobFrom) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3746,7 +3670,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket updateBuddyChannel(final int characterid, final int channel) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3763,7 +3687,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket itemEffect(final int characterid, final int itemid) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3778,7 +3702,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket itemEffects(final int characterid, final int itemid) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3793,7 +3717,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket updateBuddyCapacity(final int capacity) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3808,7 +3732,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showChair(final int characterid, final int itemid) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3823,7 +3747,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket cancelChair(final int id) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3832,8 +3756,7 @@ public class MaplePacketCreator
         mplew.writeShort(SendPacketOpcode.CANCEL_CHAIR.getValue());
         if (id == -1) {
             mplew.write(0);
-        }
-        else {
+        } else {
             mplew.write(1);
             mplew.writeShort(id);
         }
@@ -3843,7 +3766,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket spawnReactor(final MapleReactor reactor) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3861,7 +3784,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket triggerReactor(final MapleReactor reactor, final int stance) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3878,7 +3801,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket destroyReactor(final MapleReactor reactor) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3894,28 +3817,28 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket musicChange(final String song) {
         if (ServerConstants.调试输出封包) {
             System.out.println("musicChange--------------------");
         }
         return environmentChange(song, 6);
     }
-    
+
     public static MaplePacket showEffect(final String effect) {
         if (ServerConstants.调试输出封包) {
             System.out.println("showEffect--------------------");
         }
         return environmentChange(effect, 3);
     }
-    
+
     public static MaplePacket playSound(final String sound) {
         if (ServerConstants.调试输出封包) {
             System.out.println("playSound--------------------");
         }
         return environmentChange(sound, 4);
     }
-    
+
     public static MaplePacket environmentChange(final String env, final int mode) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3930,7 +3853,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket startMapEffect(final String msg, final int itemid, final boolean active) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3948,7 +3871,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket removeMapEffect() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -3963,7 +3886,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket fuckGuildInfo(final MapleCharacter c) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4005,7 +3928,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showGuildInfo(final MapleCharacter c) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4032,7 +3955,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     private static void getGuildInfo(final MaplePacketLittleEndianWriter mplew, final MapleGuild guild) {
         if (ServerConstants.调试输出封包) {
             System.out.println("getGuildInfo--------------------");
@@ -4052,7 +3975,7 @@ public class MaplePacketCreator
         mplew.writeInt(guild.getGP());
         mplew.writeInt((guild.getAllianceId() > 0) ? guild.getAllianceId() : 0);
     }
-    
+
     private static void getGuildInfo2(final MaplePacketLittleEndianWriter mplew, final MapleGuild guild, final MapleCharacter chr) {
         if (ServerConstants.调试输出封包) {
             System.out.println("getGuildInfo2--------------------");
@@ -4072,7 +3995,7 @@ public class MaplePacketCreator
         mplew.writeInt(guild.getGP());
         mplew.writeInt((guild.getAllianceId() > 0) ? guild.getAllianceId() : 0);
     }
-    
+
     public static MaplePacket guildMemberOnline(final int gid, final int cid, final boolean bOnline) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4089,7 +4012,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket guildInvite(final int gid, final String charName, final int levelFrom, final int jobFrom) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4105,7 +4028,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket denyGuildInvitation(final String charname) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4120,7 +4043,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket genericGuildMessage(final byte code) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4134,7 +4057,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket newGuildMember(final MapleGuildCharacter mgc) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4157,7 +4080,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket memberLeft(final MapleGuildCharacter mgc, final boolean bExpelled) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4174,7 +4097,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket changeRank(final MapleGuildCharacter mgc) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4191,7 +4114,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket guildNotice(final int gid, final String notice) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4207,7 +4130,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket guildMemberLevelJobUpdate(final MapleGuildCharacter mgc) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4225,7 +4148,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket rankTitleChange(final int gid, final String[] ranks) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4243,7 +4166,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket guildDisband(final int gid) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4259,7 +4182,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket guildEmblemChange(final int gid, final short bg, final byte bgcolor, final short logo, final byte logocolor) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4278,7 +4201,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket guildCapacityChange(final int gid, final int capacity) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4294,7 +4217,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket removeGuildFromAlliance(final MapleGuildAlliance alliance, final MapleGuild expelledGuild, final boolean expelled) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4311,7 +4234,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket changeAlliance(final MapleGuildAlliance alliance, final boolean in) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4336,7 +4259,7 @@ public class MaplePacketCreator
             mplew.writeInt(members.size());
             for (final MapleGuildCharacter mgc : members) {
                 mplew.writeInt(mgc.getId());
-                mplew.write((byte)(in ? mgc.getAllianceRank() : 0));
+                mplew.write((byte) (in ? mgc.getAllianceRank() : 0));
             }
         }
         if (ServerConstants.PACKET_ERROR_OFF) {
@@ -4345,7 +4268,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket changeAllianceLeader(final int allianceid, final int newLeader, final int oldLeader) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4362,7 +4285,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket updateAllianceLeader(final int allianceid, final int newLeader, final int oldLeader) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4379,7 +4302,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket sendAllianceInvite(final String allianceName, final MapleCharacter inviter) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4396,7 +4319,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket changeGuildInAlliance(final MapleGuildAlliance alliance, final MapleGuild guild, final boolean add) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4410,7 +4333,7 @@ public class MaplePacketCreator
         mplew.writeInt(members.size());
         for (final MapleGuildCharacter mgc : members) {
             mplew.writeInt(mgc.getId());
-            mplew.write((byte)(add ? mgc.getAllianceRank() : 0));
+            mplew.write((byte) (add ? mgc.getAllianceRank() : 0));
         }
         if (ServerConstants.PACKET_ERROR_OFF) {
             final ServerConstants ERROR = new ServerConstants();
@@ -4418,7 +4341,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket changeAllianceRank(final int allianceid, final MapleGuildCharacter player) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4435,7 +4358,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket createGuildAlliance(final MapleGuildAlliance alliance) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4461,7 +4384,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getAllianceInfo(final MapleGuildAlliance alliance) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4479,7 +4402,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getAllianceUpdate(final MapleGuildAlliance alliance) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4494,7 +4417,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getGuildAlliance(final MapleGuildAlliance alliance) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4524,7 +4447,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket addGuildToAlliance(final MapleGuildAlliance alliance, final MapleGuild newGuild) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4542,7 +4465,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     private static void addAllianceInfo(final MaplePacketLittleEndianWriter mplew, final MapleGuildAlliance alliance) {
         if (ServerConstants.调试输出封包) {
             System.out.println("addAllianceInfo--------------------");
@@ -4559,7 +4482,7 @@ public class MaplePacketCreator
         mplew.writeInt(alliance.getCapacity());
         mplew.writeMapleAsciiString(alliance.getNotice());
     }
-    
+
     public static MaplePacket allianceMemberOnline(final int alliance, final int gid, final int id, final boolean online) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4577,7 +4500,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket updateAlliance(final MapleGuildCharacter mgc, final int allianceid) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4596,7 +4519,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket updateAllianceRank(final int allianceid, final MapleGuildCharacter mgc) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4613,7 +4536,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket disbandAlliance(final int alliance) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4628,7 +4551,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket BBSThreadList(final List<MapleBBSThread> bbs, int start) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4670,7 +4593,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     private static void addThread(final MaplePacketLittleEndianWriter mplew, final MapleBBSThread rs) {
         if (ServerConstants.调试输出封包) {
             System.out.println("addThread--------------------");
@@ -4682,7 +4605,7 @@ public class MaplePacketCreator
         mplew.writeInt(rs.icon);
         mplew.writeInt(rs.getReplyCount());
     }
-    
+
     public static MaplePacket showThread(final MapleBBSThread thread) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4709,7 +4632,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showGuildRanks(final int npcid, final List<MapleGuildRanking.GuildRankingInfo> all) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4754,7 +4677,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showlevelRanks(final int npcid, final List<MapleGuildRanking.levelRankingInfo> all) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.GUILD_OPERATION.getValue());
@@ -4775,7 +4698,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showGuildRanks(final int npcid, final ResultSet rs) throws SQLException {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.GUILD_OPERATION.getValue());
@@ -4801,7 +4724,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showLevelRanks(final int npcid, final ResultSet rs) throws SQLException {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.GUILD_OPERATION.getValue());
@@ -4827,7 +4750,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showMesoRanks(final int npcid, final ResultSet rs) throws SQLException {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.GUILD_OPERATION.getValue());
@@ -4853,7 +4776,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket MapleMSpvpdeaths(final int npcid, final ResultSet rs) throws SQLException {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.GUILD_OPERATION.getValue());
@@ -4875,7 +4798,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showCustomRanks(final int npcid, final ResultSet rs) throws SQLException {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.GUILD_OPERATION.getValue());
@@ -4897,7 +4820,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket MapleMSpvpkills(final int npcid, final ResultSet rs) throws SQLException {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.GUILD_OPERATION.getValue());
@@ -4919,7 +4842,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showRQRanks(final int npcid, final ResultSet rs) throws SQLException {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.GUILD_OPERATION.getValue());
@@ -4945,7 +4868,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showVipRanks(final int npcid, final ResultSet rs) throws SQLException {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.GUILD_OPERATION.getValue());
@@ -4971,7 +4894,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket updateGP(final int gid, final int GP) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -4987,7 +4910,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket skillEffect(final MapleCharacter from, final int skillId, final byte level, final byte flags, final byte speed, final byte unk) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5006,7 +4929,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket skillCancel(final MapleCharacter from, final int skillId) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5021,7 +4944,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showMagnet(final int mobid, final byte success) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5036,7 +4959,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket sendHint(final String hint, int width, int height) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5062,7 +4985,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket messengerInvite(final String from, final int messengerid) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5080,7 +5003,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket addMessengerPlayer(final String from, final MapleCharacter chr, final int position, final int channel) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5098,7 +5021,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket removeMessengerPlayer(final int position) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5113,7 +5036,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket updateMessengerPlayer(final String from, final MapleCharacter chr, final int position, final int channel) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5131,7 +5054,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket joinMessenger(final int position) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5146,7 +5069,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket messengerChat(final String text) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5161,7 +5084,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket messengerNote(final String text, final int mode, final int mode2) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5177,7 +5100,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getFindReplyWithCS(final String target, final boolean buddy) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5194,7 +5117,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getFindReplyWithMTS(final String target, final boolean buddy) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5211,7 +5134,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showEquipEffect() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5224,7 +5147,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showEquipEffect(final int team) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5238,7 +5161,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket summonSkill(final int cid, final int summonSkillId, final int newStance) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5254,7 +5177,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket skillCooldown(final int sid, final int time) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5269,7 +5192,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket useSkillBook(final MapleCharacter chr, final int skillid, final int maxlevel, final boolean canuse, final boolean success) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5288,7 +5211,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getMacros(final SkillMacro[] macros) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5318,7 +5241,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket updateAriantPQRanking(final String name, final int score, final boolean empty) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5336,13 +5259,14 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket catchMonster(final int mobid, final int itemid, final byte success) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
             System.out.println("catchMonster--------------------");
         }
-        if (itemid == 2270002) {}
+        if (itemid == 2270002) {
+        }
         mplew.writeShort(153);
         mplew.writeInt(mobid);
         mplew.writeInt(itemid);
@@ -5353,7 +5277,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showAriantScoreBoard() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5371,7 +5295,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket boatPacket(final boolean type) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5385,7 +5309,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket boatPacket(final int effect) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5399,7 +5323,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket boatEffect(final int effect) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5413,7 +5337,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket removeItemFromDuey(final boolean remove, final int Package) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5429,7 +5353,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket sendDuey(final byte operation, final List<MapleDueyActions> packages) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5454,8 +5378,7 @@ public class MaplePacketCreator
                     if (dp.getItem() != null) {
                         mplew.write(1);
                         PacketHelper.addItemInfo(mplew, dp.getItem(), true, true);
-                    }
-                    else {
+                    } else {
                         mplew.write(0);
                     }
                 }
@@ -5469,7 +5392,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket Mulung_DojoUp2() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5483,7 +5406,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket dojoWarpUp() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.DOJO_WARP_UP.getValue());
@@ -5495,7 +5418,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showQuestMsg(final String msg) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5510,21 +5433,21 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket HSText(final String m) {
         if (ServerConstants.调试输出封包) {
             System.out.println("Mulung_Pts--------------------");
         }
         return showQuestMsg(m);
     }
-    
+
     public static MaplePacket Mulung_Pts(final int recv, final int total) {
         if (ServerConstants.调试输出封包) {
             System.out.println("Mulung_Pts--------------------");
         }
         return showQuestMsg("你获得 " + recv + " 修炼点数, 目前累计了 " + total + " 点修炼点数");
     }
-    
+
     public static MaplePacket showOXQuiz(final int questionSet, final int questionId, final boolean askQuestion) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5540,7 +5463,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket leftKnockBack() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5553,7 +5476,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket rollSnowball(final int type, final MapleSnowball.MapleSnowballs ball1, final MapleSnowball.MapleSnowballs ball2) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5573,14 +5496,14 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket enterSnowBall() {
         if (ServerConstants.调试输出封包) {
             System.out.println("enterSnowBall--------------------");
         }
         return rollSnowball(0, null, null);
     }
-    
+
     public static MaplePacket hitSnowBall(final int team, final int damage, final int distance, final int delay) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5597,7 +5520,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket snowballMessage(final int team, final int message) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5612,7 +5535,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket finishedSort(final int type) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5627,7 +5550,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket coconutScore(final int[] coconutscore) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5642,7 +5565,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket hitCoconut(final boolean spawn, final int id, final int type) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5652,8 +5575,7 @@ public class MaplePacketCreator
         if (spawn) {
             mplew.write(0);
             mplew.writeInt(128);
-        }
-        else {
+        } else {
             mplew.writeInt(id);
             mplew.write(type);
         }
@@ -5663,7 +5585,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket finishedGather(final int type) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5678,7 +5600,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket yellowChat(final String msg) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5693,7 +5615,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket sendLevelup(final boolean family, final int level, final String name) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5709,7 +5631,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket sendMarriage(final boolean family, final String name) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5724,7 +5646,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket sendJobup(final boolean family, final int jobid, final String name) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5740,7 +5662,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showZakumShrine(final boolean spawned, final int time) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5755,7 +5677,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showHorntailShrine(final boolean spawned, final int time) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5770,7 +5692,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showChaosZakumShrine(final boolean spawned, final int time) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5785,7 +5707,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showChaosHorntailShrine(final boolean spawned, final int time) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5800,7 +5722,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket stopClock() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5813,7 +5735,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket addTutorialStats() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(0);
         if (ServerConstants.调试输出封包) {
@@ -5836,7 +5758,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket temporaryStats_Aran() {
         if (ServerConstants.调试输出封包) {
             System.out.println("temporaryStats_Aran--------------------");
@@ -5853,7 +5775,7 @@ public class MaplePacketCreator
         stats.add(new Pair<MapleStat.Temp, Integer>(MapleStat.Temp.JUMP, 120));
         return temporaryStats(stats);
     }
-    
+
     public static MaplePacket temporaryStats_Balrog(final MapleCharacter chr) {
         if (ServerConstants.调试输出封包) {
             System.out.println("temporaryStats_Balrog--------------------");
@@ -5868,7 +5790,7 @@ public class MaplePacketCreator
         stats.add(new Pair<MapleStat.Temp, Integer>(MapleStat.Temp.MATK, chr.getStat().getTotalMagic() / offset));
         return temporaryStats(stats);
     }
-    
+
     public static MaplePacket temporaryStats(final List<Pair<MapleStat.Temp, Integer>> stats) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5896,8 +5818,7 @@ public class MaplePacketCreator
             if (value >= 1) {
                 if (value <= 512) {
                     mplew.writeShort(statupdate2.getRight().shortValue());
-                }
-                else {
+                } else {
                     mplew.write(statupdate2.getRight().byteValue());
                 }
             }
@@ -5908,7 +5829,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket temporaryStats_Reset() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5921,7 +5842,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showHpHealed(final int cid, final int amount) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5937,7 +5858,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showOwnHpHealed(final int amount) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5952,7 +5873,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket sendPyramidUpdate(final int amount) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5966,7 +5887,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket sendPyramidResult(final byte rank, final int amount) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5981,7 +5902,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket sendMarrageEffect() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -5994,7 +5915,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket sendPyramidEnergy(final String type, final String amount) {
         if (ServerConstants.调试输出封包) {
             System.out.println("sendPyramidEnergy--------------------");
@@ -6025,28 +5946,28 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket sendGhostPoint(final String type, final String amount) {
         if (ServerConstants.调试输出封包) {
             System.out.println("sendGhostPoint--------------------");
         }
         return sendString(2, type, amount);
     }
-    
+
     public static MaplePacket sendGhostStatus(final String type, final String amount) {
         if (ServerConstants.调试输出封包) {
             System.out.println("sendGhostStatus--------------------");
         }
         return sendString(3, type, amount);
     }
-    
+
     public static MaplePacket MulungEnergy(final int energy) {
         if (ServerConstants.调试输出封包) {
             System.out.println("MulungEnergy--------------------");
         }
         return sendPyramidEnergy("energy", String.valueOf(energy));
     }
-    
+
     public static MaplePacket getEvanTutorial(final String data) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6065,7 +5986,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showEventInstructions() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6079,7 +6000,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getOwlOpen() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6097,7 +6018,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getOwlSearched(final int itemSearch, final List<HiredMerchant> hms) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6148,7 +6069,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getRPSMode(final byte mode, final int mesos, final int selection, final int answer) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6180,7 +6101,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getSlotUpdate(final byte invType, final byte newSlots) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6195,7 +6116,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getMovingPlatforms(final MapleMap map) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6225,7 +6146,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getUpdateEnvironment(final MapleMap map) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6243,7 +6164,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket sendEngagementRequest(final String name, final int cid) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6259,7 +6180,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket trembleEffect(final int type, final int delay) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6275,7 +6196,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket sendEngagement(final byte msg, final int item, final MapleCharacter male, final MapleCharacter female) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6302,7 +6223,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket englishQuizMsg(final String msg) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6317,7 +6238,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket openBeans(final int beansCount, final int type) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6332,7 +6253,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket updateBeans(final int cid, final int beansCount) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6348,7 +6269,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showBeans(final int 力度, final int size, final int Pos, final int Type) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6365,7 +6286,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showCharCash(final MapleCharacter chr) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6380,7 +6301,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket spawnLove(final int oid, final int itemid, final String name, final String msg, final Point pos, final int ft) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6399,7 +6320,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket removeLove(final int oid) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6413,7 +6334,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket licenseRequest() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6427,7 +6348,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket licenseResult() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6441,7 +6362,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showForcedEquip() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6455,7 +6376,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket removeTutorialStats() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6468,7 +6389,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket spawnTutorialSummon(final int type) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6482,7 +6403,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket requestBuddylistAdd(final int cidFrom, final String nameFrom) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.BUDDYLIST.getValue());
@@ -6503,7 +6424,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket sendAutoHpPot(final int itemId) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.AUTO_HP_POT.getValue());
@@ -6514,7 +6435,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket sendAutoMpPot(final int itemId) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.AUTO_MP_POT.getValue());
@@ -6525,7 +6446,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket testPacket(final byte[] testmsg) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.write(testmsg);
@@ -6535,7 +6456,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket updateAriantScore(final List<MapleCharacter> players) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.ARIANT_SCORE_UPDATE.getValue());
@@ -6552,7 +6473,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket updateAriantScore(final String name, final int score, final boolean empty) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.ARIANT_SCORE_UPDATE.getValue());
@@ -6567,11 +6488,11 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket modifyInventory(final boolean updateTick, final ModifyInventory mod) {
         return modifyInventory(updateTick, Collections.singletonList(mod));
     }
-    
+
     public static MaplePacket modifyInventory(final boolean updateTick, final List<ModifyInventory> mods) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.MODIFY_INVENTORY_ITEM.getValue());
@@ -6618,7 +6539,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket petAutoHP(final int itemId) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.AUTO_HP_POT.getValue());
@@ -6629,7 +6550,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket petAutoMP(final int itemId) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.AUTO_MP_POT.getValue());
@@ -6640,7 +6561,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket catchMob(final int mobid, final int itemid, final byte success) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(80);
@@ -6653,11 +6574,11 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket serverMessagePopUp(final String message) {
         return serverMessage(1, 0, message, false);
     }
-    
+
     public static MaplePacket updateEquipSlot(final IItem item) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6678,7 +6599,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket cancelBuffMONSTERS(final List<MapleBuffStat> statups) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6694,7 +6615,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket cancelForeignBuffMONSTERS(final int cid, final List<MapleBuffStat> statups) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6711,7 +6632,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket displayGuide(final int guide) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.SUMMON_HINT_MSG.getValue());
@@ -6724,7 +6645,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static String returnSerialNumber() {
         final String cpu = getCPUSerial();
         final String disk = getHardDiskSerialNumber("C");
@@ -6733,7 +6654,7 @@ public class MaplePacketCreator
         final String newStr = s.substring(8, s.length());
         return newStr;
     }
-    
+
     public static String getCPUSerial() {
         String result = "";
         try {
@@ -6751,8 +6672,7 @@ public class MaplePacketCreator
             }
             input.close();
             file.delete();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.fillInStackTrace();
         }
         if (result.trim().length() < 1 || result == null) {
@@ -6760,7 +6680,7 @@ public class MaplePacketCreator
         }
         return result.trim();
     }
-    
+
     public static String getHardDiskSerialNumber(final String drive) {
         String result = "";
         try {
@@ -6777,15 +6697,15 @@ public class MaplePacketCreator
                 result += line;
             }
             input.close();
+        } catch (IOException ex) {
         }
-        catch (IOException ex) {}
         return result.trim();
     }
-    
+
     public static boolean isshowPacket() {
         return false;
     }
-    
+
     public static MaplePacket openWeb(final String web) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6799,11 +6719,11 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket LieDetectorResponse(final byte msg) {
-        return LieDetectorResponse(msg, (byte)0);
+        return LieDetectorResponse(msg, (byte) 0);
     }
-    
+
     public static MaplePacket LieDetectorResponse(final byte msg, final byte msg2) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.LIE_DETECTOR.getValue());
@@ -6815,7 +6735,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket sendLieDetector(final byte[] image, final int attempt) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.LIE_DETECTOR.getValue());
@@ -6836,7 +6756,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket shenlong(final int i) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(i);
@@ -6847,7 +6767,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket shenlong2(final int i) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(i);
@@ -6858,7 +6778,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket DragonBall1(final int i, final boolean Zhaohuan) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeInt(0);
@@ -6867,8 +6787,7 @@ public class MaplePacketCreator
             mplew.writeShort(0);
             mplew.writeShort(i);
             mplew.writeShort(0);
-        }
-        else {
+        } else {
             mplew.writeLong(512L);
         }
         if (ServerConstants.PACKET_ERROR_OFF) {
@@ -6877,7 +6796,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket 杀怪排行榜(final int npcid, final ResultSet rs) throws SQLException {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.GUILD_OPERATION.getValue());
@@ -6899,7 +6818,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getCY1(final int npc, final String talk, final byte type) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.NPC_TALK.getValue());
@@ -6918,7 +6837,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getCY2(final int npc, final String talk, final byte type) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.NPC_TALK.getValue());
@@ -6937,7 +6856,7 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket PVPdamagePlayer(final int chrId, final int type, final int monsteridfrom, final int damage) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.DAMAGE_PLAYER.getValue());
@@ -6952,7 +6871,7 @@ public class MaplePacketCreator
         mplew.writeInt(damage);
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket testCombo(final int value) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -6966,13 +6885,13 @@ public class MaplePacketCreator
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getInventoryStatus() {
         return modifyInventory(false, Collections.EMPTY_LIST);
     }
-    
+
     static {
         MaplePacketCreator.EMPTY_STATUPDATE = Collections.emptyList();
-        CHAR_INFO_MAGIC = new byte[] { -1, -55, -102, 59 };
+        CHAR_INFO_MAGIC = new byte[]{-1, -55, -102, 59};
     }
 }

@@ -3,18 +3,18 @@ package handling.login.handler;
 import client.LoginCrypto;
 import constants.ServerConstants;
 import database.DatabaseConnection;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class AutoRegister
-{
+public class AutoRegister {
     private static final int ACCOUNTS_PER_MAC = 100;
     public static boolean autoRegister;
     public static boolean success;
     public static boolean mac;
-    
+
     public static boolean getAccountExists(final String login) {
         boolean accountExists = false;
         final Connection con = DatabaseConnection.getConnection();
@@ -27,13 +27,12 @@ public class AutoRegister
             }
             rs.close();
             ps.close();
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             System.out.println("getAccountExists   " + ex);
         }
         return accountExists;
     }
-    
+
     public static boolean getAccountExistsByID(final int id) {
         boolean accountExists = false;
         final Connection con = DatabaseConnection.getConnection();
@@ -46,20 +45,18 @@ public class AutoRegister
             }
             rs.close();
             ps.close();
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             System.out.println("getAccountExists   " + ex);
         }
         return accountExists;
     }
-    
+
     public static void createAccount(final String login, final String pwd, final String eip, final String macs) {
         final String sockAddr = eip;
         Connection con;
         try {
             con = DatabaseConnection.getConnection();
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             System.out.println(ex);
             return;
         }
@@ -82,13 +79,12 @@ public class AutoRegister
             if (rs.getRow() >= 100) {
                 AutoRegister.mac = false;
             }
-        }
-        catch (SQLException ex2) {
+        } catch (SQLException ex2) {
             ex2.printStackTrace();
             System.out.println(ex2);
         }
     }
-    
+
     static {
         AutoRegister.autoRegister = ServerConstants.getAutoReg();
         AutoRegister.success = false;

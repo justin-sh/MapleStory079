@@ -4,35 +4,33 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.inventory.IItem;
 import client.inventory.ItemFlag;
-import java.util.ArrayList;
-import java.util.List;
 import server.MapleInventoryManipulator;
-import server.maps.MapleMapObject;
 import tools.packet.PlayerShopPacket;
 
-public class MaplePlayerShop extends AbstractPlayerStore
-{
+import java.util.ArrayList;
+import java.util.List;
+
+public class MaplePlayerShop extends AbstractPlayerStore {
     private int boughtnumber;
     private final List<String> bannedList;
-    
+
     public MaplePlayerShop(final MapleCharacter owner, final int itemId, final String desc) {
         super(owner, itemId, desc, "", 3);
         this.boughtnumber = 0;
         this.bannedList = new ArrayList<String>();
     }
-    
+
     @Override
     public void buy(final MapleClient c, final int item, final short quantity) {
         final MaplePlayerShopItem pItem = this.items.get(item);
         if (pItem.bundles > 0) {
             final IItem newItem = pItem.item.copy();
-            newItem.setQuantity((short)(quantity * newItem.getQuantity()));
+            newItem.setQuantity((short) (quantity * newItem.getQuantity()));
             final byte flag = newItem.getFlag();
             if (ItemFlag.KARMA_EQ.check(flag)) {
-                newItem.setFlag((byte)(flag - ItemFlag.KARMA_EQ.getValue()));
-            }
-            else if (ItemFlag.KARMA_USE.check(flag)) {
-                newItem.setFlag((byte)(flag - ItemFlag.KARMA_USE.getValue()));
+                newItem.setFlag((byte) (flag - ItemFlag.KARMA_EQ.getValue()));
+            } else if (ItemFlag.KARMA_USE.check(flag)) {
+                newItem.setFlag((byte) (flag - ItemFlag.KARMA_USE.getValue()));
             }
             final int gainmeso = pItem.price * quantity;
             if (c.getPlayer().getMeso() >= gainmeso) {
@@ -49,23 +47,21 @@ public class MaplePlayerShop extends AbstractPlayerStore
                             return;
                         }
                     }
-                }
-                else {
+                } else {
                     c.getPlayer().dropMessage(1, "你的背包已满.");
                 }
-            }
-            else {
+            } else {
                 c.getPlayer().dropMessage(1, "You do not have enough mesos.");
             }
             this.getMCOwner().getClient().getSession().write(PlayerShopPacket.shopItemUpdate(this));
         }
     }
-    
+
     @Override
     public byte getShopType() {
         return 2;
     }
-    
+
     @Override
     public void closeShop(final boolean saveItems, final boolean remove) {
         final MapleCharacter owner = this.getMCOwner();
@@ -74,7 +70,7 @@ public class MaplePlayerShop extends AbstractPlayerStore
         for (final MaplePlayerShopItem items : this.getItems()) {
             if (items.bundles > 0) {
                 final IItem newItem = items.item.copy();
-                newItem.setQuantity((short)(items.bundles * newItem.getQuantity()));
+                newItem.setQuantity((short) (items.bundles * newItem.getQuantity()));
                 if (!MapleInventoryManipulator.addFromDrop(owner.getClient(), newItem, false)) {
                     this.saveItems();
                     break;
@@ -86,7 +82,7 @@ public class MaplePlayerShop extends AbstractPlayerStore
         this.update();
         this.getMCOwner().getClient().getSession().write(PlayerShopPacket.shopErrorMessage(10, 1));
     }
-    
+
     public void banPlayer(final String name) {
         if (!this.bannedList.contains(name)) {
             this.bannedList.add(name);
@@ -100,7 +96,7 @@ public class MaplePlayerShop extends AbstractPlayerStore
             }
         }
     }
-    
+
     public boolean isBanned(final String name) {
         return this.bannedList.contains(name);
     }

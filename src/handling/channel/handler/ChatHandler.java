@@ -11,8 +11,7 @@ import handling.world.World;
 import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
-public class ChatHandler
-{
+public class ChatHandler {
     public static final void GeneralChat(final String text, final byte unk, final MapleClient c, final MapleCharacter chr) {
         if (chr != null) {
             try {
@@ -20,8 +19,7 @@ public class ChatHandler
                 if (condition) {
                     return;
                 }
-            }
-            catch (Throwable e) {
+            } catch (Throwable e) {
                 System.err.println(e);
             }
             if (!chr.isGM() && text.length() >= 80) {
@@ -29,14 +27,13 @@ public class ChatHandler
             }
             if (chr.isHidden()) {
                 chr.getMap().broadcastGMMessage(chr, MaplePacketCreator.getChatText(chr.getId(), text, c.getPlayer().isGM(), unk), true);
-            }
-            else {
+            } else {
                 chr.getCheatTracker().checkMsg();
                 chr.getMap().broadcastMessage(MaplePacketCreator.getChatText(chr.getId(), text, c.getPlayer().isGM(), unk), c.getPlayer().getPosition());
             }
         }
     }
-    
+
     public static void Others(final SeekableLittleEndianAccessor slea, final MapleClient c, final MapleCharacter chr) {
         final int type = slea.readByte();
         final byte numRecipients = slea.readByte();
@@ -81,7 +78,7 @@ public class ChatHandler
             }
         }
     }
-    
+
     public static void Messenger(final SeekableLittleEndianAccessor slea, final MapleClient c) {
         MapleMessenger messenger = c.getPlayer().getMessenger();
         switch (slea.readByte()) {
@@ -90,8 +87,7 @@ public class ChatHandler
                     final int messengerid = slea.readInt();
                     if (messengerid == 0) {
                         c.getPlayer().setMessenger(World.Messenger.createMessenger(new MapleMessengerCharacter(c.getPlayer())));
-                    }
-                    else {
+                    } else {
                         messenger = World.Messenger.getMessenger(messengerid);
                         if (messenger != null) {
                             final int position = messenger.getLowestPosition();
@@ -129,19 +125,15 @@ public class ChatHandler
                         if (!target.isGM() || c.getPlayer().isGM()) {
                             c.getSession().write(MaplePacketCreator.messengerNote(input, 4, 1));
                             target.getClient().getSession().write(MaplePacketCreator.messengerInvite(c.getPlayer().getName(), messenger.getId()));
-                        }
-                        else {
+                        } else {
                             c.getSession().write(MaplePacketCreator.messengerNote(input, 4, 0));
                         }
-                    }
-                    else {
+                    } else {
                         c.getSession().write(MaplePacketCreator.messengerChat(c.getPlayer().getName() + " : " + target.getName() + "已经是使用枫叶信使."));
                     }
-                }
-                else if (World.isConnected(input)) {
+                } else if (World.isConnected(input)) {
                     World.Messenger.messengerInvite(c.getPlayer().getName(), messenger.getId(), input, c.getChannel(), c.getPlayer().isGM());
-                }
-                else {
+                } else {
                     c.getSession().write(MaplePacketCreator.messengerNote(input, 4, 0));
                 }
                 break;
@@ -155,8 +147,7 @@ public class ChatHandler
                         break;
                     }
                     break;
-                }
-                else {
+                } else {
                     if (!c.getPlayer().isGM()) {
                         World.Messenger.declineChat(targeted, c.getPlayer().getName());
                         break;
@@ -173,7 +164,7 @@ public class ChatHandler
             }
         }
     }
-    
+
     public static void Whisper_Find(final SeekableLittleEndianAccessor slea, final MapleClient c) {
         final byte mode = slea.readByte();
         switch (mode) {
@@ -190,10 +181,9 @@ public class ChatHandler
                         }
                         if (player != null) {
                             if (!player.isGM() || (c.getPlayer().isGM() && player.isGM())) {
-                                c.getSession().write(MaplePacketCreator.getFindReply(recipient, (byte)ch, mode == 68));
-                            }
-                            else {
-                                c.getSession().write(MaplePacketCreator.getWhisperReply(recipient, (byte)0));
+                                c.getSession().write(MaplePacketCreator.getFindReply(recipient, (byte) ch, mode == 68));
+                            } else {
+                                c.getSession().write(MaplePacketCreator.getWhisperReply(recipient, (byte) 0));
                             }
                             return;
                         }
@@ -208,7 +198,7 @@ public class ChatHandler
                             break;
                         }
                         default: {
-                            c.getSession().write(MaplePacketCreator.getWhisperReply(recipient, (byte)0));
+                            c.getSession().write(MaplePacketCreator.getWhisperReply(recipient, (byte) 0));
                             break;
                         }
                     }
@@ -218,7 +208,7 @@ public class ChatHandler
                     c.getSession().write(MaplePacketCreator.getFindReplyWithMap(player.getName(), player.getMap().getId(), mode == 68));
                     break;
                 }
-                c.getSession().write(MaplePacketCreator.getWhisperReply(recipient, (byte)0));
+                c.getSession().write(MaplePacketCreator.getWhisperReply(recipient, (byte) 0));
                 break;
             }
             case 6: {
@@ -231,7 +221,7 @@ public class ChatHandler
                 final String text = slea.readMapleAsciiString();
                 final int ch = World.Find.findChannel(recipient);
                 if (ch <= 0) {
-                    c.getSession().write(MaplePacketCreator.getWhisperReply(recipient, (byte)0));
+                    c.getSession().write(MaplePacketCreator.getWhisperReply(recipient, (byte) 0));
                     break;
                 }
                 final MapleCharacter player2 = ChannelServer.getInstance(ch).getPlayerStorage().getCharacterByName(recipient);
@@ -240,10 +230,9 @@ public class ChatHandler
                 }
                 player2.getClient().getSession().write(MaplePacketCreator.getWhisper(c.getPlayer().getName(), c.getChannel(), text));
                 if (!c.getPlayer().isGM() && player2.isGM()) {
-                    c.getSession().write(MaplePacketCreator.getWhisperReply(recipient, (byte)0));
-                }
-                else {
-                    c.getSession().write(MaplePacketCreator.getWhisperReply(recipient, (byte)1));
+                    c.getSession().write(MaplePacketCreator.getWhisperReply(recipient, (byte) 0));
+                } else {
+                    c.getSession().write(MaplePacketCreator.getWhisperReply(recipient, (byte) 1));
                 }
                 break;
             }

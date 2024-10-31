@@ -5,18 +5,17 @@ import client.inventory.ItemLoader;
 import client.inventory.MapleInventoryType;
 import constants.GameConstants;
 import database.DatabaseConnection;
+import tools.Pair;
+
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import tools.Pair;
 
-public class MTSCart implements Serializable
-{
+public class MTSCart implements Serializable {
     private static final long serialVersionUID = 231541893513373578L;
     private final int characterId;
     private int tab;
@@ -26,7 +25,7 @@ public class MTSCart implements Serializable
     private final List<Integer> cart;
     private final List<Integer> notYetSold;
     private int owedNX;
-    
+
     public MTSCart(final int characterId) throws SQLException {
         this.tab = 1;
         this.type = 0;
@@ -42,23 +41,23 @@ public class MTSCart implements Serializable
         this.loadCart();
         this.loadNotYetSold();
     }
-    
+
     public List<IItem> getInventory() {
         return this.transfer;
     }
-    
+
     public void addToInventory(final IItem item) {
         this.transfer.add(item);
     }
-    
+
     public void removeFromInventory(final IItem item) {
         this.transfer.remove(item);
     }
-    
+
     public List<Integer> getCart() {
         return this.cart;
     }
-    
+
     public boolean addToCart(final int car) {
         if (!this.cart.contains(car)) {
             this.cart.add(car);
@@ -66,7 +65,7 @@ public class MTSCart implements Serializable
         }
         return false;
     }
-    
+
     public void removeFromCart(final int car) {
         for (int i = 0; i < this.cart.size(); ++i) {
             if (this.cart.get(i) == car) {
@@ -74,15 +73,15 @@ public class MTSCart implements Serializable
             }
         }
     }
-    
+
     public List<Integer> getNotYetSold() {
         return this.notYetSold;
     }
-    
+
     public void addToNotYetSold(final int car) {
         this.notYetSold.add(car);
     }
-    
+
     public void removeFromNotYetSold(final int car) {
         for (int i = 0; i < this.notYetSold.size(); ++i) {
             if (this.notYetSold.get(i) == car) {
@@ -90,17 +89,17 @@ public class MTSCart implements Serializable
             }
         }
     }
-    
+
     public int getSetOwedNX() {
         final int on = this.owedNX;
         this.owedNX = 0;
         return on;
     }
-    
+
     public void increaseOwedNX(final int newNX) {
         this.owedNX += newNX;
     }
-    
+
     public void save() throws SQLException {
         final List<Pair<IItem, MapleInventoryType>> itemsWithType = new ArrayList<Pair<IItem, MapleInventoryType>>();
         for (final IItem item : this.getInventory()) {
@@ -124,7 +123,7 @@ public class MTSCart implements Serializable
         }
         ps.close();
     }
-    
+
     public void loadCart() throws SQLException {
         final PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("SELECT * FROM mts_cart WHERE characterid = ?");
         ps.setInt(1, this.characterId);
@@ -133,8 +132,7 @@ public class MTSCart implements Serializable
             final int iId = rs.getInt("itemid");
             if (iId < 0) {
                 this.owedNX -= iId;
-            }
-            else {
+            } else {
                 if (!MTSStorage.getInstance().check(iId)) {
                     continue;
                 }
@@ -144,7 +142,7 @@ public class MTSCart implements Serializable
         rs.close();
         ps.close();
     }
-    
+
     public void loadNotYetSold() throws SQLException {
         final PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("SELECT * FROM mts_items WHERE characterid = ?");
         ps.setInt(1, this.characterId);
@@ -158,21 +156,21 @@ public class MTSCart implements Serializable
         rs.close();
         ps.close();
     }
-    
+
     public void changeInfo(final int tab, final int type, final int page) {
         this.tab = tab;
         this.type = type;
         this.page = page;
     }
-    
+
     public int getTab() {
         return this.tab;
     }
-    
+
     public int getType() {
         return this.type;
     }
-    
+
     public int getPage() {
         return this.page;
     }

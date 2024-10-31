@@ -6,56 +6,12 @@ import handling.cashshop.CashShopServer;
 import handling.cashshop.handler.CashShopOperation;
 import handling.cashshop.handler.MTSOperation;
 import handling.channel.ChannelServer;
-import handling.channel.handler.AllianceHandler;
-import handling.channel.handler.BBSHandler;
-import handling.channel.handler.BeanGame;
-import handling.channel.handler.BuddyListHandler;
-import handling.channel.handler.ChatHandler;
-import handling.channel.handler.DueyHandler;
-import handling.channel.handler.FamilyHandler;
-import handling.channel.handler.GuildHandler;
-import handling.channel.handler.HiredMerchantHandler;
-import handling.channel.handler.InterServerHandler;
-import handling.channel.handler.InventoryHandler;
-import handling.channel.handler.ItemMakerHandler;
-import handling.channel.handler.MobHandler;
-import handling.channel.handler.MonsterCarnivalHandler;
-import handling.channel.handler.NPCHandler;
-import handling.channel.handler.PartyHandler;
-import handling.channel.handler.PetHandler;
-import handling.channel.handler.PlayerHandler;
-import handling.channel.handler.PlayerInteractionHandler;
-import handling.channel.handler.PlayersHandler;
-import handling.channel.handler.StatsHandling;
-import handling.channel.handler.SummonHandler;
-import handling.channel.handler.UserInterfaceHandler;
+import handling.channel.handler.*;
 import handling.login.LoginServer;
 import handling.login.handler.CharLoginHandler;
 import handling.login.handler.PacketErrorHandler;
 import handling.mina.MaplePacketDecoder;
 import handling.world.World;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.lang.management.ManagementFactory;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.JMException;
-import javax.management.MBeanRegistrationException;
-import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
-import javax.management.NotCompliantMBeanException;
-import javax.management.ObjectName;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
@@ -71,8 +27,17 @@ import tools.data.input.GenericSeekableLittleEndianAccessor;
 import tools.data.input.SeekableLittleEndianAccessor;
 import tools.packet.LoginPacket;
 
-public class MapleServerHandler extends IoHandlerAdapter implements MapleServerHandlerMBean
-{
+import javax.management.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+public class MapleServerHandler extends IoHandlerAdapter implements MapleServerHandlerMBean {
     private static boolean Log_Packets;
     private static String nl;
     private static File loggedIPs;
@@ -87,7 +52,7 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
     private boolean cs;
     private List<String> BlockedIP;
     private Map<String, Pair<Long, Byte>> tracker;
-    
+
     public static void reloadLoggedIPs() {
         for (final FileWriter fw : MapleServerHandler.logIPMap.values()) {
             if (fw != null) {
@@ -96,8 +61,7 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
                     fw.write(MapleServerHandler.nl);
                     fw.flush();
                     fw.close();
-                }
-                catch (IOException ex) {
+                } catch (IOException ex) {
                     System.out.println("Error closing Packet Log.");
                     System.out.println(ex);
                 }
@@ -116,19 +80,18 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
                     MapleServerHandler.logIPMap.put(line, fw2);
                 }
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             System.out.println("无法加载登录IP数据包。");
             System.out.println(e);
         }
     }
-    
+
     private static FileWriter isLoggedIP(final IoSession sess) {
         final String a = sess.getRemoteAddress().toString();
         final String realIP = a.substring(a.indexOf(47) + 1, a.indexOf(58));
         return MapleServerHandler.logIPMap.get(realIP);
     }
-    
+
     public static void log(final SeekableLittleEndianAccessor packet, final RecvPacketOpcode op, final MapleClient c, final IoSession io) {
         if (MapleServerHandler.blocked.contains(op)) {
             return;
@@ -141,35 +104,33 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
             }
             if (logged == null) {
                 logged = new LoggedPacket(packet, op, io.getRemoteAddress().toString(), (c == null) ? -1 : c.getAccID(), (c == null || c.getAccountName() == null) ? "[Null]" : c.getAccountName(), (c == null || c.getPlayer() == null || c.getPlayer().getName() == null) ? "[Null]" : c.getPlayer().getName());
-            }
-            else {
+            } else {
                 logged.setInfo(packet, op, io.getRemoteAddress().toString(), (c == null) ? -1 : c.getAccID(), (c == null || c.getAccountName() == null) ? "[Null]" : c.getAccountName(), (c == null || c.getPlayer() == null || c.getPlayer().getName() == null) ? "[Null]" : c.getPlayer().getName());
             }
             MapleServerHandler.Packet_Log.add(logged);
-        }
-        finally {
+        } finally {
             MapleServerHandler.Packet_Log_Lock.writeLock().unlock();
         }
     }
-    
+
     public static void registerMBean() {
         final MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
         try {
             final MapleServerHandler mbean = new MapleServerHandler();
             mBeanServer.registerMBean(mbean, new ObjectName("handling:type=MapleServerHandler"));
-        }
-        catch (InstanceAlreadyExistsException | MBeanRegistrationException | MalformedObjectNameException | NotCompliantMBeanException e) {
+        } catch (InstanceAlreadyExistsException | MBeanRegistrationException | MalformedObjectNameException |
+                 NotCompliantMBeanException e) {
             System.out.println("Error registering PacketLog MBean");
             e.printStackTrace();
         }
     }
-    
+
     public MapleServerHandler() {
         this.channel = -1;
         this.BlockedIP = new ArrayList<String>();
         this.tracker = new ConcurrentHashMap<String, Pair<Long, Byte>>();
     }
-    
+
     public MapleServerHandler(final int channel, final boolean cs) {
         this.channel = -1;
         this.BlockedIP = new ArrayList<String>();
@@ -177,7 +138,7 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
         this.channel = channel;
         this.cs = cs;
     }
-    
+
     public void writeLog() {
         try {
             final FileWriter fw = new FileWriter(MapleServerHandler.Packet_Log_Output, true);
@@ -190,41 +151,37 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
                 }
                 fw.flush();
                 fw.close();
-            }
-            finally {
+            } finally {
                 MapleServerHandler.Packet_Log_Lock.readLock().unlock();
             }
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             System.out.println("Error writing log to file.");
         }
     }
-    
+
     public void messageSent(final IoSession session, final Object message) throws Exception {
-        final Runnable r = ((MaplePacket)message).getOnSend();
+        final Runnable r = ((MaplePacket) message).getOnSend();
         if (r != null) {
             r.run();
         }
         super.messageSent(session, message);
     }
-    
+
     public void exceptionCaught(final IoSession session, final Throwable cause) throws Exception {
     }
-    
+
     public void sessionOpened(final IoSession session) throws Exception {
         final String address = session.getRemoteAddress().toString().split(":")[0];
         final Pair<Long, Byte> track = this.tracker.get(address);
         byte count;
         if (track == null) {
             count = 1;
-        }
-        else {
+        } else {
             count = track.right;
             final long difference = System.currentTimeMillis() - track.left;
             if (difference < 2000L) {
                 ++count;
-            }
-            else if (difference > 20000L) {
+            } else if (difference > 20000L) {
                 count = 1;
             }
             if (count >= 10) {
@@ -242,24 +199,22 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
                 session.close(true);
                 return;
             }
-        }
-        else if (this.cs) {
+        } else if (this.cs) {
             if (CashShopServer.isShutdown()) {
                 System.out.print("商城服务器尚未开启,发现连接进入，该连接被断开");
                 session.close(true);
                 return;
             }
-        }
-        else if (LoginServer.isShutdown()) {
+        } else if (LoginServer.isShutdown()) {
             System.out.print("登录服务器尚未开启,发现连接进入，该连接被断开");
             session.close(true);
             return;
         }
-        final byte[] serverRecv = { 70, 114, 122, (byte)Randomizer.nextInt(255) };
-        final byte[] serverSend = { 82, 48, 120, (byte)Randomizer.nextInt(255) };
-        final byte[] ivRecv = ServerConstants.Use_Fixed_IV ? new byte[] { 9, 0, 5, 95 } : serverRecv;
-        final byte[] ivSend = ServerConstants.Use_Fixed_IV ? new byte[] { 1, 95, 4, 63 } : serverSend;
-        final MapleClient client = new MapleClient(new MapleAESOFB(ivSend, (short)(65535 - ServerConstants.MAPLE_VERSION)), new MapleAESOFB(ivRecv, ServerConstants.MAPLE_VERSION), session);
+        final byte[] serverRecv = {70, 114, 122, (byte) Randomizer.nextInt(255)};
+        final byte[] serverSend = {82, 48, 120, (byte) Randomizer.nextInt(255)};
+        final byte[] ivRecv = ServerConstants.Use_Fixed_IV ? new byte[]{9, 0, 5, 95} : serverRecv;
+        final byte[] ivSend = ServerConstants.Use_Fixed_IV ? new byte[]{1, 95, 4, 63} : serverSend;
+        final MapleClient client = new MapleClient(new MapleAESOFB(ivSend, (short) (65535 - ServerConstants.MAPLE_VERSION)), new MapleAESOFB(ivRecv, ServerConstants.MAPLE_VERSION), session);
         client.setChannel(this.channel);
         final MaplePacketDecoder.DecoderState decoderState = new MaplePacketDecoder.DecoderState();
         session.setAttribute(MaplePacketDecoder.DECODER_STATE_KEY, decoderState);
@@ -270,11 +225,9 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
         final StringBuilder sb = new StringBuilder();
         if (this.channel > -1) {
             sb.append("[频道服务器] 频道 ").append(this.channel).append(" : ");
-        }
-        else if (this.cs) {
+        } else if (this.cs) {
             sb.append("[商城服务器]");
-        }
-        else {
+        } else {
             sb.append("[登录服务器]");
         }
         sb.append("IoSession opened ").append(address);
@@ -285,21 +238,19 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
             if (this.channel > -1) {
                 fw.write("=== Logged Into Channel " + this.channel + " ===");
                 fw.write(MapleServerHandler.nl);
-            }
-            else if (this.cs) {
+            } else if (this.cs) {
                 fw.write("=== Logged Into CashShop Server ===");
                 fw.write(MapleServerHandler.nl);
-            }
-            else {
+            } else {
                 fw.write("=== Logged Into Login Server ===");
                 fw.write(MapleServerHandler.nl);
             }
             fw.flush();
         }
     }
-    
+
     public void sessionClosed(final IoSession session) throws Exception {
-        final MapleClient client = (MapleClient)session.getAttribute(MapleClient.CLIENT_KEY);
+        final MapleClient client = (MapleClient) session.getAttribute(MapleClient.CLIENT_KEY);
         if (client != null) {
             try {
                 final FileWriter fw = isLoggedIP(session);
@@ -309,8 +260,7 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
                     fw.flush();
                 }
                 client.disconnect(true, this.cs);
-            }
-            finally {
+            } finally {
                 World.Client.removeClient(client);
                 session.close(true);
                 session.removeAttribute(MapleClient.CLIENT_KEY);
@@ -318,10 +268,10 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
         }
         super.sessionClosed(session);
     }
-    
+
     public void messageReceived(final IoSession session, final Object message) {
         try {
-            final SeekableLittleEndianAccessor slea = new GenericSeekableLittleEndianAccessor(new ByteArrayByteStream((byte[])message));
+            final SeekableLittleEndianAccessor slea = new GenericSeekableLittleEndianAccessor(new ByteArrayByteStream((byte[]) message));
             if (slea.available() < 2L) {
                 return;
             }
@@ -334,17 +284,18 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
                 if (recv.getValue() == header_num) {
                     if (MapleServerHandler.debugMode && !RecvPacketOpcode.isSpamHeader(recv)) {
                         final StringBuilder sb = new StringBuilder("Received data 已處理 :" + String.valueOf(recv) + "\n");
-                        sb.append(HexTool.toString((byte[])message)).append("\n").append(HexTool.toStringFromAscii((byte[])message));
+                        sb.append(HexTool.toString((byte[]) message)).append("\n").append(HexTool.toStringFromAscii((byte[]) message));
                         System.out.println(sb.toString());
                     }
-                    final MapleClient c = (MapleClient)session.getAttribute(MapleClient.CLIENT_KEY);
+                    final MapleClient c = (MapleClient) session.getAttribute(MapleClient.CLIENT_KEY);
                     if (!c.isReceiving()) {
                         return;
                     }
                     if (recv.NeedsChecking() && !c.isLoggedIn()) {
                         return;
                     }
-                    if (c.getPlayer() == null || !c.isMonitored() || !MapleServerHandler.blocked.contains(recv)) {}
+                    if (c.getPlayer() == null || !c.isMonitored() || !MapleServerHandler.blocked.contains(recv)) {
+                    }
                     if (MapleServerHandler.Log_Packets) {
                         log(slea, recv, c, session);
                     }
@@ -360,28 +311,25 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
                         fw.flush();
                     }
                     return;
-                }
-                else {
+                } else {
                     ++i;
                 }
             }
             if (MapleServerHandler.debugMode) {
                 final StringBuilder sb2 = new StringBuilder("Received data 未處理 : ");
-                sb2.append(HexTool.toString((byte[])message)).append("\n").append(HexTool.toStringFromAscii((byte[])message));
+                sb2.append(HexTool.toString((byte[]) message)).append("\n").append(HexTool.toStringFromAscii((byte[]) message));
                 System.out.println(sb2.toString());
             }
-        }
-        catch (RejectedExecutionException ex) {
+        } catch (RejectedExecutionException ex) {
             ex.printStackTrace();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             FileoutputUtil.outputFileError(FileoutputUtil.PacketEx_Log, e);
             e.printStackTrace();
         }
     }
-    
+
     public void sessionIdle(final IoSession session, final IdleStatus status) throws Exception {
-        final MapleClient client = (MapleClient)session.getAttribute(MapleClient.CLIENT_KEY);
+        final MapleClient client = (MapleClient) session.getAttribute(MapleClient.CLIENT_KEY);
         if (client != null) {
             client.sendPing();
             super.sessionIdle(session, status);
@@ -389,7 +337,7 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
         }
         session.close(true);
     }
-    
+
     public static boolean isSpamHeader(final RecvPacketOpcode header) {
         switch (header) {
             case PONG:
@@ -411,7 +359,7 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
             }
         }
     }
-    
+
     public static void handlePacket(final RecvPacketOpcode header, final SeekableLittleEndianAccessor slea, final MapleClient c, final boolean cs) throws Exception {
         switch (header) {
             case PONG: {
@@ -682,7 +630,7 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
             }
             case USE_UPGRADE_SCROLL: {
                 c.getPlayer().updateTick(slea.readInt());
-                InventoryHandler.UseUpgradeScroll((byte)slea.readShort(), (byte)slea.readShort(), (byte)slea.readShort(), c, c.getPlayer());
+                InventoryHandler.UseUpgradeScroll((byte) slea.readShort(), (byte) slea.readShort(), (byte) slea.readShort(), c, c.getPlayer());
                 break;
             }
             case USE_SUMMON_BAG: {
@@ -874,7 +822,7 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
                 if (slea.available() < 12L) {
                     break;
                 }
-                PetHandler.PetChat((int)slea.readLong(), slea.readShort(), slea.readMapleAsciiString(), c.getPlayer());
+                PetHandler.PetChat((int) slea.readLong(), slea.readShort(), slea.readMapleAsciiString(), c.getPlayer());
                 break;
             }
             case PET_COMMAND: {
@@ -998,7 +946,7 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
             }
         }
     }
-    
+
     static {
         MapleServerHandler.Log_Packets = true;
         MapleServerHandler.nl = System.getProperty("line.separator");
@@ -1011,12 +959,11 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
         MapleServerHandler.Packet_Log_Lock = new ReentrantReadWriteLock();
         MapleServerHandler.Packet_Log_Output = new File("logs/PacketLog.txt");
         reloadLoggedIPs();
-        final RecvPacketOpcode[] block = { RecvPacketOpcode.NPC_ACTION, RecvPacketOpcode.MOVE_PLAYER, RecvPacketOpcode.MOVE_PET, RecvPacketOpcode.MOVE_SUMMON, RecvPacketOpcode.MOVE_LIFE, RecvPacketOpcode.HEAL_OVER_TIME, RecvPacketOpcode.STRANGE_DATA };
+        final RecvPacketOpcode[] block = {RecvPacketOpcode.NPC_ACTION, RecvPacketOpcode.MOVE_PLAYER, RecvPacketOpcode.MOVE_PET, RecvPacketOpcode.MOVE_SUMMON, RecvPacketOpcode.MOVE_LIFE, RecvPacketOpcode.HEAL_OVER_TIME, RecvPacketOpcode.STRANGE_DATA};
         MapleServerHandler.blocked.addAll(Arrays.asList(block));
     }
-    
-    private static class LoggedPacket
-    {
+
+    private static class LoggedPacket {
         private static final String nl;
         private String ip;
         private String accName;
@@ -1025,11 +972,11 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
         private SeekableLittleEndianAccessor packet;
         private long timestamp;
         private RecvPacketOpcode op;
-        
+
         public LoggedPacket(final SeekableLittleEndianAccessor p, final RecvPacketOpcode op, final String ip, final int id, final String accName, final String chrName) {
             this.setInfo(p, op, ip, id, accName, chrName);
         }
-        
+
         public void setInfo(final SeekableLittleEndianAccessor p, final RecvPacketOpcode op, final String ip, final int id, final String accName, final String chrName) {
             this.ip = ip;
             this.op = op;
@@ -1038,7 +985,7 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
             this.chrName = chrName;
             this.timestamp = System.currentTimeMillis();
         }
-        
+
         @Override
         public String toString() {
             final StringBuilder sb = new StringBuilder();
@@ -1048,7 +995,7 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
             sb.append(" [Data: ").append(this.packet.toString()).append(']');
             return sb.toString();
         }
-        
+
         static {
             nl = System.getProperty("line.separator");
         }

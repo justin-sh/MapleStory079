@@ -12,15 +12,6 @@ import constants.ServerConstants;
 import database.DatabaseConnection;
 import handling.MaplePacket;
 import handling.SendPacketOpcode;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import server.CashItemFactory;
 import server.CashItemInfo;
 import server.CashShop;
@@ -30,11 +21,16 @@ import tools.KoreanDateUtil;
 import tools.Pair;
 import tools.data.output.MaplePacketLittleEndianWriter;
 
-public class MTSCSPacket
-{
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
+
+public class MTSCSPacket {
     private static byte[] warpCS;
     private static byte[] CHAR_INFO_MAGIC;
-    
+
     public static MaplePacket warpCS(final MapleClient c) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         final MapleCharacter chr = c.getPlayer();
@@ -61,7 +57,7 @@ public class MTSCSPacket
         final Collection<IItem> equippedC = iv.list();
         final List<Item> equipped = new ArrayList<Item>(equippedC.size());
         for (final IItem item : equippedC) {
-            equipped.add((Item)item);
+            equipped.add((Item) item);
         }
         Collections.sort(equipped);
         for (final Item item2 : equipped) {
@@ -140,7 +136,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket warpCSS(final MapleClient c) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         final MapleCharacter chr = c.getPlayer();
@@ -205,7 +201,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static void addModCashItemInfo(final MaplePacketLittleEndianWriter mplew, final CashItemInfo.CashModInfo item) {
         if (ServerConstants.调试输出封包) {
             System.out.println("addModCashItemInfo--------------------");
@@ -241,8 +237,7 @@ public class MTSCSPacket
             final List<CashItemInfo> pack = CashItemFactory.getInstance().getPackageItems(item.sn);
             if (pack == null) {
                 mplew.write(0);
-            }
-            else {
+            } else {
                 mplew.write(pack.size());
                 for (int i = 0; i < pack.size(); ++i) {
                     mplew.writeInt(pack.get(i).getSN());
@@ -250,7 +245,7 @@ public class MTSCSPacket
             }
         }
     }
-    
+
     public static MaplePacket sendBlockedMessage(final int type) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -264,7 +259,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket playCashSong(final int itemid, final String name) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -279,7 +274,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket show塔罗牌(final String name, final String otherName, final int love, final int cardId, final int commentId) {
         if (ServerConstants.调试输出封包) {
             System.out.println("playCashSong--------------------");
@@ -297,7 +292,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket useCharm(final byte charmsleft, final byte daysleft) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -314,7 +309,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket useWheel(final int charmsleft) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -329,7 +324,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket itemExpired(final int itemid) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -344,7 +339,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket ViciousHammer(final boolean start, final int hammered) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -355,8 +350,7 @@ public class MTSCSPacket
             mplew.write(49);
             mplew.writeInt(0);
             mplew.writeInt(hammered);
-        }
-        else {
+        } else {
             mplew.write(53);
             mplew.writeInt(0);
         }
@@ -366,7 +360,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket changePetFlag(final int uniqueId, final boolean added, final int flagAdded) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -382,7 +376,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket changePetName(final MapleCharacter chr, final String newname, final int slot) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -399,7 +393,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showNotes(final ResultSet notes, final int count) throws SQLException {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -422,7 +416,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket useChalkboard(final int charid, final String msg) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -432,8 +426,7 @@ public class MTSCSPacket
         mplew.writeInt(charid);
         if (msg == null || msg.length() <= 0) {
             mplew.write(0);
-        }
-        else {
+        } else {
             mplew.write(1);
             mplew.writeMapleAsciiString(msg);
         }
@@ -443,7 +436,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getTrockRefresh(final MapleCharacter chr, final boolean vip, final boolean delete) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -457,8 +450,7 @@ public class MTSCSPacket
             for (int i = 0; i < 10; ++i) {
                 mplew.writeInt(map[i]);
             }
-        }
-        else {
+        } else {
             final int[] map = chr.getRegRocks();
             for (int i = 0; i < 5; ++i) {
                 mplew.writeInt(map[i]);
@@ -470,7 +462,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket sendWishList(final MapleCharacter chr, final boolean update) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -490,8 +482,7 @@ public class MTSCSPacket
             }
             rs.close();
             ps.close();
-        }
-        catch (SQLException se) {
+        } catch (SQLException se) {
             System.out.println("Error getting wishlist data:" + se);
         }
         while (i > 0) {
@@ -504,7 +495,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showCashInventory(final MapleClient c) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.CS_OPERATION.getValue());
@@ -522,7 +513,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showNXMapleTokens(final MapleCharacter chr) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -537,7 +528,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showBoughtCSPackage(final Map<Integer, IItem> ccc, final int accid) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -556,7 +547,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showBoughtCSItem(final int itemid, final int sn, final int uniqueid, final int accid, final int quantity, final String giftFrom, final long expire) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -571,7 +562,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showBoughtCSItem(final IItem item, final int sn, final int accid) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -586,33 +577,33 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static void addCashItemInfo(final MaplePacketLittleEndianWriter mplew, final IItem item, final int accId, final int sn) {
         if (ServerConstants.调试输出封包) {
             System.out.println("addCashItemInfoA--------------------");
         }
         addCashItemInfo(mplew, item, accId, sn, true);
     }
-    
+
     public static void addCashItemInfo(final MaplePacketLittleEndianWriter mplew, final IItem item, final int accId, final int sn, final boolean isFirst) {
         if (ServerConstants.调试输出封包) {
             System.out.println("addCashItemInfoB--------------------");
         }
         addCashItemInfo(mplew, item.getUniqueId(), accId, item.getItemId(), sn, item.getQuantity(), item.getGiftFrom(), item.getExpiration(), isFirst);
     }
-    
+
     public static void addCashItemInfo(final MaplePacketLittleEndianWriter mplew, final int uniqueid, final int accId, final int itemid, final int sn, final int quantity, final String sender, final long expire) {
         if (ServerConstants.调试输出封包) {
             System.out.println("addCashItemInfoC--------------------");
         }
         addCashItemInfo(mplew, uniqueid, accId, itemid, sn, quantity, sender, expire, true);
     }
-    
+
     public static void addCashItemInfo(final MaplePacketLittleEndianWriter mplew, final int uniqueid, final int accId, final int itemid, final int sn, final int quantity, final String sender, final long expire, final boolean isFirst) {
         if (ServerConstants.调试输出封包) {
             System.out.println("addCashItemInfoD--------------------");
         }
-        mplew.writeLong((uniqueid > 0) ? ((long)uniqueid) : 0L);
+        mplew.writeLong((uniqueid > 0) ? ((long) uniqueid) : 0L);
         mplew.writeLong(accId);
         mplew.writeInt(itemid);
         mplew.writeInt(isFirst ? sn : 0);
@@ -621,7 +612,7 @@ public class MTSCSPacket
         PacketHelper.addExpirationTime(mplew, expire);
         mplew.writeLong(0L);
     }
-    
+
     public static MaplePacket showBoughtCSQuestItem(final int price, final short quantity, final byte position, final int itemid) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -639,7 +630,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket sendCSFail(final int err) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -654,7 +645,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showCouponRedeemedItem(final int itemid) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -674,7 +665,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showCouponRedeemedItem(final Map<Integer, IItem> items, final int mesos, final int maplePoints, final MapleClient c) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -694,7 +685,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket enableCSorMTS() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -707,7 +698,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket enableCSUse() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -722,7 +713,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getCSInventory(final MapleClient c) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.CS_OPERATION.getValue());
@@ -733,12 +724,12 @@ public class MTSCSPacket
             Integer sn = null;
             try {
                 sn = CashItemFactory.getInstance().getSnFromId(itemz.getItemId());
+            } catch (Exception ex) {
             }
-            catch (Exception ex) {}
             mplew.writeLong(itemz.getUniqueId());
             mplew.writeLong(c.getAccID());
             mplew.writeInt(itemz.getItemId());
-            mplew.writeInt((sn == null) ? 0 : ((int)sn));
+            mplew.writeInt((sn == null) ? 0 : ((int) sn));
             mplew.writeShort(itemz.getQuantity());
             mplew.writeAsciiString(itemz.getGiftFrom());
             for (int i = itemz.getGiftFrom().getBytes().length; i < 13; ++i) {
@@ -755,7 +746,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getCSGifts(final MapleClient c) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -777,7 +768,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket cashItemExpired(final int uniqueid) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -792,7 +783,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket sendGift(final int itemid, final int quantity, final String receiver) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -809,7 +800,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket increasedInvSlots(final int inv, final int slots) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -825,7 +816,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket increasedStorageSlots(final int slots) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -840,7 +831,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket confirmToCSInventory(final IItem item, final int accId, final int sn) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -862,7 +853,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket confirmFromCSInventory(final IItem item, final short pos) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -878,7 +869,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket sendMesobagFailed() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -891,7 +882,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket sendMesobagSuccess(final int mesos) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -905,7 +896,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket startMTS(final MapleCharacter chr, final MapleClient c) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -926,7 +917,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket sendMTS(final List<MTSStorage.MTSItemInfo> items, final int tab, final int type, final int page, final int pages) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -951,7 +942,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket showMTSCash(final MapleCharacter p) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -965,7 +956,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getMTSWantedListingOver(final int nx, final int items) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -981,7 +972,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getMTSConfirmSell() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -995,7 +986,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getMTSFailSell() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1010,7 +1001,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getMTSConfirmBuy() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1024,7 +1015,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getMTSFailBuy() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1039,7 +1030,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getMTSConfirmCancel() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1053,7 +1044,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getMTSFailCancel() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1068,7 +1059,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getMTSConfirmTransfer(final int quantity, final int pos) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1084,7 +1075,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     private static void addMTSItemInfo(final MaplePacketLittleEndianWriter mplew, final MTSStorage.MTSItemInfo item) {
         if (ServerConstants.调试输出封包) {
             System.out.println("addMTSItemInfo--------------------");
@@ -1100,7 +1091,7 @@ public class MTSCSPacket
         mplew.writeMapleAsciiString(item.getSeller());
         mplew.writeZeroBytes(28);
     }
-    
+
     public static MaplePacket getNotYetSoldInv(final List<MTSStorage.MTSItemInfo> items) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1118,7 +1109,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getTransferInventory(final List<IItem> items, final boolean changed) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1144,7 +1135,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket addToCartMessage(final boolean fail, final boolean remove) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -1155,16 +1146,13 @@ public class MTSCSPacket
             if (fail) {
                 mplew.write(44);
                 mplew.writeInt(-1);
-            }
-            else {
+            } else {
                 mplew.write(43);
             }
-        }
-        else if (fail) {
+        } else if (fail) {
             mplew.write(42);
             mplew.writeInt(-1);
-        }
-        else {
+        } else {
             mplew.write(41);
         }
         if (ServerConstants.PACKET_ERROR_OFF) {
@@ -1173,7 +1161,7 @@ public class MTSCSPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket 商城送礼物(final int itemid, final int quantity, final String receiver) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendPacketOpcode.CS_OPERATION.getValue());
@@ -1182,9 +1170,9 @@ public class MTSCSPacket
         mplew.writeShort(quantity);
         return mplew.getPacket();
     }
-    
+
     static {
         MTSCSPacket.warpCS = HexTool.getByteArrayFromHexString("00 00 00 63 00 74 00 65 00 64 00 2F 00 32 00 00 00 00 00 02 00 11 00 AD 01 08 06 02 00 00 00 33 00 00 00 05 00 13 00 AF 00 08 06 A0 01 14 00 30 E1 7B 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 02 00 18 00 B2 01 08 06 02 00 00 00 33 00 00 00 08 00 1A 00 B4 00 0A 06 B8 01 14 00 A8 10 88 06 69 00 6C 00 6C 00 2F 00 39 00 30 00 30 00 31 00");
-        MTSCSPacket.CHAR_INFO_MAGIC = new byte[] { -1, -55, -102, 59 };
+        MTSCSPacket.CHAR_INFO_MAGIC = new byte[]{-1, -55, -102, 59};
     }
 }

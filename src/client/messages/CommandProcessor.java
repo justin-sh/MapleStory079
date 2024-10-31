@@ -1,16 +1,20 @@
 package client.messages;
 
-import constants.*;
-import client.*;
-import database.*;
-
-import java.sql.*;
-
-import tools.*;
+import client.MapleCharacter;
+import client.MapleClient;
 import client.messages.commands.*;
+import constants.ServerConstants;
+import database.DatabaseConnection;
+import tools.FileoutputUtil;
+import tools.MaplePacketCreator;
 
-import java.util.*;
-import java.lang.reflect.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 
 public class CommandProcessor {
     private static HashMap<String, CommandObject> commands;
@@ -144,14 +148,16 @@ public class CommandProcessor {
                                 CommandProcessor.commands.put(rankNeeded.getCommandPrefix() + c.getSimpleName().toLowerCase(), new CommandObject(rankNeeded.getCommandPrefix() + c.getSimpleName().toLowerCase(), (CommandExecute) o, rankNeeded.getLevel()));
                             }
                         }
-                    } catch (IllegalAccessException | IllegalArgumentException | InstantiationException | SecurityException ex6) {
+                    } catch (IllegalAccessException | IllegalArgumentException | InstantiationException |
+                             SecurityException ex6) {
                         ex6.printStackTrace();
                         FileoutputUtil.outputFileError(FileoutputUtil.ScriptEx_Log, ex6);
                     }
                 }
                 Collections.sort(cL);
                 CommandProcessor.commandList.put(rankNeeded.getLevel(), cL);
-            } catch (IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException | InvocationTargetException ex7) {
+            } catch (IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException |
+                     InvocationTargetException ex7) {
                 ex7.printStackTrace();
                 FileoutputUtil.outputFileError(FileoutputUtil.ScriptEx_Log, ex7);
             }

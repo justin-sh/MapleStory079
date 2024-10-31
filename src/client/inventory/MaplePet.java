@@ -1,7 +1,11 @@
 package client.inventory;
 
 import database.DatabaseConnection;
-import java.awt.Point;
+import server.MapleItemInformationProvider;
+import server.movement.LifeMovement;
+import server.movement.LifeMovementFragment;
+
+import java.awt.*;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,9 +15,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import server.MapleItemInformationProvider;
-import server.movement.LifeMovement;
-import server.movement.LifeMovementFragment;
 
 public class MaplePet implements Serializable {
     private static long serialVersionUID = 9179541993413738569L;
@@ -43,7 +44,7 @@ public class MaplePet implements Serializable {
             ps.close();
             return ret;
         } catch (SQLException ex) {
-            Logger.getLogger(MaplePet.class.getName()).log(Level.SEVERE, (String)null, ex);
+            Logger.getLogger(MaplePet.class.getName()).log(Level.SEVERE, (String) null, ex);
             return null;
         }
     }
@@ -60,9 +61,9 @@ public class MaplePet implements Serializable {
             PreparedStatement pse = DatabaseConnection.getConnection().prepareStatement("INSERT INTO pets (petid, name, level, closeness, fullness, seconds, flags) VALUES (?, ?, ?, ?, ?, ?, ?)");
             pse.setInt(1, uniqueid);
             pse.setString(2, name);
-            pse.setByte(3, (byte)level);
-            pse.setShort(4, (short)closeness);
-            pse.setByte(5, (byte)fullness);
+            pse.setByte(3, (byte) level);
+            pse.setShort(4, (short) closeness);
+            pse.setByte(5, (byte) fullness);
             pse.setInt(6, secondsLeft);
             pse.setShort(7, ret1);
             pse.executeUpdate();
@@ -156,7 +157,7 @@ public class MaplePet implements Serializable {
     }
 
     public void setSummoned(int summoned) {
-        this.summoned = (byte)summoned;
+        this.summoned = (byte) summoned;
     }
 
     public short getInventoryPosition() {
@@ -178,7 +179,7 @@ public class MaplePet implements Serializable {
     public void setCloseness(int closeness) {
         if (closeness >= Integer.MAX_VALUE || closeness <= 0)
             closeness = 1;
-        this.closeness = (short)closeness;
+        this.closeness = (short) closeness;
         this.changed = true;
     }
 
@@ -187,7 +188,7 @@ public class MaplePet implements Serializable {
     }
 
     public void setLevel(int level) {
-        this.level = (byte)level;
+        this.level = (byte) level;
         this.changed = true;
     }
 
@@ -196,7 +197,7 @@ public class MaplePet implements Serializable {
     }
 
     public void setFullness(int fullness) {
-        this.fullness = (byte)fullness;
+        this.fullness = (byte) fullness;
         this.changed = true;
     }
 
@@ -205,7 +206,7 @@ public class MaplePet implements Serializable {
     }
 
     public void setFlags(int fffh) {
-        this.flags = (short)fffh;
+        this.flags = (short) fffh;
         this.changed = true;
     }
 
@@ -240,7 +241,7 @@ public class MaplePet implements Serializable {
     public boolean canConsume(int itemId) {
         MapleItemInformationProvider mii = MapleItemInformationProvider.getInstance();
         for (Iterator<Integer> iterator = mii.petsCanConsume(itemId).iterator(); iterator.hasNext(); ) {
-            int petId = ((Integer)iterator.next()).intValue();
+            int petId = ((Integer) iterator.next()).intValue();
             if (petId == this.petitemid)
                 return true;
         }
@@ -251,8 +252,8 @@ public class MaplePet implements Serializable {
         for (LifeMovementFragment move : movement) {
             if (move instanceof LifeMovement) {
                 if (move instanceof server.movement.AbsoluteLifeMovement)
-                    setPos(((LifeMovement)move).getPosition());
-                setStance(((LifeMovement)move).getNewstate());
+                    setPos(((LifeMovement) move).getPosition());
+                setStance(((LifeMovement) move).getNewstate());
             }
         }
     }

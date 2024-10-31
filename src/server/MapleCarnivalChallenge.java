@@ -2,14 +2,14 @@ package server;
 
 import client.MapleCharacter;
 import handling.world.MaplePartyCharacter;
+
 import java.lang.ref.WeakReference;
 
 
-public class MapleCarnivalChallenge
-{
+public class MapleCarnivalChallenge {
     WeakReference<MapleCharacter> challenger;
     String challengeinfo;
-    
+
     public static String getJobNameById(final int job) {
         switch (job) {
             case 0: {
@@ -221,7 +221,7 @@ public class MapleCarnivalChallenge
             }
         }
     }
-    
+
     public static String getJobBasicNameById(final int job) {
         switch (job) {
             case 0: {
@@ -433,7 +433,7 @@ public class MapleCarnivalChallenge
             }
         }
     }
-    
+
     public MapleCarnivalChallenge(final MapleCharacter challenger) {
         this.challengeinfo = "";
         this.challenger = new WeakReference<MapleCharacter>(challenger);
@@ -446,11 +446,11 @@ public class MapleCarnivalChallenge
         }
         this.challengeinfo += "#k";
     }
-    
+
     public MapleCharacter getChallenger() {
         return this.challenger.get();
     }
-    
+
     public String getChallengeInfo() {
         return this.challengeinfo;
     }

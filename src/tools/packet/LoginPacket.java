@@ -8,14 +8,14 @@ import handling.MaplePacket;
 import handling.SendPacketOpcode;
 import handling.login.LoginServer;
 import handling.login.handler.Balloon;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import tools.HexTool;
 import tools.data.output.MaplePacketLittleEndianWriter;
 
-public class LoginPacket
-{
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+public class LoginPacket {
     public static MaplePacket getHello(final short mapleVersion, final byte[] sendIv, final byte[] recvIv) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(16);
         if (ServerConstants.调试输出封包) {
@@ -23,7 +23,7 @@ public class LoginPacket
         }
         mplew.writeShort(13);
         mplew.writeShort(mapleVersion);
-        mplew.write(new byte[] { 0, 0 });
+        mplew.write(new byte[]{0, 0});
         mplew.write(recvIv);
         mplew.write(sendIv);
         mplew.write(4);
@@ -33,7 +33,7 @@ public class LoginPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getPing() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(16);
         if (ServerConstants.调试输出封包) {
@@ -46,7 +46,7 @@ public class LoginPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket StrangeDATA() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(16);
         if (ServerConstants.调试输出封包) {
@@ -60,7 +60,7 @@ public class LoginPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket genderNeeded(final MapleClient c) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(3);
         if (ServerConstants.调试输出封包) {
@@ -74,7 +74,7 @@ public class LoginPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getLoginFailed(final int reason) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(16);
         if (ServerConstants.调试输出封包) {
@@ -89,7 +89,7 @@ public class LoginPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getPermBan(final byte reason) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(16);
         if (ServerConstants.调试输出封包) {
@@ -106,7 +106,7 @@ public class LoginPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getTempBan(final long timestampTill, final byte reason) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(17);
         if (ServerConstants.调试输出封包) {
@@ -123,7 +123,7 @@ public class LoginPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getGenderChanged(final MapleClient client) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -139,7 +139,7 @@ public class LoginPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getGenderNeeded(final MapleClient client) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -153,7 +153,7 @@ public class LoginPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getAuthSuccessRequest(final MapleClient client) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -177,7 +177,7 @@ public class LoginPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getServerList(final int serverId, final String serverName, final Map<Integer, Integer> channelLoad) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -204,8 +204,7 @@ public class LoginPacket
             int load;
             if (channels.contains(j)) {
                 load = channelLoad.get(j);
-            }
-            else {
+            } else {
                 load = 1200;
             }
             mplew.writeMapleAsciiString(serverName + "-" + j);
@@ -225,7 +224,7 @@ public class LoginPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getEndOfServerList() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -239,7 +238,7 @@ public class LoginPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getServerStatus(final int status) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -253,7 +252,7 @@ public class LoginPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket getCharList(final boolean secondpw, final List<MapleCharacter> chars, final int charslots) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -274,7 +273,7 @@ public class LoginPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket addNewCharEntry(final MapleCharacter chr, final boolean worked) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -289,7 +288,7 @@ public class LoginPacket
         }
         return mplew.getPacket();
     }
-    
+
     public static MaplePacket charNameResponse(final String charname, final boolean nameUsed) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.调试输出封包) {
@@ -304,7 +303,7 @@ public class LoginPacket
         }
         return mplew.getPacket();
     }
-    
+
     private static void addCharEntry(final MaplePacketLittleEndianWriter mplew, final MapleCharacter chr, final boolean ranking, final boolean viewAll) {
         if (ServerConstants.调试输出封包) {
             System.out.println("addCharEntry--------------------");

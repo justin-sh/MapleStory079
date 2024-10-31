@@ -3,7 +3,6 @@ package handling.channel.handler;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleDisease;
-import java.util.List;
 import server.MapleCarnivalFactory;
 import server.Randomizer;
 import server.life.MapleLifeFactory;
@@ -13,8 +12,9 @@ import tools.Pair;
 import tools.data.input.SeekableLittleEndianAccessor;
 import tools.packet.MonsterCarnivalPacket;
 
-public class MonsterCarnivalHandler
-{
+import java.util.List;
+
+public class MonsterCarnivalHandler {
     public static void MonsterCarnival(final SeekableLittleEndianAccessor slea, final MapleClient c) {
         if (c.getPlayer().getCarnivalParty() == null) {
             c.getSession().write(MaplePacketCreator.enableActions());
@@ -73,11 +73,9 @@ public class MonsterCarnivalHandler
                         found = true;
                         if (dis == null) {
                             chr2.dispel();
-                        }
-                        else if (skil.getSkill() == null) {
+                        } else if (skil.getSkill() == null) {
                             chr2.giveDebuff(dis, 1, 30000L, MapleDisease.getByDisease(dis), 1);
-                        }
-                        else {
+                        } else {
                             chr2.giveDebuff(dis, skil.getSkill());
                         }
                         if (!skil.targetsAll) {

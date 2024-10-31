@@ -18,14 +18,15 @@ SET FOREIGN_KEY_CHECKS=0;
 -- Table structure for `forum_reply`
 -- ----------------------------
 DROP TABLE IF EXISTS `forum_reply`;
-CREATE TABLE `forum_reply` (
-  `rid` int(4) NOT NULL AUTO_INCREMENT,
-  `tid` int(4) DEFAULT NULL,
-  `cid` int(4) DEFAULT NULL,
-  `cname` varchar(255) DEFAULT NULL,
-  `time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `news` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`rid`)
+CREATE TABLE `forum_reply`
+(
+    `rid`   int(4) NOT NULL AUTO_INCREMENT,
+    `tid`   int(4) DEFAULT NULL,
+    `cid`   int(4) DEFAULT NULL,
+    `cname` varchar(255) DEFAULT NULL,
+    `time`  timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    `news`  varchar(255) DEFAULT NULL,
+    PRIMARY KEY (`rid`)
 ) ENGINE=MyISAM AUTO_INCREMENT=33 DEFAULT CHARSET=utf8;
 
 -- ----------------------------

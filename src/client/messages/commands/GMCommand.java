@@ -10,64 +10,49 @@ import handling.channel.ChannelServer;
 import handling.world.World;
 import server.MapleInventoryManipulator;
 import server.maps.MapleMap;
-import tools.ArrayMap;
-import tools.DateUtil;
-import tools.FileoutputUtil;
-import tools.MaplePacketCreator;
-import tools.Pair;
-import tools.StringUtil;
+import tools.*;
 
 import java.util.Map;
 
-public class GMCommand
-{
+public class GMCommand {
     public static ServerConstants.PlayerGMRank getPlayerLevelRequired() {
         return ServerConstants.PlayerGMRank.GM;
     }
-    
-    public static class 拉 extends WarpHere
-    {
+
+    public static class 拉 extends WarpHere {
     }
-    
-    public static class 等级 extends Level
-    {
+
+    public static class 等级 extends Level {
     }
-    
-    public static class 转职 extends Job
-    {
+
+    public static class 转职 extends Job {
     }
-    
-    public static class 清空 extends ClearInv
-    {
+
+    public static class 清空 extends ClearInv {
     }
-    
-    public static class 踢人 extends DC
-    {
+
+    public static class 踢人 extends DC {
     }
-    
-    public static class 读取玩家 extends spy
-    {
+
+    public static class 读取玩家 extends spy {
     }
-    
-    public static class 解除封号 extends UnBan
-    {
+
+    public static class 解除封号 extends UnBan {
     }
-    
-    public static class 刷钱 extends GainMeso
-    {
+
+    public static class 刷钱 extends GainMeso {
     }
+
     public static class 给点卷 extends GainCash {
     }
-    
-    public static class WarpHere extends CommandExecute
-    {
+
+    public static class WarpHere extends CommandExecute {
         @Override
         public int execute(final MapleClient c, final String[] splitted) {
             MapleCharacter victim = c.getChannelServer().getPlayerStorage().getCharacterByName(splitted[1]);
             if (victim != null) {
                 victim.changeMap(c.getPlayer().getMap(), c.getPlayer().getMap().findClosestSpawnpoint(c.getPlayer().getPosition()));
-            }
-            else {
+            } else {
                 final int ch = World.Find.findChannel(splitted[1]);
                 if (ch < 0) {
                     c.getPlayer().dropMessage(5, "角色不在线");
@@ -85,19 +70,18 @@ public class GMCommand
             return 1;
         }
     }
-    
-    public static class UnBan extends CommandExecute
-    {
+
+    public static class UnBan extends CommandExecute {
         protected boolean hellban;
-        
+
         public UnBan() {
             this.hellban = false;
         }
-        
+
         private String getCommand() {
             return "UnBan";
         }
-        
+
         @Override
         public int execute(final MapleClient c, final String[] splitted) {
             if (splitted.length < 2) {
@@ -107,8 +91,7 @@ public class GMCommand
             byte ret;
             if (this.hellban) {
                 ret = MapleClient.unHellban(splitted[1]);
-            }
-            else {
+            } else {
                 ret = MapleClient.unban(splitted[1]);
             }
             if (ret == -2) {
@@ -123,25 +106,20 @@ public class GMCommand
             final byte ret_ = MapleClient.unbanIPMacs(splitted[1]);
             if (ret_ == -2) {
                 c.getPlayer().dropMessage(6, "[UnbanIP] SQL error.");
-            }
-            else if (ret_ == -1) {
+            } else if (ret_ == -1) {
                 c.getPlayer().dropMessage(6, "[UnbanIP] The character does not exist.");
-            }
-            else if (ret_ == 0) {
+            } else if (ret_ == 0) {
                 c.getPlayer().dropMessage(6, "[UnbanIP] No IP or Mac with that character exists!");
-            }
-            else if (ret_ == 1) {
+            } else if (ret_ == 1) {
                 c.getPlayer().dropMessage(6, "[UnbanIP] IP/Mac -- one of them was found and unbanned.");
-            }
-            else if (ret_ == 2) {
+            } else if (ret_ == 2) {
                 c.getPlayer().dropMessage(6, "[UnbanIP] Both IP and Macs were unbanned.");
             }
             return (ret_ > 0) ? 1 : 0;
         }
     }
-    
-    public static class DC extends CommandExecute
-    {
+
+    public static class DC extends CommandExecute {
         @Override
         public int execute(final MapleClient c, final String[] splitted) {
             ChannelServer.forceRemovePlayerByCharName(splitted[1]);
@@ -149,27 +127,24 @@ public class GMCommand
             return 1;
         }
     }
-    
-    public static class Job extends CommandExecute
-    {
+
+    public static class Job extends CommandExecute {
         @Override
         public int execute(final MapleClient c, final String[] splitted) {
             c.getPlayer().changeJob(Integer.parseInt(splitted[1]));
             return 1;
         }
     }
-    
-    public static class GainMeso extends CommandExecute
-    {
+
+    public static class GainMeso extends CommandExecute {
         @Override
         public int execute(final MapleClient c, final String[] splitted) {
             c.getPlayer().gainMeso(Integer.MAX_VALUE - c.getPlayer().getMeso(), true);
             return 1;
         }
     }
-    
-    public static class Level extends CommandExecute
-    {
+
+    public static class Level extends CommandExecute {
         @Override
         public int execute(final MapleClient c, final String[] splitted) {
             c.getPlayer().setLevel(Short.parseShort(splitted[1]));
@@ -180,15 +155,13 @@ public class GMCommand
             return 1;
         }
     }
-    
-    public static class spy extends CommandExecute
-    {
+
+    public static class spy extends CommandExecute {
         @Override
         public int execute(final MapleClient c, final String[] splitted) {
             if (splitted.length < 2) {
                 c.getPlayer().dropMessage(6, "使用规则: !spy <玩家名字>");
-            }
-            else {
+            } else {
                 final MapleCharacter victim = c.getChannelServer().getPlayerStorage().getCharacterByName(splitted[1]);
                 if (victim.getGMLevel() > c.getPlayer().getGMLevel() && c.getPlayer().getId() != victim.getId()) {
                     c.getPlayer().dropMessage(5, "你不能查看比你高权限的人!");
@@ -200,17 +173,15 @@ public class GMCommand
                     c.getPlayer().dropMessage(5, "地图: " + victim.getMapId() + " - " + victim.getMap().getMapName());
                     c.getPlayer().dropMessage(5, "力量: " + victim.getStat().getStr() + "  ||  敏捷: " + victim.getStat().getDex() + "  ||  智力: " + victim.getStat().getInt() + "  ||  运气: " + victim.getStat().getLuk());
                     c.getPlayer().dropMessage(5, "拥有 " + victim.getMeso() + " 金币.");
-                }
-                else {
+                } else {
                     c.getPlayer().dropMessage(5, "找不到此玩家.");
                 }
             }
             return 1;
         }
     }
-    
-    public static class ClearInv extends CommandExecute
-    {
+
+    public static class ClearInv extends CommandExecute {
         @Override
         public int execute(final MapleClient c, final String[] splitted) {
             final Map<Pair<Short, Short>, MapleInventoryType> eqs = new ArrayMap<Pair<Short, Short>, MapleInventoryType>();
@@ -272,8 +243,7 @@ public class GMCommand
         }
     }
 
-    public static class ExpRate extends CommandExecute
-    {
+    public static class ExpRate extends CommandExecute {
         @Override
         public int execute(final MapleClient c, final String[] splitted) {
             if (splitted.length > 1) {
@@ -282,8 +252,7 @@ public class GMCommand
                     for (final ChannelServer cserv : ChannelServer.getAllInstances()) {
                         cserv.setExpRate(rate);
                     }
-                }
-                else {
+                } else {
                     c.getChannelServer().setExpRate(rate);
                 }
                 c.getPlayer().dropMessage(6, "经验倍率已改变更为 " + rate + "x");
@@ -332,7 +301,7 @@ public class GMCommand
                     mch2.startMapEffect(msg, 5121009);
                 }
             }
-            FileoutputUtil.logToFile("logs/Data/给予点卷_"+ DateUtil.getCurrentDateStr2()+"_a.txt", "\r\n " + FileoutputUtil.NowTime() + " GM " + c.getPlayer().getName() + " 给了 " + player.getName() + " 点卷 " + amount + "点");
+            FileoutputUtil.logToFile("logs/Data/给予点卷_" + DateUtil.getCurrentDateStr2() + "_a.txt", "\r\n " + FileoutputUtil.NowTime() + " GM " + c.getPlayer().getName() + " 给了 " + player.getName() + " 点卷 " + amount + "点");
             return 1;
         }
 

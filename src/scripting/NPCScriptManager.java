@@ -40,9 +40,9 @@ public class NPCScriptManager extends AbstractScriptManager {
             if (!this.mapleClientNPCConversationManagerMap.containsKey(c)) {
                 Invocable iv;
                 if (wh == 0) {
-                    iv = this.getInvocable("npc"+ File.separator + npc + ".js", c, true);
+                    iv = this.getInvocable("npc" + File.separator + npc + ".js", c, true);
                 } else {
-                    iv = this.getInvocable("npc"+File.separator + npc + "_" + wh + ".js", c, true);
+                    iv = this.getInvocable("npc" + File.separator + npc + "_" + wh + ".js", c, true);
                 }
                 ScriptEngine scriptengine = (ScriptEngine) iv;
                 NPCConversationManager cm;
@@ -137,7 +137,7 @@ public class NPCScriptManager extends AbstractScriptManager {
         lock.lock();
         try {
             if (!this.mapleClientNPCConversationManagerMap.containsKey(c)) {
-                final Invocable iv = this.getInvocable("quest"+File.separator + quest + ".js", c, true);
+                final Invocable iv = this.getInvocable("quest" + File.separator + quest + ".js", c, true);
                 if (iv == null) {
                     this.dispose(c);
                     return;
@@ -196,7 +196,7 @@ public class NPCScriptManager extends AbstractScriptManager {
         lock.lock();
         try {
             if (!this.mapleClientNPCConversationManagerMap.containsKey(c)) {
-                final Invocable iv = this.getInvocable("quest"+File.separator + quest + ".js", c, true);
+                final Invocable iv = this.getInvocable("quest" + File.separator + quest + ".js", c, true);
                 if (iv == null) {
                     this.dispose(c);
                     return;
@@ -252,13 +252,13 @@ public class NPCScriptManager extends AbstractScriptManager {
             this.mapleClientNPCConversationManagerMap.remove(c);
             if (npccm.getType() == -1) {
                 if (npccm.getwh() == 0) {
-                    c.removeScriptEngine(scriptsPath +"scripts"+File.separator+"npc"+File.separator + npccm.getNpc() + ".js");
+                    c.removeScriptEngine(scriptsPath + "scripts" + File.separator + "npc" + File.separator + npccm.getNpc() + ".js");
                 } else {
-                    c.removeScriptEngine(scriptsPath +"scripts"+File.separator+"npc"+File.separator + npccm.getNpc() + "_" + npccm.getwh() + ".js");
+                    c.removeScriptEngine(scriptsPath + "scripts" + File.separator + "npc" + File.separator + npccm.getNpc() + "_" + npccm.getwh() + ".js");
                 }
-                c.removeScriptEngine(scriptsPath +"scripts"+File.separator+"npc"+File.separator+"notcoded.js");
+                c.removeScriptEngine(scriptsPath + "scripts" + File.separator + "npc" + File.separator + "notcoded.js");
             } else {
-                c.removeScriptEngine(scriptsPath +"scripts"+File.separator+"quest"+File.separator + npccm.getQuest() + ".js");
+                c.removeScriptEngine(scriptsPath + "scripts" + File.separator + "quest" + File.separator + npccm.getQuest() + ".js");
             }
         }
         if (c.getPlayer() != null && c.getPlayer().getConversation() == 1) {

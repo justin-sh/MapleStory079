@@ -1,15 +1,5 @@
 package provider.WzXML;
 
-import java.awt.Point;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -18,33 +8,41 @@ import provider.MapleData;
 import provider.MapleDataEntity;
 import tools.FileoutputUtil;
 
-public class XMLDomMapleData implements MapleData, Serializable
-{
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.awt.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+public class XMLDomMapleData implements MapleData, Serializable {
     private Node node;
     private File imageDataDir;
-    
+
     private XMLDomMapleData(final Node node) {
         this.node = node;
     }
-    
+
     public XMLDomMapleData(final FileInputStream fis, final File imageDataDir) {
         try {
             final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
             final Document document = documentBuilder.parse(fis);
             this.node = document.getFirstChild();
-        }
-        catch (Exception ex2) {
+        } catch (Exception ex2) {
             throw new RuntimeException(ex2);
         }
         this.imageDataDir = imageDataDir;
     }
-    
+
     @Override
     public MapleData getChildByPath(final String path) {
         final String[] segments = path.split("/");
         if (segments[0].equals("..")) {
-            return ((MapleData)this.getParent()).getChildByPath(path.substring(path.indexOf("/") + 1));
+            return ((MapleData) this.getParent()).getChildByPath(path.substring(path.indexOf("/") + 1));
         }
         Node myNode = this.node;
         for (int x = 0; x < segments.length; ++x) {
@@ -58,8 +56,7 @@ public class XMLDomMapleData implements MapleData, Serializable
                         foundChild = true;
                         break;
                     }
-                }
-                catch (NullPointerException e) {
+                } catch (NullPointerException e) {
                     FileoutputUtil.outputFileError(FileoutputUtil.PacketEx_Log, e);
                 }
             }
@@ -71,7 +68,7 @@ public class XMLDomMapleData implements MapleData, Serializable
         ret.imageDataDir = new File(this.imageDataDir, this.getName() + "/" + path).getParentFile();
         return ret;
     }
-    
+
     @Override
     public List<MapleData> getChildren() {
         final List<MapleData> ret = new ArrayList<MapleData>();
@@ -86,7 +83,7 @@ public class XMLDomMapleData implements MapleData, Serializable
         }
         return ret;
     }
-    
+
     @Override
     public Object getData() {
         final NamedNodeMap attributes = this.node.getAttributes();
@@ -119,7 +116,7 @@ public class XMLDomMapleData implements MapleData, Serializable
             }
         }
     }
-    
+
     @Override
     public MapleDataType getType() {
         final String nodeName2;
@@ -166,7 +163,7 @@ public class XMLDomMapleData implements MapleData, Serializable
             }
         }
     }
-    
+
     @Override
     public MapleDataEntity getParent() {
         final Node parentNode = this.node.getParentNode();
@@ -177,12 +174,12 @@ public class XMLDomMapleData implements MapleData, Serializable
         parentData.imageDataDir = this.imageDataDir.getParentFile();
         return parentData;
     }
-    
+
     @Override
     public String getName() {
         return this.node.getAttributes().getNamedItem("name").getNodeValue();
     }
-    
+
     @Override
     public Iterator<MapleData> iterator() {
         return this.getChildren().iterator();

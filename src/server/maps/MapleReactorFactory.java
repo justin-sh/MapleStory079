@@ -1,8 +1,5 @@
 package server.maps;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
@@ -10,11 +7,14 @@ import provider.MapleDataTool;
 import tools.Pair;
 import tools.StringUtil;
 
-public class MapleReactorFactory
-{
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
+public class MapleReactorFactory {
     private static final MapleDataProvider data;
     private static final Map<Integer, MapleReactorStats> reactorStats;
-    
+
     public static MapleReactorStats getReactor(final int rid) {
         MapleReactorStats stats = MapleReactorFactory.reactorStats.get(rid);
         if (stats == null) {
@@ -54,10 +54,9 @@ public class MapleReactorFactory
                             }
                         }
                         foundState = true;
-                        stats.addState(i, type, reactItem, (byte)MapleDataTool.getIntConvert("state", reactorInfoData), MapleDataTool.getIntConvert("timeOut", reactorInfoData_, -1), (byte)((MapleDataTool.getIntConvert("2", reactorInfoData, 0) > 0 || reactorInfoData.getChildByPath("clickArea") != null || type == 9) ? 1 : (canTouch ? 2 : 0)));
-                    }
-                    else {
-                        stats.addState(i, 999, null, (byte)(foundState ? -1 : (i + 1)), 0, (byte)0);
+                        stats.addState(i, type, reactItem, (byte) MapleDataTool.getIntConvert("state", reactorInfoData), MapleDataTool.getIntConvert("timeOut", reactorInfoData_, -1), (byte) ((MapleDataTool.getIntConvert("2", reactorInfoData, 0) > 0 || reactorInfoData.getChildByPath("clickArea") != null || type == 9) ? 1 : (canTouch ? 2 : 0)));
+                    } else {
+                        stats.addState(i, 999, null, (byte) (foundState ? -1 : (i + 1)), 0, (byte) 0);
                     }
                     ++i;
                 }
@@ -65,14 +64,13 @@ public class MapleReactorFactory
                 if (rid != infoId) {
                     MapleReactorFactory.reactorStats.put(rid, stats);
                 }
-            }
-            else {
+            } else {
                 MapleReactorFactory.reactorStats.put(rid, stats);
             }
         }
         return stats;
     }
-    
+
     static {
         data = MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzPath") + "/Reactor.wz"));
         reactorStats = new HashMap<Integer, MapleReactorStats>();

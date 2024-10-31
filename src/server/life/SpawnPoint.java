@@ -1,14 +1,14 @@
 package server.life;
 
-import java.awt.Point;
-import java.util.concurrent.atomic.AtomicInteger;
 import server.MapleCarnivalFactory;
 import server.maps.MapleMap;
 import server.maps.MapleReactor;
 import tools.MaplePacketCreator;
 
-public class SpawnPoint extends Spawns
-{
+import java.awt.*;
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class SpawnPoint extends Spawns {
     private final MapleMonster monster;
     private final Point pos;
     private long nextPossibleSpawn;
@@ -18,7 +18,7 @@ public class SpawnPoint extends Spawns
     private final boolean immobile;
     private final String msg;
     private final byte carnivalTeam;
-    
+
     public SpawnPoint(final MapleMonster monster, final Point pos, final int mobTime, final byte carnivalTeam, final String msg) {
         this.carnival = -1;
         this.spawnedMonsters = new AtomicInteger(0);
@@ -30,36 +30,36 @@ public class SpawnPoint extends Spawns
         this.immobile = !monster.getStats().getMobile();
         this.nextPossibleSpawn = System.currentTimeMillis();
     }
-    
+
     public void setCarnival(final int c) {
         this.carnival = c;
     }
-    
+
     @Override
     public Point getPosition() {
         return this.pos;
     }
-    
+
     @Override
     public MapleMonster getMonster() {
         return this.monster;
     }
-    
+
     @Override
     public byte getCarnivalTeam() {
         return this.carnivalTeam;
     }
-    
+
     @Override
     public int getCarnivalId() {
         return this.carnival;
     }
-    
+
     @Override
     public boolean shouldSpawn() {
         return this.mobTime >= 0 && ((this.mobTime == 0 && !this.immobile) || this.spawnedMonsters.get() <= 0) && this.spawnedMonsters.get() <= 1 && this.nextPossibleSpawn <= System.currentTimeMillis();
     }
-    
+
     @Override
     public MapleMonster spawnMonster(final MapleMap map) {
         final MapleMonster mob = new MapleMonster(this.monster);
@@ -94,7 +94,7 @@ public class SpawnPoint extends Spawns
         }
         return mob;
     }
-    
+
     @Override
     public int getMobTime() {
         return this.mobTime;

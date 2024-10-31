@@ -1,6 +1,9 @@
 package client;
 
 import database.DatabaseConnection;
+import tools.Pair;
+import tools.data.output.MaplePacketLittleEndianWriter;
+
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,45 +11,41 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import tools.Pair;
-import tools.data.output.MaplePacketLittleEndianWriter;
 
 
-public class MapleKeyLayout implements Serializable
-{
+public class MapleKeyLayout implements Serializable {
     private static long serialVersionUID;
     private boolean changed;
     private Map<Integer, Pair<Byte, Integer>> keymap;
-    
+
     public MapleKeyLayout() {
         this.changed = false;
         this.keymap = new HashMap<Integer, Pair<Byte, Integer>>();
     }
-    
+
     public MapleKeyLayout(final Map<Integer, Pair<Byte, Integer>> keys) {
         this.changed = false;
         this.keymap = keys;
     }
-    
+
     public Map<Integer, Pair<Byte, Integer>> Layout() {
         this.changed = true;
         return this.keymap;
     }
-    
+
     public void writeData(final MaplePacketLittleEndianWriter mplew) {
         for (int x = 0; x < 90; ++x) {
             final Pair<Byte, Integer> binding = this.keymap.get(x);
             if (binding != null) {
                 mplew.write(binding.getLeft());
                 mplew.writeInt(binding.getRight());
-            }
-            else {
+            } else {
                 mplew.write(0);
                 mplew.writeInt(0);
             }
         }
     }
-    
+
     public void saveKeys(final int charid) throws SQLException {
         if (!this.changed || this.keymap.size() == 0) {
             return;
@@ -91,8 +90,7 @@ public class MapleKeyLayout implements Serializable
                 ps2.setInt(4, key2);
                 ps2.executeUpdate();
                 ps2.close();
-            }
-            else {
+            } else {
                 ps2 = con.prepareStatement("INSERT INTO keymap (`characterid`, `key`, `type`, `action`) VALUES (?, ?, ?, ?)");
                 ps2.setInt(1, charid);
                 ps2.setInt(2, key2);
@@ -105,7 +103,7 @@ public class MapleKeyLayout implements Serializable
         }
         ps.close();
     }
-    
+
     static {
         MapleKeyLayout.serialVersionUID = 9179541993413738569L;
     }

@@ -1,21 +1,12 @@
 package client;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import provider.MapleData;
-import provider.MapleDataDirectoryEntry;
-import provider.MapleDataFileEntry;
-import provider.MapleDataProvider;
-import provider.MapleDataProviderFactory;
-import provider.MapleDataTool;
+import provider.*;
 import tools.StringUtil;
 
-public class SkillFactory
-{
+import java.io.File;
+import java.util.*;
+
+public class SkillFactory {
     private static final Map<Integer, ISkill> skills;
     private static final Map<Integer, List<Integer>> skillsByJob;
     private static final Map<Integer, SummonSkillEntry> SummonSkillInformation;
@@ -51,9 +42,9 @@ public class SkillFactory
                                     continue;
                                 }
                                 final SummonSkillEntry sse = new SummonSkillEntry();
-                                sse.attackAfter = (short)MapleDataTool.getInt("attackAfter", summon_data, 999999);
-                                sse.type = (byte)MapleDataTool.getInt("type", summon_data, 0);
-                                sse.mobCount = (byte)MapleDataTool.getInt("mobCount", summon_data, 1);
+                                sse.attackAfter = (short) MapleDataTool.getInt("attackAfter", summon_data, 999999);
+                                sse.type = (byte) MapleDataTool.getInt("type", summon_data, 0);
+                                sse.mobCount = (byte) MapleDataTool.getInt("mobCount", summon_data, 1);
                                 SkillFactory.SummonSkillInformation.put(skillid, sse);
                             }
                         }
@@ -63,7 +54,7 @@ public class SkillFactory
         }
         return null;
     }
-    
+
     public static ISkill getSkill1(final int id) {
         ISkill ret = SkillFactory.skills.get(id);
         if (ret != null) {
@@ -83,11 +74,11 @@ public class SkillFactory
             return ret;
         }
     }
-    
+
     public static List<Integer> getSkillsByJob(final int jobId) {
         return SkillFactory.skillsByJob.get(jobId);
     }
-    
+
     public static String getSkillName(final int id) {
         final ISkill skil = getSkill(id);
         if (skil != null) {
@@ -95,7 +86,7 @@ public class SkillFactory
         }
         return null;
     }
-    
+
     public static String getName(final int id) {
         String strId = Integer.toString(id);
         strId = StringUtil.getLeftPaddedStr(strId, '0', 7);
@@ -105,15 +96,15 @@ public class SkillFactory
         }
         return null;
     }
-    
+
     public static SummonSkillEntry getSummonData(final int skillid) {
         return SkillFactory.SummonSkillInformation.get(skillid);
     }
-    
+
     public static Collection<ISkill> getAllSkills() {
         return SkillFactory.skills.values();
     }
-    
+
     static {
         skills = new HashMap<Integer, ISkill>();
         skillsByJob = new HashMap<Integer, List<Integer>>();

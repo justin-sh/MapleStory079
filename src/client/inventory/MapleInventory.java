@@ -2,16 +2,11 @@ package client.inventory;
 
 import client.MapleCharacter;
 import constants.GameConstants;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import server.MapleItemInformationProvider;
 import tools.MaplePacketCreator;
+
+import java.io.Serializable;
+import java.util.*;
 
 public class MapleInventory implements Iterable<IItem>, Serializable {
     private final Map<Short, IItem> inventory;
@@ -27,7 +22,7 @@ public class MapleInventory implements Iterable<IItem>, Serializable {
     }
 
     public void addSlot(byte slot) {
-        this.slotLimit = (byte)(this.slotLimit + slot);
+        this.slotLimit = (byte) (this.slotLimit + slot);
         if (this.slotLimit > 96)
             this.slotLimit = 96;
     }
@@ -100,8 +95,8 @@ public class MapleInventory implements Iterable<IItem>, Serializable {
     public void move(short sSlot, short dSlot, short slotMax) {
         if (dSlot > this.slotLimit)
             return;
-        Item source = (Item)this.inventory.get(Short.valueOf(sSlot));
-        Item target = (Item)this.inventory.get(Short.valueOf(dSlot));
+        Item source = (Item) this.inventory.get(Short.valueOf(sSlot));
+        Item target = (Item) this.inventory.get(Short.valueOf(dSlot));
         if (source == null)
             throw new InventoryException("Trying to move empty slot");
         if (target == null) {
@@ -112,10 +107,10 @@ public class MapleInventory implements Iterable<IItem>, Serializable {
             if (this.type.getType() == MapleInventoryType.EQUIP.getType() || this.type.getType() == MapleInventoryType.CASH.getType()) {
                 swap(target, source);
             } else if (source.getQuantity() + target.getQuantity() > slotMax) {
-                source.setQuantity((short)(source.getQuantity() + target.getQuantity() - slotMax));
+                source.setQuantity((short) (source.getQuantity() + target.getQuantity() - slotMax));
                 target.setQuantity(slotMax);
             } else {
-                target.setQuantity((short)(source.getQuantity() + target.getQuantity()));
+                target.setQuantity((short) (source.getQuantity() + target.getQuantity()));
                 this.inventory.remove(Short.valueOf(sSlot));
             }
         } else {
@@ -138,7 +133,7 @@ public class MapleInventory implements Iterable<IItem>, Serializable {
     }
 
     public void removeItem(short slot) {
-        removeItem(slot, (short)1, false);
+        removeItem(slot, (short) 1, false);
     }
 
     public void removeItem(short slot, short quantity, boolean allowZero) {
@@ -149,9 +144,9 @@ public class MapleInventory implements Iterable<IItem>, Serializable {
         IItem item = this.inventory.get(Short.valueOf(slot));
         if (item == null)
             return;
-        item.setQuantity((short)(item.getQuantity() - quantity));
+        item.setQuantity((short) (item.getQuantity() - quantity));
         if (item.getQuantity() < 0)
-            item.setQuantity((short)0);
+            item.setQuantity((short) 0);
         if (item.getQuantity() == 0 && !allowZero)
             removeSlot(slot);
         if (chr != null) {
@@ -175,7 +170,7 @@ public class MapleInventory implements Iterable<IItem>, Serializable {
     public short getNextFreeSlot() {
         if (isFull())
             return -1;
-        for (short i = 1; i <= this.slotLimit; i = (short)(i + 1)) {
+        for (short i = 1; i <= this.slotLimit; i = (short) (i + 1)) {
             if (!this.inventory.keySet().contains(Short.valueOf(i)))
                 return i;
         }
@@ -186,11 +181,11 @@ public class MapleInventory implements Iterable<IItem>, Serializable {
         if (isFull())
             return 0;
         byte free = 0;
-        for (short i = 1; i <= this.slotLimit; i = (short)(i + 1)) {
+        for (short i = 1; i <= this.slotLimit; i = (short) (i + 1)) {
             if (!this.inventory.keySet().contains(Short.valueOf(i)))
-                free = (byte)(free + 1);
+                free = (byte) (free + 1);
         }
-        return (short)free;
+        return (short) free;
     }
 
     public MapleInventoryType getType() {

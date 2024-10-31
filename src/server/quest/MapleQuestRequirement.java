@@ -8,23 +8,23 @@ import client.inventory.IItem;
 import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
 import constants.GameConstants;
-import java.io.Serializable;
-import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.List;
 import provider.MapleData;
 import provider.MapleDataTool;
 import tools.Pair;
 
-public class MapleQuestRequirement implements Serializable
-{
+import java.io.Serializable;
+import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.List;
+
+public class MapleQuestRequirement implements Serializable {
     private static final long serialVersionUID = 9179541993413738569L;
     private MapleQuest quest;
     private MapleQuestRequirementType type;
     private int intStore;
     private String stringStore;
     private List<Pair<Integer, Integer>> dataStore;
-    
+
     public MapleQuestRequirement(final MapleQuest quest, final MapleQuestRequirementType type, final MapleData data) {
         this.type = type;
         this.quest = quest;
@@ -122,14 +122,14 @@ public class MapleQuestRequirement implements Serializable
         switch (this.type) {
             case job:
                 for (Pair<Integer, Integer> a : this.dataStore) {
-                    if (((Integer)a.getRight()).intValue() == c.getJob() || c.isGM())
+                    if (((Integer) a.getRight()).intValue() == c.getJob() || c.isGM())
                         return true;
                 }
                 return false;
             case skill:
                 for (Pair<Integer, Integer> a : this.dataStore) {
-                    boolean acquire = (((Integer)a.getRight()).intValue() > 0);
-                    int skill = ((Integer)a.getLeft()).intValue();
+                    boolean acquire = (((Integer) a.getRight()).intValue() > 0);
+                    int skill = ((Integer) a.getLeft()).intValue();
                     ISkill skil = SkillFactory.getSkill(skill);
                     if (acquire) {
                         if (skil.isFourthJob()) {
@@ -147,8 +147,8 @@ public class MapleQuestRequirement implements Serializable
                 return true;
             case quest:
                 for (Pair<Integer, Integer> a : this.dataStore) {
-                    MapleQuestStatus q = c.getQuest(MapleQuest.getInstance(((Integer)a.getLeft()).intValue()));
-                    int state = ((Integer)a.getRight()).intValue();
+                    MapleQuestStatus q = c.getQuest(MapleQuest.getInstance(((Integer) a.getLeft()).intValue()));
+                    int state = ((Integer) a.getRight()).intValue();
                     if (state == 0 || (
                             q == null && state == 0))
                         continue;
@@ -158,12 +158,12 @@ public class MapleQuestRequirement implements Serializable
                 return true;
             case item:
                 for (Pair<Integer, Integer> a : this.dataStore) {
-                    int itemId = ((Integer)a.getLeft()).intValue();
+                    int itemId = ((Integer) a.getLeft()).intValue();
                     short quantity = 0;
                     MapleInventoryType iType = GameConstants.getInventoryType(itemId);
                     for (IItem item : c.getInventory(iType).listById(itemId))
-                        quantity = (short)(quantity + item.getQuantity());
-                    int count = ((Integer)a.getRight()).intValue();
+                        quantity = (short) (quantity + item.getQuantity());
+                    int count = ((Integer) a.getRight()).intValue();
                     if (quantity < count || (count <= 0 && quantity > 0))
                         return false;
                 }
@@ -179,8 +179,8 @@ public class MapleQuestRequirement implements Serializable
                 return (cal.getTimeInMillis() >= System.currentTimeMillis());
             case mob:
                 for (Pair<Integer, Integer> a : this.dataStore) {
-                    int mobId = ((Integer)a.getLeft()).intValue();
-                    int killReq = ((Integer)a.getRight()).intValue();
+                    int mobId = ((Integer) a.getLeft()).intValue();
+                    int killReq = ((Integer) a.getRight()).intValue();
                     if (c.getQuest(this.quest).getMobKills(mobId) < killReq)
                         return false;
                 }
@@ -197,8 +197,8 @@ public class MapleQuestRequirement implements Serializable
                 return false;
             case mbcard:
                 for (Pair<Integer, Integer> a : this.dataStore) {
-                    int cardId = ((Integer)a.getLeft()).intValue();
-                    int killReq = ((Integer)a.getRight()).intValue();
+                    int cardId = ((Integer) a.getLeft()).intValue();
+                    int killReq = ((Integer) a.getRight()).intValue();
                     if (c.getMonsterBook().getLevelByCard(cardId) < killReq)
                         return false;
                 }
@@ -211,7 +211,7 @@ public class MapleQuestRequirement implements Serializable
                 return (c.getQuest(this.quest).getStatus() != 2 || c.getQuest(this.quest).getCompletionTime() <= System.currentTimeMillis() - (this.intStore * 60) * 1000L);
             case pet:
                 for (Pair<Integer, Integer> a : this.dataStore) {
-                    if (c.getPetIndexById(((Integer)a.getRight()).intValue()) == -1)
+                    if (c.getPetIndexById(((Integer) a.getRight()).intValue()) == -1)
                         return false;
                 }
                 return true;
@@ -228,7 +228,7 @@ public class MapleQuestRequirement implements Serializable
     public MapleQuestRequirementType getType() {
         return this.type;
     }
-    
+
     @Override
     public String toString() {
         return this.type.toString();

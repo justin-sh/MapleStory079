@@ -1,7 +1,5 @@
 package tools;
 
-import handling.RecvPacketOpcode;
-
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -87,11 +85,11 @@ public class GetInfo {
             String sMAC = "";
             Formatter formatter = new Formatter();
             for (int i = 0; i < mac.length; i++) {
-                sMAC = formatter.format(Locale.getDefault(), "%02X%s", new Object[] { Byte.valueOf(mac[i]), (i < mac.length - 1) ? "-" : "" }).toString();
+                sMAC = formatter.format(Locale.getDefault(), "%02X%s", new Object[]{Byte.valueOf(mac[i]), (i < mac.length - 1) ? "-" : ""}).toString();
             }
             System.out.println("IP：" + sIP);
             System.out.println("MAC：" + sMAC);
-        } catch (SocketException|UnknownHostException e) {
+        } catch (SocketException | UnknownHostException e) {
             e.printStackTrace();
         }
     }

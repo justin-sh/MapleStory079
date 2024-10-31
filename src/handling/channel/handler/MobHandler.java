@@ -3,14 +3,11 @@ package handling.channel.handler;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.inventory.MapleInventoryType;
-import java.awt.Point;
-import java.util.List;
 import server.MapleInventoryManipulator;
 import server.Randomizer;
 import server.life.MapleMonster;
 import server.life.MobSkill;
 import server.life.MobSkillFactory;
-import server.maps.AnimatedMapleMapObject;
 import server.maps.MapleMap;
 import server.movement.LifeMovementFragment;
 import tools.FileoutputUtil;
@@ -19,8 +16,10 @@ import tools.Pair;
 import tools.data.input.SeekableLittleEndianAccessor;
 import tools.packet.MobPacket;
 
-public class MobHandler
-{
+import java.awt.*;
+import java.util.List;
+
+public class MobHandler {
     public static final void MoveMonster(SeekableLittleEndianAccessor slea, MapleClient c, MapleCharacter chr) {
         List<LifeMovementFragment> res;
         if (chr == null || chr.getMap() == null)
@@ -44,16 +43,16 @@ public class MobHandler
             byte size = monster.getNoSkills();
             boolean used = false;
             if (size > 0) {
-                Pair<Integer, Integer> skillToUse = monster.getSkills().get((byte)Randomizer.nextInt(size));
-                realskill = ((Integer)skillToUse.getLeft()).intValue();
-                level = ((Integer)skillToUse.getRight()).intValue();
+                Pair<Integer, Integer> skillToUse = monster.getSkills().get((byte) Randomizer.nextInt(size));
+                realskill = ((Integer) skillToUse.getLeft()).intValue();
+                level = ((Integer) skillToUse.getRight()).intValue();
                 MobSkill mobSkill = MobSkillFactory.getMobSkill(realskill, level);
                 if (mobSkill != null && !mobSkill.checkCurrentBuff(chr, monster)) {
                     long now = System.currentTimeMillis();
                     long ls = monster.getLastSkillUsed(realskill);
                     if (ls == 0L || now - ls > mobSkill.getCoolTime()) {
                         monster.setLastSkillUsed(realskill, now, mobSkill.getCoolTime());
-                        int reqHp = (int)((float)monster.getHp() / (float)monster.getMobMaxHp() * 100.0F);
+                        int reqHp = (int) ((float) monster.getHp() / (float) monster.getMobMaxHp() * 100.0F);
                         if (reqHp <= mobSkill.getHP()) {
                             used = true;
                             mobSkill.applyEffect(chr, monster, true);
@@ -102,14 +101,14 @@ public class MobHandler
             checkShammos(chr, mobto, map);
         }
     }
-    
+
     public static void checkShammos(final MapleCharacter chr, final MapleMonster mobto, final MapleMap map) {
         if (!mobto.isAlive() && mobto.getId() == 9300275) {
             for (final MapleCharacter chrz : map.getCharactersThreadsafe()) {
                 if (chrz.getParty() != null && chrz.getParty().getLeader().getId() == chrz.getId()) {
                     if (chrz.haveItem(2022698)) {
                         MapleInventoryManipulator.removeById(chrz.getClient(), MapleInventoryType.USE, 2022698, 1, false, true);
-                        mobto.heal((int)mobto.getMobMaxHp(), mobto.getMobMaxMp(), true);
+                        mobto.heal((int) mobto.getMobMaxHp(), mobto.getMobMaxMp(), true);
                         return;
                     }
                     break;
@@ -120,12 +119,11 @@ public class MobHandler
             for (final MapleCharacter chrz2 : map.getCharactersThreadsafe()) {
                 chrz2.changeMap(mapp, mapp.getPortal(0));
             }
-        }
-        else if (mobto.getId() == 9300275 && mobto.getEventInstance() != null) {
+        } else if (mobto.getId() == 9300275 && mobto.getEventInstance() != null) {
             mobto.getEventInstance().setProperty("HP", String.valueOf(mobto.getHp()));
         }
     }
-    
+
     public static void MonsterBomb(final int oid, final MapleCharacter chr) {
         final MapleMonster monster = chr.getMap().getMonsterByOid(oid);
         if (monster == null || !chr.isAlive() || chr.isHidden()) {
@@ -136,7 +134,7 @@ public class MobHandler
             chr.getMap().killMonster(monster, chr, false, false, selfd);
         }
     }
-    
+
     public static void AutoAggro(final int monsteroid, final MapleCharacter chr) {
         if (chr == null || chr.getMap() == null || chr.isHidden()) {
             return;
@@ -146,12 +144,10 @@ public class MobHandler
             if (monster.getController() != null) {
                 if (chr.getMap().getCharacterById(monster.getController().getId()) == null) {
                     monster.switchController(chr, true);
-                }
-                else {
+                } else {
                     monster.switchController(monster.getController(), true);
                 }
-            }
-            else {
+            } else {
                 monster.switchController(chr, true);
             }
         }

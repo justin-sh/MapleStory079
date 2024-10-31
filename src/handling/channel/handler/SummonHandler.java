@@ -1,35 +1,25 @@
 package handling.channel.handler;
 
-import client.ISkill;
-import client.MapleBuffStat;
-import client.MapleCharacter;
-import client.MapleClient;
-import client.SkillFactory;
-import client.SummonSkillEntry;
+import client.*;
 import client.anticheat.CheatingOffense;
 import client.status.MonsterStatus;
 import client.status.MonsterStatusEffect;
-import java.awt.Point;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import server.MapleStatEffect;
 import server.life.MapleMonster;
 import server.life.SummonAttackEntry;
-import server.maps.AnimatedMapleMapObject;
-import server.maps.MapleMap;
-import server.maps.MapleMapObject;
-import server.maps.MapleMapObjectType;
-import server.maps.MapleSummon;
-import server.maps.SummonMovementType;
+import server.maps.*;
 import server.movement.LifeMovementFragment;
 import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 import tools.packet.MobPacket;
 
-public class SummonHandler
-{
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+public class SummonHandler {
     public static void MoveSummon(final SeekableLittleEndianAccessor slea, final MapleCharacter chr) {
         final int oid = slea.readInt();
         final Point startPos = new Point(slea.readShort(), slea.readShort());
@@ -49,7 +39,7 @@ public class SummonHandler
             }
         }
     }
-    
+
     public static void DamageSummon(final SeekableLittleEndianAccessor slea, final MapleCharacter chr) {
         if (chr == null || !chr.isAlive() || chr.getMap() == null) {
             return;
@@ -63,7 +53,7 @@ public class SummonHandler
             while (iter.hasNext()) {
                 final MapleSummon summon = iter.next();
                 if (summon.is替身术() && summon.getOwnerId() == chr.getId() && damage > 0) {
-                    summon.addHP((short)(-damage));
+                    summon.addHP((short) (-damage));
                     if (summon.getHP() <= 0) {
                         remove = true;
                     }
@@ -71,15 +61,14 @@ public class SummonHandler
                     break;
                 }
             }
-        }
-        finally {
+        } finally {
             chr.unlockSummonsReadLock();
         }
         if (remove) {
             chr.cancelEffectFromBuffStat(MapleBuffStat.替身术);
         }
     }
-    
+
     public static void SummonAttack(final SeekableLittleEndianAccessor slea, final MapleClient c, final MapleCharacter chr) {
         if (chr == null || !chr.isAlive() || chr.getMap() == null) {
             return;
@@ -89,7 +78,7 @@ public class SummonHandler
         if (obj == null) {
             return;
         }
-        final MapleSummon summon = (MapleSummon)obj;
+        final MapleSummon summon = (MapleSummon) obj;
         if (summon.getOwnerId() != chr.getId() || summon.getSkillLevel() <= 0) {
             return;
         }
@@ -124,7 +113,8 @@ public class SummonHandler
                 allDamage.add(new SummonAttackEntry(mob, damage));
             }
         }
-        if (!summon.isChangedMap()) {}
+        if (!summon.isChangedMap()) {
+        }
         final ISkill summonSkill = SkillFactory.getSkill(summon.getSkill());
         final MapleStatEffect summonEffect = summonSkill.getEffect(summon.getSkillLevel());
         if (summonEffect == null) {

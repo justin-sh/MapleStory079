@@ -5,12 +5,10 @@ import client.MapleClient;
 import handling.MaplePacket;
 import handling.world.World;
 import handling.world.guild.MapleGuild;
-import java.util.Iterator;
 import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
-public class AllianceHandler
-{
+public class AllianceHandler {
     public static void HandleAlliance(SeekableLittleEndianAccessor slea, MapleClient c, boolean denied) {
         int inviteid, newGuild, gid;
         if (c.getPlayer().getGuildId() <= 0) {

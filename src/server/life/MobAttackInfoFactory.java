@@ -1,8 +1,5 @@
 package server.life;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
@@ -10,16 +7,19 @@ import provider.MapleDataTool;
 import tools.Pair;
 import tools.StringUtil;
 
-public class MobAttackInfoFactory
-{
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
+public class MobAttackInfoFactory {
     private static final MobAttackInfoFactory instance;
     private static final MapleDataProvider dataSource;
     private static final Map<Pair<Integer, Integer>, MobAttackInfo> mobAttacks;
-    
+
     public static MobAttackInfoFactory getInstance() {
         return MobAttackInfoFactory.instance;
     }
-    
+
     public MobAttackInfo getMobAttackInfo(final MapleMonster mob, final int attack) {
         MobAttackInfo ret = MobAttackInfoFactory.mobAttacks.get(new Pair(mob.getId(), attack));
         if (ret != null) {
@@ -45,7 +45,7 @@ public class MobAttackInfoFactory
         MobAttackInfoFactory.mobAttacks.put(new Pair<Integer, Integer>(mob.getId(), attack), ret);
         return ret;
     }
-    
+
     static {
         instance = new MobAttackInfoFactory();
         dataSource = MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzPath") + "/Mob.wz"));

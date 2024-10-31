@@ -1,7 +1,6 @@
 package server.life;
 
-public class MonsterGlobalDropEntry
-{
+public class MonsterGlobalDropEntry {
     public byte dropType;
     public short questid;
     public int itemId;
@@ -10,7 +9,7 @@ public class MonsterGlobalDropEntry
     public int Maximum;
     public int continent;
     public boolean onlySelf;
-    
+
     public MonsterGlobalDropEntry(final int itemId, final int chance, final int continent, final byte dropType, final int Minimum, final int Maximum, final short questid) {
         this.onlySelf = false;
         this.itemId = itemId;
@@ -21,7 +20,7 @@ public class MonsterGlobalDropEntry
         this.Minimum = Minimum;
         this.Maximum = Maximum;
     }
-    
+
     public MonsterGlobalDropEntry(final int itemId, final int chance, final int continent, final byte dropType, final int Minimum, final int Maximum, final short questid, final boolean onlySelf) {
         this.onlySelf = false;
         this.itemId = itemId;

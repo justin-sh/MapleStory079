@@ -6,8 +6,7 @@ import tools.FileoutputUtil;
 import tools.StringUtil;
 import tools.data.input.SeekableLittleEndianAccessor;
 
-public class PacketErrorHandler
-{
+public class PacketErrorHandler {
     public static void handlePacket(final SeekableLittleEndianAccessor slea, final MapleClient c) {
         if (slea.available() >= 6L) {
             slea.skip(6);
@@ -25,7 +24,7 @@ public class PacketErrorHandler
             FileoutputUtil.packetLog("logs/封包出错.log", from + Recv);
         }
     }
-    
+
     private static String lookupRecv(final int val) {
         for (final SendPacketOpcode op : SendPacketOpcode.values()) {
             if (op.getValue() == val) {

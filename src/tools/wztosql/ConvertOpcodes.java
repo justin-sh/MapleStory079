@@ -1,12 +1,14 @@
 package tools.wztosql;
 
-import java.util.*;
-import tools.*;
-import handling.*;
-import java.io.*;
+import handling.RecvPacketOpcode;
+import handling.SendPacketOpcode;
+import tools.HexTool;
 
-public class ConvertOpcodes
-{
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Scanner;
+
+public class ConvertOpcodes {
     public static void main(final String[] args) throws IOException {
         final StringBuilder sb = new StringBuilder();
         final Scanner input = new Scanner(System.in);

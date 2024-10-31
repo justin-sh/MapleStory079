@@ -1,23 +1,9 @@
 package client.messages.commands;
 
 
-import client.ISkill;
-import client.LoginCrypto;
-import client.MapleCharacter;
-import client.MapleCharacterUtil;
-import client.MapleClient;
-import client.MapleDisease;
-import client.MapleStat;
-import client.SkillFactory;
+import client.*;
 import client.anticheat.CheatingOffense;
-import client.inventory.Equip;
-import client.inventory.IItem;
-import client.inventory.ItemFlag;
-import client.inventory.MapleInventory;
-import client.inventory.MapleInventoryIdentifier;
-import client.inventory.MapleInventoryType;
-import client.inventory.MaplePet;
-import client.inventory.MapleRing;
+import client.inventory.*;
 import client.messages.CommandProcessorUtil;
 import client.messages.CopyItemInfo;
 import constants.GameConstants;
@@ -34,41 +20,19 @@ import scripting.EventManager;
 import scripting.NPCScriptManager;
 import scripting.PortalScriptManager;
 import scripting.ReactorScriptManager;
-import server.CashItemFactory;
-import server.MapleInventoryManipulator;
-import server.MapleItemInformationProvider;
-import server.MaplePortal;
-import server.MapleShopFactory;
-import server.ShutdownServer;
 import server.Timer;
+import server.*;
 import server.events.MapleEvent;
 import server.events.MapleEventType;
 import server.events.MapleOxQuizFactory;
-import server.life.MapleLifeFactory;
-import server.life.MapleMonster;
-import server.life.MapleMonsterInformationProvider;
-import server.life.MapleNPC;
-import server.life.MobSkillFactory;
-import server.life.OverrideMonsterStats;
-import server.life.PlayerNPC;
-import server.maps.MapleMap;
-import server.maps.MapleMapObject;
-import server.maps.MapleMapObjectType;
-import server.maps.MapleReactor;
-import server.maps.MapleReactorFactory;
-import server.maps.MapleReactorStats;
+import server.life.*;
+import server.maps.*;
 import server.quest.MapleQuest;
-import tools.ArrayMap;
-import tools.CPUSampler;
-import tools.FileoutputUtil;
-import tools.HexTool;
-import tools.MaplePacketCreator;
-import tools.MockIOSession;
-import tools.StringUtil;
+import tools.*;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.MobPacket;
 
-import java.awt.Point;
+import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -77,13 +41,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.*;
 import java.util.concurrent.ScheduledFuture;
 
 public class AdminCommand {
@@ -120,7 +79,6 @@ public class AdminCommand {
 
     public static class 给所有人点卷 extends CashEveryone {
     }
-
 
 
     public static class 刷新地图 extends ReloadMap {
@@ -1287,7 +1245,6 @@ public class AdminCommand {
             return new StringBuilder().append("!选择活动 - 选择活动").toString();
         }
     }
-
 
 
     public static class RemoveItem extends CommandExecute {

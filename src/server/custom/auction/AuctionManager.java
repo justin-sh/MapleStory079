@@ -2,18 +2,14 @@ package server.custom.auction;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.inventory.Equip;
-import client.inventory.IEquip;
-import client.inventory.IItem;
-import client.inventory.Item;
-import client.inventory.ItemFlag;
-import client.inventory.MapleInventoryIdentifier;
-import client.inventory.MapleInventoryType;
-import client.inventory.MaplePet;
-import client.inventory.MapleRing;
+import client.inventory.*;
 import constants.GameConstants;
 import constants.OtherSettings;
 import database.DatabaseConnection;
+import server.MapleInventoryManipulator;
+import server.MapleItemInformationProvider;
+import tools.MaplePacketCreator;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,19 +17,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import server.MapleInventoryManipulator;
-import server.MapleItemInformationProvider;
-import tools.MaplePacketCreator;
 
-public class AuctionManager
-{
+public class AuctionManager {
     public static AuctionManager getInstance() {
         return InstanceHolder.instance;
     }
-    
+
     private AuctionManager() {
     }
-    
+
     public final void gainItem(final IItem item, final short quantity, final MapleClient cg) {
         if (quantity >= 0) {
             final MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
@@ -42,7 +34,7 @@ public class AuctionManager
                 return;
             }
             if (type.equals(MapleInventoryType.EQUIP) && !GameConstants.isThrowingStar(item.getItemId()) && !GameConstants.isBullet(item.getItemId())) {
-                final Equip equip = (Equip)item;
+                final Equip equip = (Equip) item;
                 final String name = ii.getName(item.getItemId());
                 if (item.getItemId() / 10000 == 114 && name != null && name.length() > 0) {
                     final String msg = "你已获得称号 <" + name + ">";
@@ -50,17 +42,15 @@ public class AuctionManager
                     cg.getPlayer().dropMessage(5, msg);
                 }
                 MapleInventoryManipulator.addbyItem(cg, equip.copy());
-            }
-            else {
+            } else {
                 MapleInventoryManipulator.addbyItem(cg, item.copy());
             }
-        }
-        else {
+        } else {
             MapleInventoryManipulator.removeById(cg, GameConstants.getInventoryType(item.getItemId()), item.getItemId(), -quantity, true, false);
         }
         cg.getSession().write(MaplePacketCreator.getShowItemGain(item.getItemId(), quantity, true));
     }
-    
+
     public int putInt(final MapleCharacter player, final IItem source, short quantity) {
         final int ret = 1;
         if (player == null || source == null) {
@@ -102,15 +92,15 @@ public class AuctionManager
         MapleInventoryManipulator.removeFromSlot(player.getClient(), itemtype, source.getPosition(), quantity, false);
         return ret;
     }
-    
+
     public int takeOutAuctionItem(final MapleCharacter player, final long id) {
         final AuctionItem auctionItem = this.findById(id);
         if (auctionItem == null) {
             return -5;
         }
-        return this.takeOutAuctionItem(player, id, (short)auctionItem.getQuantity());
+        return this.takeOutAuctionItem(player, id, (short) auctionItem.getQuantity());
     }
-    
+
     public int takeOutAuctionItem(final MapleCharacter player, final long id, final short count) {
         final AuctionItem auctionItem = this.findById(id);
         if (auctionItem == null) {
@@ -118,7 +108,7 @@ public class AuctionManager
         }
         return this.takeOutAuctionItem(player, auctionItem, count);
     }
-    
+
     public int takeOutAuctionItem(final MapleCharacter player, final AuctionItem auctionItem, final short count) {
         if (auctionItem == null) {
             return -5;
@@ -139,8 +129,7 @@ public class AuctionManager
         if (count < auctionItem.getQuantity() && !GameConstants.isThrowingStar(auctionItem.getItem().getItemId()) && !GameConstants.isBullet(auctionItem.getItem().getItemId())) {
             auctionItem.setQuantity(auctionItem.getQuantity() - count);
             ret = getInstance().update(auctionItem);
-        }
-        else {
+        } else {
             ret = getInstance().deleteById(auctionItem.getId());
         }
         if (ret > 0) {
@@ -148,7 +137,7 @@ public class AuctionManager
         }
         return ret;
     }
-    
+
     public int buy(final MapleCharacter player, final long id) {
         final AuctionItem auctionItem = this.findById(id);
         if (auctionItem == null) {
@@ -156,7 +145,7 @@ public class AuctionManager
         }
         return this.buy(player, auctionItem);
     }
-    
+
     public int buy(final MapleCharacter player, final AuctionItem auctionItem) {
         int ret = -1;
         if (auctionItem == null) {
@@ -188,13 +177,13 @@ public class AuctionManager
                         this.addPointSell(auctionItem.getCharacterid(), auctionItem.getPrice());
                         this.addPointBuy(player.getId(), auctionItem.getPrice());
                     }
-                    this.gainItem(auctionItem.getItem(), (short)auctionItem.getQuantity(), player.getClient());
+                    this.gainItem(auctionItem.getItem(), (short) auctionItem.getQuantity(), player.getClient());
                 }
             }
         }
         return ret;
     }
-    
+
     public int setPutaway(final long id, final int price) {
         final AuctionItem auctionItem = this.findById(id);
         if (auctionItem == null) {
@@ -203,7 +192,7 @@ public class AuctionManager
         auctionItem.setPrice(price);
         return this.setPutaway(auctionItem);
     }
-    
+
     public int setPutaway(final AuctionItem auctionItem) {
         if (AuctionState.下架 != auctionItem.getAuctionState()) {
             return -6;
@@ -214,7 +203,7 @@ public class AuctionManager
         auctionItem.setAuctionState(AuctionState.上架);
         return this.update(auctionItem);
     }
-    
+
     public int soldOut(final long id) {
         final AuctionItem auctionItem = this.findById(id);
         if (auctionItem == null) {
@@ -222,7 +211,7 @@ public class AuctionManager
         }
         return this.soldOut(auctionItem);
     }
-    
+
     public int soldOut(final AuctionItem auctionItem) {
         if (AuctionState.上架 != auctionItem.getAuctionState()) {
             return -6;
@@ -231,7 +220,7 @@ public class AuctionManager
         auctionItem.setPrice(0);
         return this.update(auctionItem);
     }
-    
+
     public AuctionPoint getAuctionPoint(final int characterid) {
         AuctionPoint auctionPoint = null;
         PreparedStatement ps = null;
@@ -254,17 +243,14 @@ public class AuctionManager
                 if (ps != null) {
                     ps.close();
                 }
-            }
-            catch (SQLException ex) {
+            } catch (SQLException ex) {
                 Logger.getLogger(AuctionManager.class.getName()).log(Level.SEVERE, null, ex);
                 return null;
             }
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             Logger.getLogger(AuctionManager.class.getName()).log(Level.SEVERE, null, ex);
             return null;
-        }
-        finally {
+        } finally {
             try {
                 if (rs != null) {
                     rs.close();
@@ -272,27 +258,26 @@ public class AuctionManager
                 if (ps != null) {
                     ps.close();
                 }
-            }
-            catch (SQLException ex2) {
+            } catch (SQLException ex2) {
                 Logger.getLogger(AuctionManager.class.getName()).log(Level.SEVERE, null, ex2);
                 return null;
             }
         }
         return auctionPoint;
     }
-    
+
     public int addPoint(final int characterid, final long point) {
         return this.addPoint(characterid, point, 1);
     }
-    
+
     public int addPointSell(final int characterid, final long point) {
         return this.addPoint(characterid, point, 2);
     }
-    
+
     public int addPointBuy(final int characterid, final long point) {
         return this.addPoint(characterid, point, 3);
     }
-    
+
     public int addPoint(final int characterid, final long point, final int type) {
         int ret = -1;
         boolean update = false;
@@ -300,8 +285,7 @@ public class AuctionManager
         if (dbPoint == null) {
             dbPoint = new AuctionPoint();
             dbPoint.setCharacterid(characterid);
-        }
-        else {
+        } else {
             update = true;
         }
         switch (type) {
@@ -326,8 +310,7 @@ public class AuctionManager
                 ps.setLong(2, dbPoint.getPoint_sell());
                 ps.setLong(3, dbPoint.getPoint_buy());
                 ps.setInt(4, dbPoint.getCharacterid());
-            }
-            else {
+            } else {
                 ps = DatabaseConnection.getConnection().prepareStatement("INSERT INTO `auctionPoint` VALUES (?, ?, ?, ?)");
                 ps.setInt(1, dbPoint.getCharacterid());
                 ps.setLong(2, dbPoint.getPoint());
@@ -339,30 +322,26 @@ public class AuctionManager
                 if (ps != null) {
                     ps.close();
                 }
-            }
-            catch (SQLException ex) {
+            } catch (SQLException ex) {
                 Logger.getLogger(AuctionManager.class.getName()).log(Level.SEVERE, null, ex);
                 return -2;
             }
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             Logger.getLogger(AuctionManager.class.getName()).log(Level.SEVERE, null, ex);
             return -2;
-        }
-        finally {
+        } finally {
             try {
                 if (ps != null) {
                     ps.close();
                 }
-            }
-            catch (SQLException ex2) {
+            } catch (SQLException ex2) {
                 Logger.getLogger(AuctionManager.class.getName()).log(Level.SEVERE, null, ex2);
                 return -2;
             }
         }
         return ret;
     }
-    
+
     public int add(final AuctionItem auctionItem) {
         int ret = -1;
         final MapleInventoryType itemtype = this.getItemTypeByItemId(auctionItem.getItem().getItemId());
@@ -371,8 +350,7 @@ public class AuctionManager
         try {
             if (itemtype.equals(MapleInventoryType.EQUIP) || itemtype.equals(MapleInventoryType.EQUIPPED)) {
                 ps = DatabaseConnection.getConnection().prepareStatement("INSERT INTO `auctionitems` VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 1);
-            }
-            else {
+            } else {
                 ps = DatabaseConnection.getConnection().prepareStatement("INSERT INTO `auctionitems` (characterid,characterName,auctionState,buyer,buyerName,price,itemid,inventorytype,quantity,owner,GM_Log,uniqueid,flag,expiredate,sender) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 1);
             }
             this.mapSavePs(ps, auctionItem);
@@ -388,17 +366,14 @@ public class AuctionManager
                 if (ps != null) {
                     ps.close();
                 }
-            }
-            catch (SQLException ex) {
+            } catch (SQLException ex) {
                 Logger.getLogger(AuctionManager.class.getName()).log(Level.SEVERE, null, ex);
                 return -2;
             }
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             Logger.getLogger(AuctionManager.class.getName()).log(Level.SEVERE, null, ex);
             return -2;
-        }
-        finally {
+        } finally {
             try {
                 if (rs != null) {
                     rs.close();
@@ -406,15 +381,14 @@ public class AuctionManager
                 if (ps != null) {
                     ps.close();
                 }
-            }
-            catch (SQLException ex2) {
+            } catch (SQLException ex2) {
                 Logger.getLogger(AuctionManager.class.getName()).log(Level.SEVERE, null, ex2);
                 return -2;
             }
         }
         return ret;
     }
-    
+
     public int update(final AuctionItem auctionItem) {
         int ret = -1;
         final MapleInventoryType itemtype = this.getItemTypeByItemId(auctionItem.getItem().getItemId());
@@ -423,15 +397,13 @@ public class AuctionManager
         try {
             if (itemtype.equals(MapleInventoryType.EQUIP) || itemtype.equals(MapleInventoryType.EQUIPPED)) {
                 ps = DatabaseConnection.getConnection().prepareStatement("UPDATE `auctionitems` SET characterid = ? ,characterName = ? ,auctionState = ?,buyer = ?,buyerName = ? ,price = ?,itemid = ?,inventorytype = ?,quantity = ?,owner = ?,GM_Log = ?,uniqueid = ?,flag = ?,expiredate = ?,sender = ?,upgradeslots = ?,level = ?,str = ?,dex = ?,_int = ?,luk = ?,hp = ?,mp = ?,watk = ?,matk = ?,wdef = ?,mdef = ?,acc = ?,avoid = ?,hands = ?,speed = ?,jump = ?,ViciousHammer = ?,itemEXP = ?,durability = ?,enhance = ?,potential1 = ?,potential2 = ?,potential3 = ?,hpR = ?,mpR = ?,itemlevel = ? where id = ?");
-            }
-            else {
+            } else {
                 ps = DatabaseConnection.getConnection().prepareStatement("UPDATE `auctionitems` SET characterid = ?, characterName = ? ,auctionState = ?,buyer = ?,buyerName = ? ,price = ?,itemid = ?,inventorytype = ?,quantity = ?,owner = ?,GM_Log = ?,uniqueid = ?,flag = ?,expiredate = ?,sender = ? where id = ?");
             }
             this.mapSavePs(ps, auctionItem);
             if (itemtype.equals(MapleInventoryType.EQUIP) || itemtype.equals(MapleInventoryType.EQUIPPED)) {
                 ps.setLong(43, auctionItem.getId());
-            }
-            else {
+            } else {
                 ps.setLong(16, auctionItem.getId());
             }
             ret = ps.executeUpdate();
@@ -442,17 +414,14 @@ public class AuctionManager
                 if (ps != null) {
                     ps.close();
                 }
-            }
-            catch (SQLException ex) {
+            } catch (SQLException ex) {
                 Logger.getLogger(AuctionManager.class.getName()).log(Level.SEVERE, null, ex);
                 return -2;
             }
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             Logger.getLogger(AuctionManager.class.getName()).log(Level.SEVERE, null, ex);
             return -2;
-        }
-        finally {
+        } finally {
             try {
                 if (rs != null) {
                     rs.close();
@@ -460,15 +429,14 @@ public class AuctionManager
                 if (ps != null) {
                     ps.close();
                 }
-            }
-            catch (SQLException ex2) {
+            } catch (SQLException ex2) {
                 Logger.getLogger(AuctionManager.class.getName()).log(Level.SEVERE, null, ex2);
                 return -2;
             }
         }
         return ret;
     }
-    
+
     public int deleteById(final long id) {
         int ret = -1;
         PreparedStatement ps_del = null;
@@ -480,30 +448,26 @@ public class AuctionManager
                 if (ps_del != null) {
                     ps_del.close();
                 }
-            }
-            catch (SQLException ex) {
+            } catch (SQLException ex) {
                 Logger.getLogger(AuctionManager.class.getName()).log(Level.SEVERE, null, ex);
                 return -2;
             }
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             Logger.getLogger(AuctionManager.class.getName()).log(Level.SEVERE, null, ex);
             return -2;
-        }
-        finally {
+        } finally {
             try {
                 if (ps_del != null) {
                     ps_del.close();
                 }
-            }
-            catch (SQLException ex2) {
+            } catch (SQLException ex2) {
                 Logger.getLogger(AuctionManager.class.getName()).log(Level.SEVERE, null, ex2);
                 return -2;
             }
         }
         return ret;
     }
-    
+
     public int deletePlayerSold(final int characterid) {
         int ret = -1;
         PreparedStatement ps_del = null;
@@ -516,30 +480,26 @@ public class AuctionManager
                 if (ps_del != null) {
                     ps_del.close();
                 }
-            }
-            catch (SQLException ex) {
+            } catch (SQLException ex) {
                 Logger.getLogger(AuctionManager.class.getName()).log(Level.SEVERE, null, ex);
                 return -2;
             }
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             Logger.getLogger(AuctionManager.class.getName()).log(Level.SEVERE, null, ex);
             return -2;
-        }
-        finally {
+        } finally {
             try {
                 if (ps_del != null) {
                     ps_del.close();
                 }
-            }
-            catch (SQLException ex2) {
+            } catch (SQLException ex2) {
                 Logger.getLogger(AuctionManager.class.getName()).log(Level.SEVERE, null, ex2);
                 return -2;
             }
         }
         return ret;
     }
-    
+
     public AuctionItem findById(final long id) {
         AuctionItem auctionItem = null;
         PreparedStatement ps = null;
@@ -551,8 +511,7 @@ public class AuctionManager
             if (rs.next()) {
                 auctionItem = this.mapLoadRs(rs);
             }
-        }
-        catch (SQLException e1) {
+        } catch (SQLException e1) {
             Logger.getLogger(AuctionManager.class.getName()).log(Level.SEVERE, null, e1);
             try {
                 if (rs != null) {
@@ -561,12 +520,10 @@ public class AuctionManager
                 if (ps != null) {
                     ps.close();
                 }
-            }
-            catch (SQLException ex) {
+            } catch (SQLException ex) {
                 Logger.getLogger(AuctionManager.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
-        finally {
+        } finally {
             try {
                 if (rs != null) {
                     rs.close();
@@ -574,14 +531,13 @@ public class AuctionManager
                 if (ps != null) {
                     ps.close();
                 }
-            }
-            catch (SQLException ex2) {
+            } catch (SQLException ex2) {
                 Logger.getLogger(AuctionManager.class.getName()).log(Level.SEVERE, null, ex2);
             }
         }
         return auctionItem;
     }
-    
+
     public List<AuctionItem> findByCharacterId(final int characterid) {
         final List<AuctionItem> ret = new ArrayList<AuctionItem>();
         PreparedStatement ps = null;
@@ -596,8 +552,7 @@ public class AuctionManager
                     ret.add(auctionItem);
                 }
             }
-        }
-        catch (SQLException e1) {
+        } catch (SQLException e1) {
             Logger.getLogger(AuctionManager.class.getName()).log(Level.SEVERE, null, e1);
             try {
                 if (rs != null) {
@@ -606,12 +561,10 @@ public class AuctionManager
                 if (ps != null) {
                     ps.close();
                 }
-            }
-            catch (SQLException ex) {
+            } catch (SQLException ex) {
                 Logger.getLogger(AuctionManager.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
-        finally {
+        } finally {
             try {
                 if (rs != null) {
                     rs.close();
@@ -619,14 +572,13 @@ public class AuctionManager
                 if (ps != null) {
                     ps.close();
                 }
-            }
-            catch (SQLException ex2) {
+            } catch (SQLException ex2) {
                 Logger.getLogger(AuctionManager.class.getName()).log(Level.SEVERE, null, ex2);
             }
         }
         return ret;
     }
-    
+
     public List<AuctionItem> findByItemType(final int inventorytype) {
         final List<AuctionItem> ret = new ArrayList<AuctionItem>();
         PreparedStatement ps = null;
@@ -641,8 +593,7 @@ public class AuctionManager
                     ret.add(auctionItem);
                 }
             }
-        }
-        catch (SQLException e1) {
+        } catch (SQLException e1) {
             Logger.getLogger(AuctionManager.class.getName()).log(Level.SEVERE, null, e1);
             try {
                 if (rs != null) {
@@ -651,12 +602,10 @@ public class AuctionManager
                 if (ps != null) {
                     ps.close();
                 }
-            }
-            catch (SQLException ex) {
+            } catch (SQLException ex) {
                 Logger.getLogger(AuctionManager.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
-        finally {
+        } finally {
             try {
                 if (rs != null) {
                     rs.close();
@@ -664,18 +613,17 @@ public class AuctionManager
                 if (ps != null) {
                     ps.close();
                 }
-            }
-            catch (SQLException ex2) {
+            } catch (SQLException ex2) {
                 Logger.getLogger(AuctionManager.class.getName()).log(Level.SEVERE, null, ex2);
             }
         }
         return ret;
     }
-    
+
     public MapleInventoryType getItemTypeByItemId(final int itemid) {
-        return MapleInventoryType.getByType((byte)(itemid / 1000000));
+        return MapleInventoryType.getByType((byte) (itemid / 1000000));
     }
-    
+
     public void mapSavePs(final PreparedStatement ps, final AuctionItem auctionItem) throws SQLException {
         final MapleInventoryType itemtype = this.getItemTypeByItemId(auctionItem.getItem().getItemId());
         final IItem item = auctionItem.getItem();
@@ -695,7 +643,7 @@ public class AuctionManager
         ps.setLong(14, item.getExpiration());
         ps.setString(15, item.getGiftFrom());
         if (itemtype.equals(MapleInventoryType.EQUIP) || itemtype.equals(MapleInventoryType.EQUIPPED)) {
-            final IEquip equip = (IEquip)item;
+            final IEquip equip = (IEquip) item;
             ps.setInt(16, equip.getUpgradeSlots());
             ps.setInt(17, equip.getLevel());
             ps.setInt(18, equip.getStr());
@@ -725,7 +673,7 @@ public class AuctionManager
             ps.setByte(42, equip.getEquipLevel());
         }
     }
-    
+
     public AuctionItem mapLoadRs(final ResultSet rs) throws SQLException {
         final long id = rs.getLong("id");
         final int characterid = rs.getInt("characterid");
@@ -770,7 +718,7 @@ public class AuctionManager
         final short hpR = rs.getShort("hpR");
         final short mpR = rs.getShort("mpR");
         final byte itemlevel = rs.getByte("itemlevel");
-        final MapleInventoryType mit = MapleInventoryType.getByType((byte)inventorytype);
+        final MapleInventoryType mit = MapleInventoryType.getByType((byte) inventorytype);
         if (characterid < 1 || mit == null) {
             return null;
         }
@@ -784,8 +732,8 @@ public class AuctionManager
         auctionItem.setCharacterName(characterName);
         auctionItem.setQuantity(quantity);
         if (mit.equals(MapleInventoryType.EQUIP) || mit.equals(MapleInventoryType.EQUIPPED)) {
-            final Equip equip = new Equip(itemid, (short)0, uniqueid, flag);
-            equip.setQuantity((short)1);
+            final Equip equip = new Equip(itemid, (short) 0, uniqueid, flag);
+            equip.setQuantity((short) 1);
             equip.setOwner(owner);
             equip.setExpiration(expiredate);
             equip.setUpgradeSlots(upgradeslots);
@@ -824,9 +772,8 @@ public class AuctionManager
                 }
             }
             auctionItem.setItem(equip.copy());
-        }
-        else {
-            final Item item = new Item(itemid, (short)0, quantity, flag);
+        } else {
+            final Item item = new Item(itemid, (short) 0, quantity, flag);
             item.setUniqueId(uniqueid);
             item.setOwner(owner);
             item.setExpiration(expiredate);
@@ -838,8 +785,7 @@ public class AuctionManager
                     if (pet != null) {
                         item.setPet(pet);
                     }
-                }
-                else {
+                } else {
                     final int new_unique = MapleInventoryIdentifier.getInstance();
                     item.setUniqueId(new_unique);
                     item.setPet(MaplePet.createPet(item.getItemId(), new_unique));
@@ -849,11 +795,10 @@ public class AuctionManager
         }
         return auctionItem;
     }
-    
-    private static class InstanceHolder
-    {
+
+    private static class InstanceHolder {
         public static final AuctionManager instance;
-        
+
         static {
             instance = new AuctionManager();
         }

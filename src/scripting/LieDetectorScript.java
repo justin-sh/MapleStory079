@@ -4,11 +4,7 @@ import server.Randomizer;
 import tools.HexTool;
 import tools.Pair;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 
 public class LieDetectorScript {
@@ -31,7 +27,7 @@ public class LieDetectorScript {
         } catch (IOException ex) {
             ex.printStackTrace();
             String scriptsPath = System.getProperty("scripts_path");
-            final File directory = new File(scriptsPath+"scripts"+File.separator+"lieDetector");
+            final File directory = new File(scriptsPath + "scripts" + File.separator + "lieDetector");
             if (!directory.exists()) {
                 System.err.println("lieDetector folder does not exist!");
                 return null;
@@ -40,7 +36,7 @@ public class LieDetectorScript {
             String answer = filename[Randomizer.nextInt(filename.length)];
             answer = answer.substring(0, answer.length() - 4);
             try {
-                return new Pair<String, String>(HexTool.toString(getBytesFromFile(new File(scriptsPath+"scripts"+File.separator+"lieDetector"+File.separator + answer + ".jpg"))), answer);
+                return new Pair<String, String>(HexTool.toString(getBytesFromFile(new File(scriptsPath + "scripts" + File.separator + "lieDetector" + File.separator + answer + ".jpg"))), answer);
             } catch (IOException ex2) {
                 ex2.printStackTrace();
                 return null;

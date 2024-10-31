@@ -1,15 +1,12 @@
 package tools.wztosql;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
+
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
 
-public class WzStringDumper宠物数据
-{
+import java.io.*;
+
+public class WzStringDumper宠物数据 {
     public static void main(final String[] args) throws FileNotFoundException, IOException {
         final File stringFile = MapleDataProviderFactory.fileInwzPath("String.wz");
         final MapleDataProvider stringProvider = MapleDataProviderFactory.getDataProvider(stringFile);

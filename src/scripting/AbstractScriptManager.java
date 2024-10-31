@@ -1,20 +1,13 @@
 package scripting;
 
 import client.MapleClient;
+import tools.FileoutputUtil;
+import tools.MaplePacketCreator;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-
-import tools.FileoutputUtil;
-import tools.MaplePacketCreator;
+import java.io.*;
 
 public abstract class AbstractScriptManager {
     private static final ScriptEngineManager sem;
@@ -26,8 +19,8 @@ public abstract class AbstractScriptManager {
     protected Invocable getInvocable(String path, final MapleClient c, final boolean npc) {
         InputStream fr = null;
         try {
-           String serverPath = System.getProperty("scripts_path");
-            path = serverPath +"scripts"+File.separator + path;
+            String serverPath = System.getProperty("scripts_path");
+            path = serverPath + "scripts" + File.separator + path;
             ScriptEngine engine = null;
             if (c != null) {
                 engine = c.getScriptEngine(path);

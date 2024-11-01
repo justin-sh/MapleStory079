@@ -20,38 +20,35 @@ public class AutoRegister {
     public static boolean success;
     public static boolean mac;
 
-    public static boolean getAccountExists(final String login) {
+    public static boolean checkAccountExistsByName(final String login) {
         boolean accountExists = false;
         final Connection con = DatabaseConnection.getConnection();
         try {
             final PreparedStatement ps = con.prepareStatement("SELECT name FROM accounts WHERE name = ?");
             ps.setString(1, login);
             final ResultSet rs = ps.executeQuery();
-            if (rs.first()) {
-                accountExists = true;
-            }
+            accountExists = rs.next();
             rs.close();
             ps.close();
         } catch (SQLException ex) {
-            System.out.println("getAccountExists   " + ex);
+            logger.warn("check account exist by login failed!", ex);
         }
         return accountExists;
     }
 
-    public static boolean getAccountExistsByID(final int id) {
+    public static boolean checkAccountExistsById(final int id) {
         boolean accountExists = false;
         final Connection con = DatabaseConnection.getConnection();
         try {
             final PreparedStatement ps = con.prepareStatement("SELECT name FROM accounts WHERE id = ?");
             ps.setInt(1, id);
             final ResultSet rs = ps.executeQuery();
-            if (rs.first()) {
-                accountExists = true;
-            }
+            accountExists = rs.next();
+
             rs.close();
             ps.close();
         } catch (SQLException ex) {
-            logger.warn("check account exist failed!", ex);
+            logger.warn("check account exist by id failed!", ex);
         }
         return accountExists;
     }
@@ -63,7 +60,7 @@ public class AutoRegister {
             final PreparedStatement ipc = con.prepareStatement("SELECT count(1) as cnt FROM accounts WHERE macs = ?");
             ipc.setString(1, macs);
             final ResultSet rs = ipc.executeQuery();
-            int macAccCnt = rs.next() ? rs.getInt(0) : 0;
+            int macAccCnt = rs.next() ? rs.getInt(1) : 0;
             if (macAccCnt < ACCOUNTS_PER_MAC) {
                 final PreparedStatement ps = con.prepareStatement("INSERT INTO accounts (name, password, email, birthday, macs, SessionIP) VALUES (?, ?, ?, ?, ?, ?)");
                 ps.setString(1, login);

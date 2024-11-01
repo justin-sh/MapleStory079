@@ -705,7 +705,7 @@ public class RoyMS extends JFrame {
 
     private void 不可以万能登录() {
         final String account = this.jTextField24.getText();
-        if (!AutoRegister.getAccountExists(account)) {
+        if (!AutoRegister.checkAccountExistsByName(account)) {
             JOptionPane.showMessageDialog(null, "账号不存在");
             return;
         }
@@ -725,7 +725,7 @@ public class RoyMS extends JFrame {
 
     private void 可以万能登录() {
         final String account = this.jTextField24.getText();
-        if (!AutoRegister.getAccountExists(account)) {
+        if (!AutoRegister.checkAccountExistsByName(account)) {
             JOptionPane.showMessageDialog(null, "账号不存在");
             return;
         }
@@ -750,7 +750,7 @@ public class RoyMS extends JFrame {
             JOptionPane.showMessageDialog(null, "密码过长");
             return;
         }
-        if (!AutoRegister.getAccountExists(account)) {
+        if (!AutoRegister.checkAccountExistsByName(account)) {
             JOptionPane.showMessageDialog(null, "账号不存在");
             return;
         }

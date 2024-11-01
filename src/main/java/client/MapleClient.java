@@ -10,6 +10,8 @@ import handling.world.*;
 import handling.world.family.MapleFamilyCharacter;
 import handling.world.guild.MapleGuildCharacter;
 import org.apache.mina.core.session.IoSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import server.Timer;
 import server.maps.MapleMap;
 import server.quest.MapleQuest;
@@ -31,6 +33,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class MapleClient implements Serializable {
+
+    private final static Logger logger = LoggerFactory.getLogger(MapleClient.class);
+
     private static final long serialVersionUID = 9179541993413738569L;
     public static transient byte LOGIN_NOTLOGGEDIN;
     public static transient byte LOGIN_SERVER_TRANSITION;
@@ -435,12 +440,14 @@ public class MapleClient implements Serializable {
 
     private Calendar getTempBanCalendar(final ResultSet rs) throws SQLException {
         final Calendar lTempban = Calendar.getInstance();
-        if (rs.getLong("tempban") == 0L) {
+
+        java.sql.Timestamp banTime = rs.getTimestamp("tempban");
+        if (banTime == null) {
             lTempban.setTimeInMillis(0L);
             return lTempban;
         }
         final Calendar today = Calendar.getInstance();
-        lTempban.setTimeInMillis(rs.getTimestamp("tempban").getTime());
+        lTempban.setTimeInMillis(banTime.getTime());
         if (today.getTimeInMillis() < lTempban.getTimeInMillis()) {
             return lTempban;
         }
@@ -687,7 +694,7 @@ public class MapleClient implements Serializable {
             rs.close();
             ps.close();
         } catch (SQLException e) {
-            System.err.println("ERROR" + e);
+            logger.error("login failed!", e);
         }
         return loginok;
     }

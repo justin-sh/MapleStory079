@@ -3470,7 +3470,7 @@ public class AdminCommand {
                 c.getPlayer().dropMessage("账号或密码异常");
                 return 0;
             }
-            final boolean ACCexist = AutoRegister.getAccountExists(acc);
+            final boolean ACCexist = AutoRegister.checkAccountExistsByName(acc);
             if (ACCexist) {
                 c.getPlayer().dropMessage("帐号已被使用");
                 return 0;

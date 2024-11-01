@@ -11,6 +11,8 @@ import handling.channel.ChannelServer;
 import handling.login.LoginInformationProvider;
 import handling.login.LoginServer;
 import handling.login.LoginWorker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import server.MapleItemInformationProvider;
 import server.ServerProperties;
 import server.quest.MapleQuest;
@@ -25,12 +27,15 @@ import java.util.Calendar;
 import java.util.List;
 
 public class CharLoginHandler {
+
+    private final static Logger logger = LoggerFactory.getLogger(CharLoginHandler.class);
+
     private static boolean loginFailCount(final MapleClient c) {
         ++c.loginAttempt;
         return c.loginAttempt > 5;
     }
 
-    public static final void login(final SeekableLittleEndianAccessor slea, final MapleClient c) {
+    public static void login(final SeekableLittleEndianAccessor slea, final MapleClient c) {
         final String login = slea.readMapleAsciiString();
         final String pwd = slea.readMapleAsciiString();
         c.setAccountName(login);
@@ -58,7 +63,7 @@ public class CharLoginHandler {
         final boolean macBan = c.isBannedMac(macData);
         final boolean banned = ipBan || macBan || 防万能;
         int loginok = 0;
-        if (!Boolean.parseBoolean(ServerProperties.getProperty("RoyMS.AutoRegister")) || !AutoRegister.autoRegister || AutoRegister.getAccountExists(login) || banned) {
+        if (!Boolean.parseBoolean(ServerProperties.getProperty("RoyMS.AutoRegister")) || !AutoRegister.autoRegister || AutoRegister.checkAccountExistsByName(login) || banned) {
             AutoRegister.success = true;
             AutoRegister.mac = true;
             loginok = c.login(login, pwd, ipBan || macBan || 防万能);

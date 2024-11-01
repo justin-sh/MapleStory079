@@ -3,6 +3,8 @@ package handling.login.handler;
 import client.LoginCrypto;
 import constants.ServerConstants;
 import database.DatabaseConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,6 +12,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class AutoRegister {
+
+    private static final Logger logger = LoggerFactory.getLogger(AutoRegister.class);
+
     private static final int ACCOUNTS_PER_MAC = 100;
     public static boolean autoRegister;
     public static boolean success;
@@ -46,25 +51,20 @@ public class AutoRegister {
             rs.close();
             ps.close();
         } catch (SQLException ex) {
-            System.out.println("getAccountExists   " + ex);
+            logger.warn("check account exist failed!", ex);
         }
         return accountExists;
     }
 
     public static void createAccount(final String login, final String pwd, final String eip, final String macs) {
         final String sockAddr = eip;
-        Connection con;
+        Connection con = DatabaseConnection.getConnection();
         try {
-            con = DatabaseConnection.getConnection();
-        } catch (Exception ex) {
-            System.out.println(ex);
-            return;
-        }
-        try {
-            final PreparedStatement ipc = con.prepareStatement("SELECT macs FROM accounts WHERE macs = ?");
+            final PreparedStatement ipc = con.prepareStatement("SELECT count(1) as cnt FROM accounts WHERE macs = ?");
             ipc.setString(1, macs);
             final ResultSet rs = ipc.executeQuery();
-            if (!rs.first() || (rs.last() && rs.getRow() < 100)) {
+            int macAccCnt = rs.next() ? rs.getInt(0) : 0;
+            if (macAccCnt < ACCOUNTS_PER_MAC) {
                 final PreparedStatement ps = con.prepareStatement("INSERT INTO accounts (name, password, email, birthday, macs, SessionIP) VALUES (?, ?, ?, ?, ?, ?)");
                 ps.setString(1, login);
                 ps.setString(2, LoginCrypto.hexSha1(pwd));
@@ -75,13 +75,11 @@ public class AutoRegister {
                 ps.executeUpdate();
                 AutoRegister.success = true;
             }
-            AutoRegister.success = true;
-            if (rs.getRow() >= 100) {
+            if (macAccCnt >= 100) {
                 AutoRegister.mac = false;
             }
         } catch (SQLException ex2) {
-            ex2.printStackTrace();
-            System.out.println(ex2);
+            logger.error("auto register failed!", ex2);
         }
     }
 

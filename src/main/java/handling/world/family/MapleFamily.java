@@ -4,6 +4,8 @@ import client.MapleCharacter;
 import database.DatabaseConnection;
 import handling.MaplePacket;
 import handling.world.World;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tools.MaplePacketCreator;
 import tools.packet.FamilyPacket;
 
@@ -16,6 +18,9 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MapleFamily implements Serializable {
+
+    private final static Logger logger = LoggerFactory.getLogger(MapleFamily.class);
+
     public static long serialVersionUID;
     private Map<Integer, MapleFamilyCharacter> members;
     private String leadername;
@@ -116,7 +121,7 @@ public class MapleFamily implements Serializable {
             PreparedStatement ps = con.prepareStatement("SELECT * FROM families WHERE familyid = ?");
             ps.setInt(1, fid);
             ResultSet rs = ps.executeQuery();
-            if (!rs.first()) {
+            if (!rs.next()) {
                 rs.close();
                 ps.close();
                 this.id = -1;
@@ -187,8 +192,7 @@ public class MapleFamily implements Serializable {
             this.resetDescendants();
             this.resetGens();
         } catch (SQLException se) {
-            System.err.println("unable to read family information from sql");
-            se.printStackTrace();
+            logger.error("unable to read family information!", se);
         }
     }
 
@@ -242,8 +246,7 @@ public class MapleFamily implements Serializable {
                 ps.close();
             }
         } catch (SQLException se) {
-            System.err.println("Error saving family to SQL");
-            se.printStackTrace();
+            logger.error("unable to save family information!", se);
         }
     }
 

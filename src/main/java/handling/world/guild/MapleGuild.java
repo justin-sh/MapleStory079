@@ -6,6 +6,8 @@ import client.MapleClient;
 import database.DatabaseConnection;
 import handling.MaplePacket;
 import handling.world.World;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tools.MaplePacketCreator;
 import tools.StringUtil;
 import tools.data.output.MaplePacketLittleEndianWriter;
@@ -22,6 +24,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class MapleGuild implements Serializable {
+
+    private final static Logger logger = LoggerFactory.getLogger(MapleGuild.class);
+
     public static long serialVersionUID;
     private List<MapleGuildCharacter> members;
     private String[] rankTitles;
@@ -80,7 +85,7 @@ public class MapleGuild implements Serializable {
             }
             rs.close();
         } catch (SQLException e) {
-            System.err.println("战斗力排行出错！");
+            logger.error("战斗力排行出错!", e);
         }
     }
 
@@ -94,7 +99,7 @@ public class MapleGuild implements Serializable {
             }
             rs.close();
         } catch (SQLException e) {
-            System.err.println("破攻排行出错！");
+            logger.error("破攻排行出错!", e);
         }
     }
 
@@ -108,7 +113,7 @@ public class MapleGuild implements Serializable {
             }
             rs.close();
         } catch (SQLException e) {
-            System.err.println("总在线时间排行出错！");
+            logger.error("总在线时间排行出错!", e);
         }
     }
 
@@ -134,7 +139,7 @@ public class MapleGuild implements Serializable {
             }
             rs.close();
         } catch (SQLException e) {
-            System.err.println("豆豆排行出错！");
+            logger.error("豆豆排行出错!", e);
         }
     }
 
@@ -159,7 +164,7 @@ public class MapleGuild implements Serializable {
             ps.close();
             rs.close();
         } catch (Exception e) {
-            System.out.println("failed to display guild ranks." + e);
+            logger.warn("failed to display guild ranks.!", e);
         }
     }
 
@@ -172,7 +177,7 @@ public class MapleGuild implements Serializable {
             ps.close();
             rs.close();
         } catch (Exception e) {
-            System.out.println("failed to display guild ranks." + e);
+            logger.warn("failed to display guild ranks.!", e);
         }
     }
 
@@ -203,8 +208,7 @@ public class MapleGuild implements Serializable {
             rs.close();
             ps.close();
         } catch (SQLException se) {
-            System.err.println("unable to read guild information from sql");
-            se.printStackTrace();
+            logger.error("unable to read guild information", se);
         }
         return ret;
     }
@@ -239,8 +243,7 @@ public class MapleGuild implements Serializable {
             ps.close();
             return ret;
         } catch (SQLException se) {
-            System.err.println("SQL THROW");
-            se.printStackTrace();
+            logger.error("unable to create guild!", se);
             return 0;
         }
     }
@@ -268,8 +271,7 @@ public class MapleGuild implements Serializable {
             ps.execute();
             ps.close();
         } catch (SQLException se) {
-            System.out.println("SQLException: " + se.getLocalizedMessage());
-            se.printStackTrace();
+            logger.error("unable to offline guild!", se);
         }
     }
 
@@ -290,7 +292,7 @@ public class MapleGuild implements Serializable {
             PreparedStatement ps = con.prepareStatement("SELECT * FROM guilds WHERE guildid = ?");
             ps.setInt(1, guildid);
             ResultSet rs = ps.executeQuery();
-            if (!rs.first()) {
+            if (!rs.next()) {
                 rs.close();
                 ps.close();
                 this.id = -1;
@@ -318,8 +320,8 @@ public class MapleGuild implements Serializable {
             ps = con.prepareStatement("SELECT id, name, level, job, guildrank, alliancerank FROM characters WHERE guildid = ? ORDER BY guildrank ASC, name ASC");
             ps.setInt(1, guildid);
             rs = ps.executeQuery();
-            if (!rs.first()) {
-                System.err.println("No members in guild " + this.id + ".  Impossible... guild is disbanding");
+            if (!rs.next()) {
+                logger.error("No members in guild " + this.id + ".  Impossible... guild is disbanding");
                 rs.close();
                 ps.close();
                 this.proper = false;
@@ -335,7 +337,7 @@ public class MapleGuild implements Serializable {
             rs.close();
             ps.close();
             if (!leaderCheck) {
-                System.err.println("Leader " + this.leader + " isn't in guild " + this.id + ".  Impossible... guild is disbanding.");
+                logger.error("Leader " + this.leader + " isn't in guild " + this.id + ".  Impossible... guild is disbanding.");
                 this.proper = false;
                 return;
             }
@@ -357,8 +359,7 @@ public class MapleGuild implements Serializable {
             rs.close();
             ps.close();
         } catch (SQLException se) {
-            System.err.println("unable to read guild information from sql");
-            se.printStackTrace();
+            logger.error("unable to read guild information.", se);
         }
     }
 
@@ -377,8 +378,7 @@ public class MapleGuild implements Serializable {
             ps.execute();
             ps.close();
         } catch (SQLException se) {
-            System.err.println("Error saving guildGP to SQL");
-            se.printStackTrace();
+            logger.error("unable to save guildGP!", se);
         }
     }
 
@@ -470,8 +470,7 @@ public class MapleGuild implements Serializable {
                 this.broadcast(MaplePacketCreator.guildDisband(this.id));
             }
         } catch (SQLException se) {
-            System.err.println("Error saving guild to SQL");
-            se.printStackTrace();
+            logger.error("unable to save guildGP!", se);
         }
     }
 
@@ -484,7 +483,7 @@ public class MapleGuild implements Serializable {
             ps.close();
             rs.close();
         } catch (Exception e) {
-            System.err.println("获取杀怪排行出错" + e);
+            logger.error("获取杀怪排行出错", e);
         }
     }
 
@@ -669,7 +668,7 @@ public class MapleGuild implements Serializable {
             ps.execute();
             ps.close();
         } catch (SQLException e) {
-            System.err.println("Saving allianceid ERROR" + e);
+            logger.error("unable to save allianceid!", e);
         }
     }
 
@@ -779,7 +778,7 @@ public class MapleGuild implements Serializable {
                 return;
             }
         }
-        System.err.println("INFO: unable to find the correct id for changeRank({" + cid + "}, {" + newRank + "})");
+        logger.error("INFO: unable to find the correct id for changeRank({" + cid + "}, {" + newRank + "})");
     }
 
     public void changeRank(final int cid, final int newRank) {
@@ -795,7 +794,7 @@ public class MapleGuild implements Serializable {
                 return;
             }
         }
-        System.err.println("INFO: unable to find the correct id for changeRank({" + cid + "}, {" + newRank + "})");
+        logger.error("INFO: unable to find the correct id for changeRank({" + cid + "}, {" + newRank + "})");
     }
 
     public void setGuildNotice(final String notice) {
@@ -856,8 +855,7 @@ public class MapleGuild implements Serializable {
             ps.execute();
             ps.close();
         } catch (SQLException e) {
-            System.err.println("Saving guild logo / BG colo ERROR");
-            e.printStackTrace();
+            logger.error("unable to save guild logo / BG color", e);
         }
     }
 
@@ -884,8 +882,7 @@ public class MapleGuild implements Serializable {
             ps.execute();
             ps.close();
         } catch (SQLException e) {
-            System.err.println("Saving guild capacity ERROR");
-            e.printStackTrace();
+            logger.error("unable to save guild capacity", e);
         }
         return true;
     }

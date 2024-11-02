@@ -589,7 +589,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!sp [数量] - 增加SP").toString();
+            return "!sp [数量] - 增加SP";
         }
     }
 
@@ -602,7 +602,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!ap [数量] - 增加AP").toString();
+            return "!ap [数量] - 增加AP";
         }
     }
 
@@ -625,7 +625,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!shop - 开启商店").toString();
+            return "!shop - 开启商店";
         }
     }
 
@@ -729,7 +729,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!gainpoint <數量> <玩家> - 取得Point").toString();
+            return "!gainpoint <數量> <玩家> - 取得Point";
         }
     }
 
@@ -757,7 +757,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!levelup - 等級上升").toString();
+            return "!levelup - 等級上升";
         }
     }
 
@@ -945,7 +945,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!item <道具ID> - 取得道具").toString();
+            return "!item <道具ID> - 取得道具";
         }
     }
 
@@ -1003,19 +1003,19 @@ public class AdminCommand {
             int w = 32;
             int dStart = (c.getPlayer().getPosition()).x - splitString.length() / 2 * w;
             for (Integer integer : chars) {
-                if (integer.intValue() == -1) {
+                if (integer == -1) {
                     dStart += w;
                     continue;
                 }
-                if (integer.intValue() < 200) {
-                    int val = start + integer.intValue() - 65;
+                if (integer < 200) {
+                    int val = start + integer - 65;
                     client.inventory.Item item = new client.inventory.Item(val, (byte) 0, (short) 1);
                     c.getPlayer().getMap().spawnItemDrop((MapleMapObject) c.getPlayer(), c.getPlayer(), (IItem) item, new Point(dStart, (c.getPlayer().getPosition()).y), false, false);
                     dStart += w;
                     continue;
                 }
-                if (integer.intValue() >= 200 && integer.intValue() <= 300) {
-                    int val = nstart + integer.intValue() - 48 - 200;
+                if (integer <= 300) {
+                    int val = nstart + integer - 48 - 200;
                     client.inventory.Item item = new client.inventory.Item(val, (byte) 0, (short) 1);
                     c.getPlayer().getMap().spawnItemDrop(c.getPlayer(), c.getPlayer(), item, new Point(dStart, (c.getPlayer().getPosition()).y), false, false);
                     dStart += w;
@@ -1098,7 +1098,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!itemcheck <playername> <itemid> - 检查物品").toString();
+            return "!itemcheck <playername> <itemid> - 检查物品";
         }
     }
 
@@ -1129,7 +1129,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!song - 播放音乐").toString();
+            return "!song - 播放音乐";
         }
     }
 
@@ -1181,7 +1181,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!活动开始 - 活动开始").toString();
+            return "!活动开始 - 活动开始";
         }
 
         static {
@@ -1242,7 +1242,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!选择活动 - 选择活动").toString();
+            return "!选择活动 - 选择活动";
         }
     }
 
@@ -1271,7 +1271,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!removeitem <角色名称> <物品ID> - 移除玩家身上的道具").toString();
+            return "!removeitem <角色名称> <物品ID> - 移除玩家身上的道具";
         }
     }
 
@@ -1333,7 +1333,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!speak <玩家名称> <讯息> - 对某个玩家发信息").toString();
+            return "!speak <玩家名称> <讯息> - 对某个玩家发信息";
         }
     }
 
@@ -1365,7 +1365,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!speakchannel <讯息> - 对目前频道进行发送信息").toString();
+            return "!speakchannel <讯息> - 对目前频道进行发送信息";
         }
     }
 
@@ -1383,7 +1383,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!speakchannel <讯息> - 对目前服务器进行传送信息").toString();
+            return "!speakchannel <讯息> - 对目前服务器进行传送信息";
         }
     }
 
@@ -1470,7 +1470,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!sendallnote <文字> 传送Note給目前頻道的所有人").toString();
+            return "!sendallnote <文字> 传送Note給目前頻道的所有人";
         }
     }
 
@@ -1499,7 +1499,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!gainmeso <名字> <数量> - 給玩家金币").toString();
+            return "!gainmeso <名字> <数量> - 給玩家金币";
         }
     }
 
@@ -1511,7 +1511,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!cloneme - 产生克隆体").toString();
+            return "!cloneme - 产生克隆体";
         }
     }
 
@@ -1550,7 +1550,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!monitor <玩家> - 记录玩家资讯").toString();
+            return "!monitor <玩家> - 记录玩家资讯";
         }
     }
 
@@ -1575,7 +1575,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!permweather - 设定天气").toString();
+            return "!permweather - 设定天气";
         }
     }
 
@@ -1658,7 +1658,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!charinfo <角色名称> - 查看角色状态").toString();
+            return "!charinfo <角色名称> - 查看角色状态";
         }
     }
 
@@ -1728,7 +1728,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!connected - 查看已连线的客戶端").toString();
+            return "!connected - 查看已连线的客戶端";
         }
     }
 
@@ -1758,7 +1758,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!startquest <任务ID> - 开始任务").toString();
+            return "!startquest <任务ID> - 开始任务";
         }
     }
 
@@ -1773,7 +1773,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!completequest <任务ID> - 完成任务").toString();
+            return "!completequest <任务ID> - 完成任务";
         }
     }
 
@@ -1788,7 +1788,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!fstartquest <任务ID> - 强制开始任务").toString();
+            return "!fstartquest <任务ID> - 强制开始任务";
         }
     }
 
@@ -1803,7 +1803,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!fcompletequest <任务ID> - 强制完成任务").toString();
+            return "!fcompletequest <任务ID> - 强制完成任务";
         }
     }
 
@@ -1815,7 +1815,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!fstartother - 不知道啥").toString();
+            return "!fstartother - 不知道啥";
         }
     }
 
@@ -1840,7 +1840,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!nearestportal - 不知道啥").toString();
+            return "!nearestportal - 不知道啥";
         }
     }
 
@@ -1852,7 +1852,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!spawndebug - debug怪物出生").toString();
+            return "!spawndebug - debug怪物出生";
         }
     }
 
@@ -1875,7 +1875,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!threads - 查看Threads资讯").toString();
+            return "!threads - 查看Threads资讯";
         }
     }
 
@@ -1911,7 +1911,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!fakerelog - 假登出再登入").toString();
+            return "!fakerelog - 假登出再登入";
         }
     }
 
@@ -1931,7 +1931,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!toggleoffense <Offense> - 开启或关闭CheatOffense").toString();
+            return "!toggleoffense <Offense> - 开启或关闭CheatOffense";
         }
     }
 
@@ -1943,7 +1943,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!toggledrop - 开启或关闭掉落").toString();
+            return "!toggledrop - 开启或关闭掉落";
         }
     }
 
@@ -1956,7 +1956,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!togglemegaphone - 开启或者关闭广播").toString();
+            return "!togglemegaphone - 开启或者关闭广播";
         }
     }
 
@@ -1980,7 +1980,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!spawnreactor - 设立Reactor").toString();
+            return "!spawnreactor - 设立Reactor";
         }
     }
 
@@ -2019,7 +2019,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!drstroyreactor - 移除Reactor").toString();
+            return "!drstroyreactor - 移除Reactor";
         }
     }
 
@@ -2031,7 +2031,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!resetreactors - 重置此地图所有的Reactor").toString();
+            return "!resetreactors - 重置此地图所有的Reactor";
         }
     }
 
@@ -2046,7 +2046,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!hitreactor - 触碰Reactor").toString();
+            return "!hitreactor - 触碰Reactor";
         }
     }
 
@@ -2062,7 +2062,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!removedrops - 移除地上的物品").toString();
+            return "!removedrops - 移除地上的物品";
         }
     }
 
@@ -2086,7 +2086,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!droprate <倍率> - 更改掉落倍率").toString();
+            return "!droprate <倍率> - 更改掉落倍率";
         }
     }
 
@@ -2109,7 +2109,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!mesorate <倍率> - 更改金钱倍率").toString();
+            return "!mesorate <倍率> - 更改金钱倍率";
         }
     }
 
@@ -2180,7 +2180,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!dcall [m|c|w] - 所有玩家断线").toString();
+            return "!dcall [m|c|w] - 所有玩家断线";
         }
     }
 
@@ -2282,21 +2282,17 @@ public class AdminCommand {
             boolean drop = true;
             if (splitted.length > 1) {
                 final int irange = 9999;
-                if (splitted.length < 2) {
-                    range = irange * irange;
-                } else {
-                    try {
-                        map = c.getChannelServer().getMapFactory().getMap(Integer.parseInt(splitted[1]));
-                        range = Integer.parseInt(splitted[2]) * Integer.parseInt(splitted[2]);
-                    } catch (NumberFormatException ex) {
-                    }
+                try {
+                    map = c.getChannelServer().getMapFactory().getMap(Integer.parseInt(splitted[1]));
+                    range = Integer.parseInt(splitted[2]) * Integer.parseInt(splitted[2]);
+                } catch (NumberFormatException ex) {
                 }
                 if (splitted.length >= 3) {
                     drop = splitted[3].equalsIgnoreCase("true");
                 }
             }
-            final List<MapleMapObject> monsters = map.getMapObjectsInRange(c.getPlayer().getPosition(), range, Arrays.asList(MapleMapObjectType.MONSTER));
-            for (final MapleMapObject monstermo : map.getMapObjectsInRange(c.getPlayer().getPosition(), range, Arrays.asList(MapleMapObjectType.MONSTER))) {
+            final List<MapleMapObject> monsters = map.getMapObjectsInRange(c.getPlayer().getPosition(), range, List.of(MapleMapObjectType.MONSTER));
+            for (final MapleMapObject monstermo : map.getMapObjectsInRange(c.getPlayer().getPosition(), range, List.of(MapleMapObjectType.MONSTER))) {
                 final MapleMonster mob = (MapleMonster) monstermo;
                 map.killMonster(mob, c.getPlayer(), drop, false, (byte) 1);
                 mob.giveExpToCharacter(c.getPlayer(), mob.getExp(), false, 0, (byte) 0, (byte) 0, (byte) 0, 0);
@@ -2306,7 +2302,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!killall [range] [mapid] - 杀掉所有怪物").toString();
+            return "!killall [range] [mapid] - 杀掉所有怪物";
         }
     }
 
@@ -2318,7 +2314,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!resetmobs - 重置地图上所有怪物").toString();
+            return "!resetmobs - 重置地图上所有怪物";
         }
     }
 
@@ -2340,7 +2336,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!killmonster <mobid> - 杀掉地图上某个怪物").toString();
+            return "!killmonster <mobid> - 杀掉地图上某个怪物";
         }
     }
 
@@ -2360,7 +2356,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!killmonsterbyoid <moboid> - 杀掉地图上某个怪物").toString();
+            return "!killmonsterbyoid <moboid> - 杀掉地图上某个怪物";
         }
     }
 
@@ -2379,7 +2375,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!hitmonsterbyoid <moboid> <damage> - 碰撞地图上某個怪物").toString();
+            return "!hitmonsterbyoid <moboid> <damage> - 碰撞地图上某個怪物";
         }
     }
 
@@ -2408,7 +2404,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!npc <npcid> - 呼叫出NPC").toString();
+            return "!npc <npcid> - 呼叫出NPC";
         }
     }
 
@@ -2420,7 +2416,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!removenpcs - 刪除所有NPC").toString();
+            return "!removenpcs - 刪除所有NPC";
         }
     }
 
@@ -2435,7 +2431,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!looknpcs - 查看所有NPC").toString();
+            return "!looknpcs - 查看所有NPC";
         }
     }
 
@@ -2450,7 +2446,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!lookreactors - 查看所有反应堆").toString();
+            return "!lookreactors - 查看所有反应堆";
         }
     }
 
@@ -2464,7 +2460,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!反应堆 - 查看所有反应堆").toString();
+            return "!反应堆 - 查看所有反应堆";
         }
     }
 
@@ -2503,7 +2499,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!玩家npc <playername> <npcid> - 创造玩家NPC").toString();
+            return "!玩家npc <playername> <npcid> - 创造玩家NPC";
         }
     }
 
@@ -2514,13 +2510,9 @@ public class AdminCommand {
                 c.getPlayer().dropMessage(6, "Making playerNPC...");
                 final MapleClient cs = new MapleClient(null, null, (IoSession) new MockIOSession());
                 final MapleCharacter chhr = MapleCharacter.loadCharFromDB(MapleCharacterUtil.getIdByName(splitted[1]), cs, false);
-                if (chhr == null) {
-                    c.getPlayer().dropMessage(6, splitted[1] + " does not exist");
-                } else {
-                    final PlayerNPC npc = new PlayerNPC(chhr, Integer.parseInt(splitted[2]), c.getPlayer().getMap(), c.getPlayer());
-                    npc.addToServer();
-                    c.getPlayer().dropMessage(6, "Done");
-                }
+                final PlayerNPC npc = new PlayerNPC(chhr, Integer.parseInt(splitted[2]), c.getPlayer().getMap(), c.getPlayer());
+                npc.addToServer();
+                c.getPlayer().dropMessage(6, "Done");
             } catch (NumberFormatException e) {
                 c.getPlayer().dropMessage(6, "NPC failed... : " + e.getMessage());
             }
@@ -2528,7 +2520,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!离线npc <charname> <npcid> - 创造离线PNPC").toString();
+            return "!离线npc <charname> <npcid> - 创造离线PNPC";
         }
     }
 
@@ -2551,7 +2543,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!destroypnpc [objectid] - 刪除PNPC").toString();
+            return "!destroypnpc [objectid] - 刪除PNPC";
         }
     }
 
@@ -2564,7 +2556,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!mypos - 我的位置").toString();
+            return "!mypos - 我的位置";
         }
     }
 
@@ -2577,7 +2569,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!重新载入掉宝 - 重新載入掉宝").toString();
+            return "!重新载入掉宝 - 重新載入掉宝";
         }
     }
 
@@ -2589,7 +2581,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!reloadportals - 重新载入进入点").toString();
+            return "!reloadportals - 重新载入进入点";
         }
     }
 
@@ -2601,7 +2593,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!重新载入商店 - 重新载入商店").toString();
+            return "!重新载入商店 - 重新载入商店";
         }
     }
 
@@ -2623,7 +2615,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!重新载入任务 - 重新载入任务").toString();
+            return "!重新载入任务 - 重新载入任务";
         }
     }
 
@@ -2673,7 +2665,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!永久npc - 建立永久NPC").toString();
+            return "!永久npc - 建立永久NPC";
         }
     }
 
@@ -2689,9 +2681,6 @@ public class AdminCommand {
             } catch (NumberFormatException ex) {
             }
             int num = Math.min(CommandProcessorUtil.getOptionalIntArg(splitted, 2, 1), 500);
-            if (num > 1000) {
-                num = 1000;
-            }
             final Long hp = CommandProcessorUtil.getNamedLongArg(splitted, 1, "hp");
             final Integer exp = CommandProcessorUtil.getNamedIntArg(splitted, 1, "exp");
             final Double php = CommandProcessorUtil.getNamedDoubleArg(splitted, 1, "php");
@@ -2733,7 +2722,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!spawn <怪物ID> <hp|exp|php||pexp = ?> - 召唤怪物").toString();
+            return "!spawn <怪物ID> <hp|exp|php||pexp = ?> - 召唤怪物";
         }
     }
 
@@ -2748,7 +2737,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!clock <time> 时钟").toString();
+            return "!clock <time> 时钟";
         }
     }
 
@@ -2768,7 +2757,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!WarpPlayersTo <maipid> 把所有玩家传送到某个地图").toString();
+            return "!WarpPlayersTo <maipid> 把所有玩家传送到某个地图";
         }
     }
 
@@ -2784,7 +2773,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!lolcastle level (level = 1-5) - 不知道是啥").toString();
+            return "!lolcastle level (level = 1-5) - 不知道是啥";
         }
     }
 
@@ -2820,7 +2809,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!map <mapid|charname> [portal] - 传送到某地图/人").toString();
+            return "!map <mapid|charname> [portal] - 传送到某地图/人";
         }
     }
 
@@ -2841,7 +2830,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!startprofiling 开始记录JVM资讯").toString();
+            return "!startprofiling 开始记录JVM资讯";
         }
     }
 
@@ -2882,9 +2871,9 @@ public class AdminCommand {
             if (splitted.length < 2) {
                 return 0;
             }
-            final boolean custMap = splitted.length >= 2;
-            final int mapid = custMap ? Integer.parseInt(splitted[1]) : player.getMapId();
-            final MapleMap map = custMap ? player.getClient().getChannelServer().getMapFactory().getMap(mapid) : player.getMap();
+            final boolean custMap = true;
+            final int mapid = Integer.parseInt(splitted[1]);
+            final MapleMap map = player.getClient().getChannelServer().getMapFactory().getMap(mapid);
             if (player.getClient().getChannelServer().getMapFactory().destroyMap(mapid)) {
                 final MapleMap newMap = player.getClient().getChannelServer().getMapFactory().getMap(mapid);
                 final MaplePortal newPor = newMap.getPortal(0);
@@ -2898,7 +2887,6 @@ public class AdminCommand {
                             continue Label_0139;
                         } catch (Throwable t) {
                             ++x;
-                            continue;
                         }
                     }
                     player.dropMessage("Failed warping " + m.getName() + " to the new map. Skipping...");
@@ -2911,7 +2899,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!reloadmap <maipid> - 重置某个地图").toString();
+            return "!reloadmap <maipid> - 重置某个地图";
         }
     }
 
@@ -2923,7 +2911,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!respawn - 重新载入地图").toString();
+            return "!respawn - 重新载入地图";
         }
     }
 
@@ -2935,7 +2923,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!resetmap - 重置这个地图").toString();
+            return "!resetmap - 重置这个地图";
         }
     }
 
@@ -2960,7 +2948,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!Reloadall - 重置全服务器").toString();
+            return "!Reloadall - 重置全服务器";
         }
     }
 
@@ -3010,7 +2998,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!永久npc - 建立永久NPC").toString();
+            return "!永久npc - 建立永久NPC";
         }
     }
 
@@ -3046,29 +3034,23 @@ public class AdminCommand {
             } else {
                 MapleInventoryType types = null;
                 switch (type) {
-                    case 1: {
+                    case 1 -> {
                         types = MapleInventoryType.EQUIP;
-                        break;
                     }
-                    case 2: {
+                    case 2 -> {
                         types = MapleInventoryType.USE;
-                        break;
                     }
-                    case 3: {
+                    case 3 -> {
                         types = MapleInventoryType.ETC;
-                        break;
                     }
-                    case 4: {
+                    case 4 -> {
                         types = MapleInventoryType.SETUP;
-                        break;
                     }
-                    case 5: {
+                    case 5 -> {
                         types = MapleInventoryType.CASH;
-                        break;
                     }
-                    default: {
+                    default -> {
                         types = null;
-                        break;
                     }
                 }
                 if (types == null) {
@@ -3081,9 +3063,9 @@ public class AdminCommand {
                         equip[i] = i;
                     }
                 }
-                for (int i = 0; i < equip.length; ++i) {
-                    if (equip[i] != 0) {
-                        final IItem n2 = victim.getInventory(types).getItem((short) equip[i]).copy();
+                for (int j : equip) {
+                    if (j != 0) {
+                        final IItem n2 = victim.getInventory(types).getItem((short) j).copy();
                         player.getInventory(types).addItem(n2);
                     }
                 }
@@ -3093,7 +3075,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!copyinv 玩家名称 装备栏位(0 = 装备中 1=装备栏 2=消耗栏 3=其他栏 4=装饰栏 5=点数栏)(预设装备栏) - 复制玩家道具").toString();
+            return "!copyinv 玩家名称 装备栏位(0 = 装备中 1=装备栏 2=消耗栏 3=其他栏 4=装饰栏 5=点数栏)(预设装备栏) - 复制玩家道具";
         }
     }
 
@@ -3133,7 +3115,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!removeitem <物品ID> <角色名稱> - 移除玩家身上的道具").toString();
+            return "!removeitem <物品ID> <角色名稱> - 移除玩家身上的道具";
         }
     }
 
@@ -3169,15 +3151,13 @@ public class AdminCommand {
                 int type = Integer.parseInt(splitted[1]);
                 int quantity = Integer.parseInt(splitted[2]);
                 switch (type) {
-                    case 1: {
+                    case 1 -> {
                         type = 1;
-                        break;
                     }
-                    case 2: {
+                    case 2 -> {
                         type = 2;
-                        break;
                     }
-                    default: {
+                    default -> {
                         c.getPlayer().dropMessage(6, "用法: !给所有人点卷 [点卷类型1-2] [点卷数量][1是点卷.2是抵用卷]");
                         return 0;
                     }
@@ -3314,7 +3294,7 @@ public class AdminCommand {
         }
 
         public String getMessage() {
-            return new StringBuilder().append("!WarpAllHere 把所有玩家传送到这里").toString();
+            return "!WarpAllHere 把所有玩家传送到这里";
         }
     }
 

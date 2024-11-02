@@ -10,13 +10,20 @@ import java.util.Properties;
 
 public class OtherSettings {
     private static OtherSettings instance;
-    private static boolean CANLOG;
-    private static final Logger log;
-    private Properties itempb_cfg;
-    private String[] itempb_id;
-    private String[] itemjy_id;
-    private String[] itemgy_id;
-    private String[] mappb_id;
+    private static final Logger logger = LoggerFactory.getLogger(OtherSettings.class);
+
+    /**
+     * 商城禁止购买的道具List
+     */
+    private String[] bannedItemIdsForCashShop;
+    /**
+     * 现金交易禁止的道具List
+     */
+    private String[] bannedItemIdsForCashTrade;
+    /**
+     * 雇佣商人禁止上架的道具List
+     */
+    private String[] bannedItemIdsForTrader;
 
     public static OtherSettings getInstance() {
         if (OtherSettings.instance == null) {
@@ -26,47 +33,32 @@ public class OtherSettings {
     }
 
     public OtherSettings() {
-        this.itempb_cfg = new Properties();
+        Properties itemsConf = new Properties();
         try {
             String path = System.getProperty("server_property_file_path");
-            final InputStreamReader is = new FileReader(path);
-//            final InputStreamReader is = new FileReader("HuaiMS_服务端配置.properties");
-            this.itempb_cfg.load(is);
-            is.close();
-            this.itempb_id = this.itempb_cfg.getProperty("cashban").split(",");
-            this.itemjy_id = this.itempb_cfg.getProperty("cashjy", "0").split(",");
-            this.itemgy_id = this.itempb_cfg.getProperty("gysj", "0").split(",");
+
+            try (InputStreamReader is = new FileReader(path)) {
+                itemsConf.load(is);
+            }
+
+            this.bannedItemIdsForCashShop = itemsConf.getProperty("cashban", "0").split(",");
+            this.bannedItemIdsForCashTrade = itemsConf.getProperty("cashjy", "0").split(",");
+            this.bannedItemIdsForTrader = itemsConf.getProperty("gysj", "0").split(",");
         } catch (IOException e) {
-            OtherSettings.log.error("Could not configuration", (Throwable) e);
+            logger.error("Could not read configuration.", e);
         }
     }
 
-    public String[] getItempb_id() {
-        return this.itempb_id;
+    public String[] getBannedItemIdsForCashShop() {
+        return this.bannedItemIdsForCashShop;
     }
 
-    public String[] getItemgy_id() {
-        return this.itemgy_id;
+    public String[] getBannedItemIdsForTrader() {
+        return this.bannedItemIdsForTrader;
     }
 
-    public String[] getItemjy_id() {
-        return this.itemjy_id;
+    public String[] getBannedItemIdsForCashTrade() {
+        return this.bannedItemIdsForCashTrade;
     }
 
-    public String[] getMappb_id() {
-        return this.mappb_id;
-    }
-
-    public boolean isCANLOG() {
-        return OtherSettings.CANLOG;
-    }
-
-    public void setCANLOG(final boolean CANLOG) {
-        OtherSettings.CANLOG = CANLOG;
-    }
-
-    static {
-        OtherSettings.instance = null;
-        log = LoggerFactory.getLogger((Class) OtherSettings.class);
-    }
 }

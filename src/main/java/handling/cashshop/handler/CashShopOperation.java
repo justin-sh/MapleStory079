@@ -162,8 +162,8 @@ public class CashShopOperation {
 
     public static void BuyCashItem(final SeekableLittleEndianAccessor slea, final MapleClient c, final MapleCharacter chr) {
         final OtherSettings item_id = new OtherSettings();
-        final String[] itembp_id = item_id.getItempb_id();
-        final String[] itemjy_id = item_id.getItemjy_id();
+        final String[] itembp_id = item_id.getBannedItemIdsForCashShop();
+        final String[] itemjy_id = item_id.getBannedItemIdsForCashTrade();
         final int action = slea.readByte();
         switch (action) {
             case 3: {

@@ -344,7 +344,7 @@ public class PlayerInteractionHandler {
             }
             case 14: {
                 final OtherSettings item_id = new OtherSettings();
-                final String[] itemgy_id = item_id.getItempb_id();
+                final String[] itemgy_id = item_id.getBannedItemIdsForCashShop();
                 final MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
                 final MapleInventoryType ivType = MapleInventoryType.getByType(slea.readByte());
                 final IItem item = chr.getInventory(ivType).getItem((byte) slea.readShort());

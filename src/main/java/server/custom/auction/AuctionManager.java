@@ -69,7 +69,7 @@ public class AuctionManager {
             return -7;
         }
         final OtherSettings item_id = new OtherSettings();
-        final String[] itemgy_id = item_id.getItempb_id();
+        final String[] itemgy_id = item_id.getBannedItemIdsForCashShop();
         for (int i = 0; i < itemgy_id.length; ++i) {
             if (source.getItemId() == Integer.parseInt(itemgy_id[i])) {
                 return -8;

@@ -14,7 +14,7 @@ public class PacketErrorHandler {
             slea.skip(4);
             final int pHeader = slea.readShort();
             String pHeaderStr = Integer.toHexString(pHeader).toUpperCase();
-            pHeaderStr = StringUtil.getLeftPaddedStr(pHeaderStr, '0', 4);
+            pHeaderStr = StringUtil.padLeft(pHeaderStr, '0', 4);
             final String op = lookupRecv(pHeader);
             String from = "";
             if (c.getPlayer() != null) {

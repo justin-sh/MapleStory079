@@ -7,13 +7,13 @@
 
     <Appenders>
         <Console name="CONSOLE">
-            <PatternLayout pattern="%d [%t] %p %c - %m%n"/>
+            <PatternLayout pattern="%d [%t] %-5p %18.18c - %m%n"/>
         </Console>
     </Appenders>
 
     <Loggers>
         <Logger name="com.justin.game.mxd079" level="DEBUG"/>
-        <Root level="WARN">
+        <Root level="INFO">
             <AppenderRef ref="CONSOLE"/>
         </Root>
     </Loggers>

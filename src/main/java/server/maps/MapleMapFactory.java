@@ -476,7 +476,7 @@ public class MapleMapFactory {
     }
 
     private String getMapName(final int mapid) {
-        String mapName = StringUtil.getLeftPaddedStr(Integer.toString(mapid), '0', 9);
+        String mapName = StringUtil.padLeft(Integer.toString(mapid), '0', 9);
         final StringBuilder builder = new StringBuilder("Map/Map");
         builder.append(mapid / 100000000);
         builder.append("/");

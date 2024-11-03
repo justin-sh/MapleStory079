@@ -9,6 +9,8 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.transport.socket.SocketSessionConfig;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import server.ServerProperties;
 import tools.Triple;
 
@@ -19,6 +21,9 @@ import java.util.HashSet;
 import java.util.Map;
 
 public class LoginServer {
+
+    private static final Logger logger = LoggerFactory.getLogger(LoginServer.class);
+
     public static int PORT;
     private static InetSocketAddress InetSocketadd;
     private static IoAcceptor acceptor;
@@ -82,6 +87,8 @@ public class LoginServer {
         LoginServer.个人PK地图 = Integer.parseInt(ServerProperties.getProperty("RoyMS.personPVP"));
         LoginServer.组队PK地图 = Integer.parseInt(ServerProperties.getProperty("RoyMS.teamPVP"));
         LoginServer.家族PK地图 = Integer.parseInt(ServerProperties.getProperty("RoyMS.familyPVP"));
+
+
         IoBuffer.setUseDirectBuffer(false);
         IoBuffer.setAllocator(new SimpleBufferAllocator());
         LoginServer.acceptor = new NioSocketAcceptor();
@@ -90,9 +97,9 @@ public class LoginServer {
         ((SocketSessionConfig) LoginServer.acceptor.getSessionConfig()).setTcpNoDelay(true);
         try {
             LoginServer.acceptor.bind(new InetSocketAddress(LoginServer.PORT));
-            System.out.println("登录服务器 : 启动端口 " + LoginServer.PORT);
+            logger.info("登录服务器 : 启动端口 " + LoginServer.PORT);
         } catch (IOException e) {
-            System.err.println("Binding to port " + LoginServer.PORT + " failed" + e);
+            logger.error("Binding to port " + LoginServer.PORT + " failed.", e);
         }
     }
 
@@ -100,7 +107,7 @@ public class LoginServer {
         if (LoginServer.finishedShutdown) {
             return;
         }
-        System.out.println("正在关闭登录伺服器...");
+        logger.info("正在关闭登录伺服器...");
         LoginServer.finishedShutdown = true;
     }
 

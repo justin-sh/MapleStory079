@@ -1,6 +1,8 @@
 package server;
 
 import database.DatabaseConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
@@ -14,6 +16,8 @@ import java.sql.SQLException;
 import java.util.*;
 
 public class CashItemFactory {
+    private static final Logger logger = LoggerFactory.getLogger(CashItemFactory.class);
+
     private static final CashItemFactory instance;
     private static final int[] bestItems;
     private boolean initialized;
@@ -39,7 +43,7 @@ public class CashItemFactory {
     }
 
     public void initialize() {
-        System.out.println("商城 :::");
+//        System.out.println("商城 :::");
         final List<Integer> itemids = new ArrayList<Integer>();
         for (final MapleData field : this.data.getData("Commodity.img").getChildren()) {
             final int SN = MapleDataTool.getIntConvert("SN", field, 0);
@@ -73,7 +77,7 @@ public class CashItemFactory {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.warn("cash item init failed!", e);
         }
         for (final int i : this.itemStats.keySet()) {
             this.getItem(i);

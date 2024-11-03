@@ -748,7 +748,7 @@ public class MonsterDropCreator {
         for (MapleData itemFolder : mob.getChildren()) {
             int id = Integer.parseInt(itemFolder.getName());
             try {
-                MapleData monsterData = mobData.getData(StringUtil.getLeftPaddedStr(Integer.toString(id) + ".img", '0', 11));
+                MapleData monsterData = mobData.getData(StringUtil.padLeft(Integer.toString(id) + ".img", '0', 11));
                 int boss = (id == 8810018) ? 1 : MapleDataTool.getIntConvert("boss", monsterData.getChildByPath("info"), 0);
                 if (boss > 0)
                     bossCache.put(Integer.valueOf(id), Boolean.valueOf(true));

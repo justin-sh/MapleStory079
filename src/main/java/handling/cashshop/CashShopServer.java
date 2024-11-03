@@ -9,12 +9,17 @@ import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.transport.socket.SocketSessionConfig;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import server.ServerProperties;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
 public class CashShopServer {
+
+    private static final Logger logger = LoggerFactory.getLogger(CashShopServer.class);
+
     private static String ip;
     private static InetSocketAddress InetSocketadd;
     private static int PORT;
@@ -37,11 +42,10 @@ public class CashShopServer {
         try {
             CashShopServer.acceptor.setHandler(new MapleServerHandler(-1, true));
             CashShopServer.acceptor.bind(new InetSocketAddress(CashShopServer.PORT));
-            System.out.println("商城    1: 启动端口 " + CashShopServer.PORT);
+            logger.info("商城    1: 启动端口 " + CashShopServer.PORT);
         } catch (IOException e) {
-            System.err.println("Binding to port " + CashShopServer.PORT + " failed");
-            e.printStackTrace();
-            throw new RuntimeException("Binding failed.", e);
+//            logger.error("Binding to port " + CashShopServer.PORT + " failed");
+            throw new RuntimeException("Binding to port " + CashShopServer.PORT + " failed", e);
         }
     }
 
@@ -61,10 +65,10 @@ public class CashShopServer {
         if (CashShopServer.finishedShutdown) {
             return;
         }
-        System.out.println("正在断开商城内玩家...");
+        logger.info("正在断开商城内玩家...");
         CashShopServer.players.disconnectAll();
         CashShopServer.playersMTS.disconnectAll();
-        System.out.println("正在关闭商城伺服器...");
+        logger.info("正在关闭商城伺服器...");
         CashShopServer.finishedShutdown = true;
     }
 

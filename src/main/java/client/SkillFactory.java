@@ -1,5 +1,7 @@
 package client;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import provider.*;
 import tools.StringUtil;
 
@@ -7,6 +9,9 @@ import java.io.File;
 import java.util.*;
 
 public class SkillFactory {
+
+    private static final Logger logger = LoggerFactory.getLogger(SkillFactory.class);
+
     private static final Map<Integer, ISkill> skills;
     private static final Map<Integer, List<Integer>> skillsByJob;
     private static final Map<Integer, SummonSkillEntry> SummonSkillInformation;
@@ -18,7 +23,7 @@ public class SkillFactory {
         if (SkillFactory.skills.size() != 0) {
             return SkillFactory.skills.get(id);
         }
-        System.out.println("加载 技能完成 :::");
+        logger.info("加载 技能完成");
         final MapleDataProvider datasource = MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzPath") + "/Skill.wz"));
         final MapleDataDirectoryEntry root = datasource.getRoot();
         for (final MapleDataFileEntry topDir : root.getFiles()) {
@@ -64,8 +69,8 @@ public class SkillFactory {
             ret = SkillFactory.skills.get(id);
             if (ret == null) {
                 final int job = id / 10000;
-                final MapleData skillroot = SkillFactory.datasource.getData(StringUtil.getLeftPaddedStr(String.valueOf(job), '0', 3) + ".img");
-                final MapleData skillData = skillroot.getChildByPath("skill/" + StringUtil.getLeftPaddedStr(String.valueOf(id), '0', 7));
+                final MapleData skillroot = SkillFactory.datasource.getData(StringUtil.padLeft(String.valueOf(job), '0', 3) + ".img");
+                final MapleData skillData = skillroot.getChildByPath("skill/" + StringUtil.padLeft(String.valueOf(id), '0', 7));
                 if (skillData != null) {
                     ret = Skill.loadFromData(id, skillData);
                 }
@@ -89,7 +94,7 @@ public class SkillFactory {
 
     public static String getName(final int id) {
         String strId = Integer.toString(id);
-        strId = StringUtil.getLeftPaddedStr(strId, '0', 7);
+        strId = StringUtil.padLeft(strId, '0', 7);
         final MapleData skillroot = SkillFactory.stringData.getChildByPath(strId);
         if (skillroot != null) {
             return MapleDataTool.getString(skillroot.getChildByPath("name"), "");

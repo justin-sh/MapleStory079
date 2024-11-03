@@ -1591,7 +1591,7 @@ public class MapleItemInformationProvider {
             }
             if (data != null) {
                 for (final MapleData c : this.stringData.getData("Item.img").getChildByPath("Eqp/" + type)) {
-                    if (data.getEntry(StringUtil.getLeftPaddedStr(c.getName() + ".img", '0', 12)) != null) {
+                    if (data.getEntry(StringUtil.padLeft(c.getName() + ".img", '0', 12)) != null) {
                         final int dataid = Integer.parseInt(c.getName());
                         final String name = MapleDataTool.getString("name", c, "无名字");
                         if (type.equals("Hair")) {

@@ -111,7 +111,7 @@ public class CashItemFactoryA {
         idLookup = new HashMap<Integer, Integer>();
         itemStats = new HashMap<Integer, CashItemInfoA>();
         data = MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzPath") + "/Etc.wz"));
-        commodities = CashItemFactoryA.data.getData(StringUtil.getLeftPaddedStr("Commodity.img", '0', 11));
+        commodities = CashItemFactoryA.data.getData(StringUtil.padLeft("Commodity.img", '0', 11));
         cashPackages = new HashMap<Integer, List<CashItemInfoA>>();
     }
 }

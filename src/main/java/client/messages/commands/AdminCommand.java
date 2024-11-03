@@ -3556,9 +3556,9 @@ public class AdminCommand {
                                     }
                                     if (ret.isFirst()) {
                                         ret.setFirst(false);
-                                        msgs.add("角色: " + StringUtil.getRightPaddedStr(ret.name, ' ', 13) + " 角色ID: " + StringUtil.getRightPaddedStr(String.valueOf(ret.chrId), ' ', 6) + " 道具: " + ret.itemId + " - " + ii.getName(ret.itemId) + " 唯一ID: " + item.getEquipOnlyId());
+                                        msgs.add("角色: " + StringUtil.padRight(ret.name, ' ', 13) + " 角色ID: " + StringUtil.padRight(String.valueOf(ret.chrId), ' ', 6) + " 道具: " + ret.itemId + " - " + ii.getName(ret.itemId) + " 唯一ID: " + item.getEquipOnlyId());
                                     } else {
-                                        msgs.add("角色: " + StringUtil.getRightPaddedStr(player.getName(), ' ', 13) + " 角色ID: " + StringUtil.getRightPaddedStr(String.valueOf(player.getId()), ' ', 6) + " 道具: " + item.getItemId() + " - " + ii.getName(item.getItemId()) + " 唯一ID: " + item.getEquipOnlyId());
+                                        msgs.add("角色: " + StringUtil.padRight(player.getName(), ' ', 13) + " 角色ID: " + StringUtil.padRight(String.valueOf(player.getId()), ' ', 6) + " 道具: " + item.getItemId() + " - " + ii.getName(item.getItemId()) + " 唯一ID: " + item.getEquipOnlyId());
                                     }
                                 } else {
                                     checkItems.put(item.getEquipOnlyId(), ret);
@@ -3576,9 +3576,9 @@ public class AdminCommand {
                                     }
                                     if (ret.isFirst()) {
                                         ret.setFirst(false);
-                                        msgs.add("角色: " + StringUtil.getRightPaddedStr(ret.name, ' ', 13) + " 角色ID: " + StringUtil.getRightPaddedStr(String.valueOf(ret.chrId), ' ', 6) + " 道具: " + ret.itemId + " - " + ii.getName(ret.itemId) + " 唯一ID: " + item.getEquipOnlyId());
+                                        msgs.add("角色: " + StringUtil.padRight(ret.name, ' ', 13) + " 角色ID: " + StringUtil.padRight(String.valueOf(ret.chrId), ' ', 6) + " 道具: " + ret.itemId + " - " + ii.getName(ret.itemId) + " 唯一ID: " + item.getEquipOnlyId());
                                     } else {
-                                        msgs.add("角色: " + StringUtil.getRightPaddedStr(player.getName(), ' ', 13) + " 角色ID: " + StringUtil.getRightPaddedStr(String.valueOf(player.getId()), ' ', 6) + " 道具: " + item.getItemId() + " - " + ii.getName(item.getItemId()) + " 唯一ID: " + item.getEquipOnlyId());
+                                        msgs.add("角色: " + StringUtil.padRight(player.getName(), ' ', 13) + " 角色ID: " + StringUtil.padRight(String.valueOf(player.getId()), ' ', 6) + " 道具: " + item.getItemId() + " - " + ii.getName(item.getItemId()) + " 唯一ID: " + item.getEquipOnlyId());
                                     }
                                 } else {
                                     checkItems.put(item.getEquipOnlyId(), ret);

@@ -1,5 +1,8 @@
 package database;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
@@ -10,6 +13,9 @@ import java.util.Properties;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class DatabaseConnection {
+
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseConnection.class);
+
     private static final HashMap<Integer, ConWrapper> connections;
     private static final ReentrantLock lock;
     private static String dbDriver;
@@ -107,23 +113,23 @@ public class DatabaseConnection {
             try {
                 DatabaseConnection.connectionTimeOut = Long.parseLong(DatabaseConnection.dbProps.getProperty("timeout"));
             } catch (NumberFormatException e2) {
-                System.out.println("[DB信息] 无法读取超时信息，使用默认值: " + DatabaseConnection.connectionTimeOut + " ");
+                logger.warn("[DB信息] 无法读取超时信息，使用默认值: " + DatabaseConnection.connectionTimeOut + " ");
             }
         }
         try {
             Class.forName(DatabaseConnection.dbDriver);
         } catch (ClassNotFoundException e3) {
-            System.out.println("[DB信息] 找不到JDBC驱动程序。");
+            logger.warn("[DB信息] 找不到JDBC驱动程序。");
         }
         try {
             final Connection con = DriverManager.getConnection(DatabaseConnection.dbUrl, DatabaseConnection.dbUser, DatabaseConnection.dbPass);
             if (!DatabaseConnection.propsInited) {
                 final long timeout = getWaitTimeout(con);
                 if (timeout == -1L) {
-                    System.out.println("[DB信息] 无法读取 Wait_Timeout, using " + DatabaseConnection.connectionTimeOut + " instead.");
+                    logger.warn("[DB信息] 无法读取 Wait_Timeout, using " + DatabaseConnection.connectionTimeOut + " instead.");
                 } else {
                     DatabaseConnection.connectionTimeOut = timeout;
-                    System.out.println("数据库正在加载.请稍等....");
+                    logger.info("数据库正在加载.请稍等....");
                 }
                 DatabaseConnection.propsInited = true;
             }
@@ -185,7 +191,7 @@ public class DatabaseConnection {
 
         public Connection getConnection() {
             if (this.expiredConnection()) {
-                System.out.println("[DB信息] 连接 " + this.id + " 已经超时.重新连接...");
+                logger.warn("[DB信息] 连接 " + this.id + " 已经超时.重新连接...");
                 try {
                     this.connection.close();
                 } catch (SQLException ex) {

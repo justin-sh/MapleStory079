@@ -45,7 +45,7 @@ public class CharLoginHandler {
         }
         final StringBuilder sps = new StringBuilder();
         for (int j = 0; j < bytes.length; ++j) {
-            sps.append(StringUtil.getLeftPaddedStr(Integer.toHexString(bytes[j]).toUpperCase(), '0', 2));
+            sps.append(StringUtil.padLeft(Integer.toHexString(bytes[j]).toUpperCase(), '0', 2));
             sps.append("-");
         }
         String macData = sps.toString();

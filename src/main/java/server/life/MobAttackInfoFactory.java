@@ -25,12 +25,12 @@ public class MobAttackInfoFactory {
         if (ret != null) {
             return ret;
         }
-        MapleData mobData = MobAttackInfoFactory.dataSource.getData(StringUtil.getLeftPaddedStr(Integer.toString(mob.getId()) + ".img", '0', 11));
+        MapleData mobData = MobAttackInfoFactory.dataSource.getData(StringUtil.padLeft(Integer.toString(mob.getId()) + ".img", '0', 11));
         if (mobData != null) {
             final MapleData infoData = mobData.getChildByPath("info/link");
             if (infoData != null) {
                 final String linkedmob = MapleDataTool.getString("info/link", mobData);
-                mobData = MobAttackInfoFactory.dataSource.getData(StringUtil.getLeftPaddedStr(linkedmob + ".img", '0', 11));
+                mobData = MobAttackInfoFactory.dataSource.getData(StringUtil.padLeft(linkedmob + ".img", '0', 11));
             }
             final MapleData attackData = mobData.getChildByPath("attack" + (attack + 1) + "/info");
             if (attackData != null) {

@@ -1,12 +1,16 @@
 package server;
 
 import constants.GameConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class RandomRewards {
+    private static final Logger logger = LoggerFactory.getLogger(RandomRewards.class);
+
     private static final RandomRewards instance;
     private List<Integer> compiledGold;
     private List<Integer> compiledSilver;
@@ -28,7 +32,7 @@ public class RandomRewards {
         this.compiledEventC = null;
         this.compiledEventB = null;
         this.compiledEventA = null;
-        System.out.println("加载 随机奖励 :::");
+        logger.info("加载 随机奖励 :::");
         List<Integer> returnArray = new ArrayList<Integer>();
         this.processRewards(returnArray, GameConstants.goldrewards);
         this.compiledGold = returnArray;

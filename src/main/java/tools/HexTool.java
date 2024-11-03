@@ -103,7 +103,7 @@ public class HexTool {
     }
 
     public static String getOpcodeToString(final int op) {
-        return "0x" + StringUtil.getLeftPaddedStr(Integer.toHexString(op).toUpperCase(), '0', 4);
+        return "0x" + StringUtil.padLeft(Integer.toHexString(op).toUpperCase(), '0', 4);
     }
 
     static {

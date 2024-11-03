@@ -15,6 +15,8 @@ import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.transport.socket.SocketSessionConfig;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import scripting.EventScriptManager;
 import server.MapleSquad;
 import server.ServerProperties;
@@ -35,6 +37,9 @@ import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class ChannelServer implements Serializable {
+
+    private static final Logger logger = LoggerFactory.getLogger(ChannelServer.class);
+
     public static long serverStartTime;
     private static final short DEFAULT_PORT = 2524;
     private static final Map<Integer, ChannelServer> instances;
@@ -300,10 +305,10 @@ public class ChannelServer implements Serializable {
             this.acceptor.setHandler(new MapleServerHandler(this.channel, false));
             this.acceptor.bind(new InetSocketAddress(this.port));
             ((SocketSessionConfig) this.acceptor.getSessionConfig()).setTcpNoDelay(true);
-            System.out.println("频道 " + this.channel + ": 启动端口 " + this.port + ": 服务器IP " + this.ip + "");
+            logger.info("频道 " + this.channel + ": 启动端口 " + this.port + ": 服务器IP " + this.ip + "");
             this.eventSM.init();
         } catch (IOException e2) {
-            System.out.println("Binding to port " + this.port + " failed (ch: " + this.getChannel() + ")" + e2);
+            logger.warn("Binding to port " + this.port + " failed (ch: " + this.getChannel() + ")", e2);
         }
     }
 
@@ -313,11 +318,11 @@ public class ChannelServer implements Serializable {
         }
         this.broadcastPacket(MaplePacketCreator.serverNotice(0, "这个频道正在关闭中."));
         this.shutdown = true;
-        System.out.println("频道 " + this.channel + " 正在清理活动脚本...");
+        logger.info("频道 " + this.channel + " 正在清理活动脚本...");
         this.eventSM.cancel();
-        System.out.println("频道 " + this.channel + ", 正在保存所有角色数据...");
-        System.out.println("频道 " + this.channel + ", Saving characters...");
-        System.out.println("频道 " + this.channel + ", 解除绑定端口...");
+        logger.info("频道 " + this.channel + ", 正在保存所有角色数据...");
+        logger.info("频道 " + this.channel + ", Saving characters...");
+        logger.info("频道 " + this.channel + ", 解除绑定端口...");
         ChannelServer.instances.remove(this.channel);
         LoginServer.removeChannel(this.channel);
         this.setFinishShutdown();
@@ -663,12 +668,12 @@ public class ChannelServer implements Serializable {
 
     public void setShutdown() {
         this.shutdown = true;
-        System.out.println("频道 " + this.channel + " 已开始关闭.");
+        logger.info("频道 " + this.channel + " 已开始关闭.");
     }
 
     public void setFinishShutdown() {
         this.finishedShutdown = true;
-        System.out.println("频道 " + this.channel + " 已关闭完成.");
+        logger.info("频道 " + this.channel + " 已关闭完成.");
     }
 
     public boolean isAdminOnly() {
@@ -717,7 +722,7 @@ public class ChannelServer implements Serializable {
                 chr.saveToDB(false, false);
             }
         }
-        System.out.println("[自动存档] 已经将频道 " + this.channel + " 的 " + ppl + " 个玩家保存到数据中.");
+        logger.info("[自动存档] 已经将频道 " + this.channel + " 的 " + ppl + " 个玩家保存到数据中.");
     }
 
 
@@ -760,10 +765,10 @@ public class ChannelServer implements Serializable {
         }
         this.broadcastPacket(MaplePacketCreator.serverNotice(0, "游戏即将关闭维护..."));
         this.shutdown = true;
-        System.out.println("频道 " + this.channel + " 正在清理活动脚本...");
+        logger.info("频道 " + this.channel + " 正在清理活动脚本...");
         this.eventSM.cancel();
-        System.out.println("频道 " + this.channel + " 正在保存所有角色数据...");
-        System.out.println("频道 " + this.channel + " 解除绑定端口...");
+        logger.info("频道 " + this.channel + " 正在保存所有角色数据...");
+        logger.info("频道 " + this.channel + " 解除绑定端口...");
         this.acceptor.unbind((SocketAddress) new InetSocketAddress(this.port));
         ChannelServer.instances.remove(this.channel);
         this.setFinishShutdown();
@@ -789,11 +794,11 @@ public class ChannelServer implements Serializable {
                 ret++;
             }
         } catch (Exception e) {
-            System.out.println("关闭雇佣商店出现错误..." + e);
+            logger.warn("关闭雇佣商店出现错误...", e);
         } finally {
             this.merchLock.writeLock().unlock();
         }
-        System.out.println("频道 " + this.channel + " 共保存雇佣商店: " + ret + " | 耗时: " + (System.currentTimeMillis() - Start) + " 毫秒.");
+        logger.info("频道 " + this.channel + " 共保存雇佣商店: " + ret + " | 耗时: " + (System.currentTimeMillis() - Start) + " 毫秒.");
     }
 
     public boolean isConnected(final String name) {

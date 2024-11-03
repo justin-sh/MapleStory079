@@ -1,6 +1,8 @@
 package server.life;
 
 import database.DatabaseConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import provider.*;
 import provider.WzXML.MapleDataType;
 import tools.FileoutputUtil;
@@ -15,6 +17,9 @@ import java.sql.SQLException;
 import java.util.*;
 
 public class MapleLifeFactory {
+
+    private static final Logger logger = LoggerFactory.getLogger(MapleLifeFactory.class);
+
     private static final MapleDataProvider data;
     private static final MapleDataProvider stringDataWZ;
     private static final MapleDataProvider etcDataWZ;
@@ -62,7 +67,7 @@ public class MapleLifeFactory {
                         }
                         MapleLifeFactory.questCount.put(id, z);
                     } else {
-                        System.out.println("null questcountgroup");
+                        logger.warn("null quest count group");
                     }
                 }
             }
@@ -74,10 +79,10 @@ public class MapleLifeFactory {
                 MapleLifeFactory.npcNames.put(rs.getInt("npc"), rs.getString("name"));
             }
         } catch (SQLException ex) {
-            System.out.println("Failed to load npc name data. " + ex);
+            logger.warn("Failed to load npc name data.", ex);
             FileoutputUtil.outputFileError("logs/数据库异常.txt", ex);
         }
-        System.out.println("共加载NPC：" + MapleLifeFactory.npcNames.size());
+        logger.info("共加载NPC：" + MapleLifeFactory.npcNames.size());
     }
 
     public static List<Integer> getQuestCount(final int id) {
@@ -87,7 +92,7 @@ public class MapleLifeFactory {
     public static MapleMonster getMonster(final int mid) {
         MapleMonsterStats stats = MapleLifeFactory.monsterStats.get(mid);
         if (stats == null) {
-            MapleData monsterData = MapleLifeFactory.data.getData(StringUtil.getLeftPaddedStr(Integer.toString(mid) + ".img", '0', 11));
+            MapleData monsterData = MapleLifeFactory.data.getData(StringUtil.padLeft(Integer.toString(mid) + ".img", '0', 11));
             if (monsterData == null) {
                 return null;
             }
@@ -167,7 +172,7 @@ public class MapleLifeFactory {
             decodeElementalString(stats, MapleDataTool.getString("elemAttr", monsterInfoData, ""));
             final int link = MapleDataTool.getIntConvert("link", monsterInfoData, 0);
             if (link != 0) {
-                monsterData = MapleLifeFactory.data.getData(StringUtil.getLeftPaddedStr(link + ".img", '0', 11));
+                monsterData = MapleLifeFactory.data.getData(StringUtil.padLeft(link + ".img", '0', 11));
             }
             for (final MapleData idata : monsterData) {
                 if (idata.getName().equals("fly")) {

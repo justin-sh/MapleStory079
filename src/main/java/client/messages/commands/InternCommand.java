@@ -43,11 +43,11 @@ public class InternCommand {
                 if (chr != null && c.getPlayer().getGMLevel() >= chr.getGMLevel()) {
                     final StringBuilder ret = new StringBuilder();
                     ret.append(" 角色名称 ");
-                    ret.append(StringUtil.getRightPaddedStr(chr.getName(), ' ', 15));
+                    ret.append(StringUtil.padRight(chr.getName(), ' ', 15));
                     ret.append(" ID: ");
-                    ret.append(StringUtil.getRightPaddedStr(chr.getId() + "", ' ', 4));
+                    ret.append(StringUtil.padRight(chr.getId() + "", ' ', 4));
                     ret.append(" 等级: ");
-                    ret.append(StringUtil.getRightPaddedStr(String.valueOf(chr.getLevel()), ' ', 4));
+                    ret.append(StringUtil.padRight(String.valueOf(chr.getLevel()), ' ', 4));
                     ret.append(" 职业: ");
                     ret.append(chr.getJob());
                     if (chr.getMap() == null) {

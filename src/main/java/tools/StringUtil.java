@@ -3,13 +3,8 @@ package tools;
 import java.nio.charset.Charset;
 
 public class StringUtil {
-    public static String getLeftPaddedStr(final String in, final char padchar, final int length) {
-        final StringBuilder builder = new StringBuilder(length);
-        for (int x = in.getBytes().length; x < length; ++x) {
-            builder.append(padchar);
-        }
-        builder.append(in);
-        return builder.toString();
+    public static String padLeft(final String in, final char padChar, final int length) {
+        return String.valueOf(padChar).repeat(Math.max(0, length - in.getBytes().length)) + in;
     }
 
     public static int getlength(final String str) {
@@ -17,12 +12,8 @@ public class StringUtil {
         return bt.length;
     }
 
-    public static String getRightPaddedStr(final String in, final char padchar, final int length) {
-        final StringBuilder builder = new StringBuilder(in);
-        for (int x = in.getBytes().length; x < length; ++x) {
-            builder.append(padchar);
-        }
-        return builder.toString();
+    public static String padRight(final String in, final char padChar, final int length) {
+        return in + String.valueOf(padChar).repeat(Math.max(0, length - in.getBytes().length));
     }
 
     public static String joinStringFrom(final String[] arr, final int start) {

@@ -40,7 +40,7 @@ public class DumpNpcNames {
         }
         for (final MapleData c : npcStringData) {
             final int nid = Integer.parseInt(c.getName());
-            final String n = StringUtil.getLeftPaddedStr(nid + ".img", '0', 11);
+            final String n = StringUtil.padLeft(nid + ".img", '0', 11);
             try {
                 if (npcData.getData(n) == null) {
                     continue;

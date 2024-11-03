@@ -2935,7 +2935,7 @@ public class MaplePacketCreator {
         mplew.write(1);
         final StringBuilder sb = new StringBuilder();
         for (final int kills : status.getMobKills().values()) {
-            sb.append(StringUtil.getLeftPaddedStr(String.valueOf(kills), '0', 3));
+            sb.append(StringUtil.padLeft(String.valueOf(kills), '0', 3));
         }
         mplew.writeMapleAsciiString(sb.toString());
         mplew.writeZeroBytes(8);
@@ -3375,7 +3375,7 @@ public class MaplePacketCreator {
             lew.writeInt(partychar.getId());
         }
         for (final MaplePartyCharacter partychar : partymembers) {
-            lew.writeAsciiString(StringUtil.getRightPaddedStr(partychar.getName(), '\0', 13));
+            lew.writeAsciiString(StringUtil.padRight(partychar.getName(), '\0', 13));
         }
         for (final MaplePartyCharacter partychar : partymembers) {
             lew.writeInt(partychar.getJobId());
@@ -3631,10 +3631,10 @@ public class MaplePacketCreator {
         for (final BuddyEntry buddy : buddylist) {
             if (buddy.isVisible()) {
                 mplew.writeInt(buddy.getCharacterId());
-                mplew.writeAsciiString(StringUtil.getRightPaddedStr(buddy.getName(), '\0', 13));
+                mplew.writeAsciiString(StringUtil.padRight(buddy.getName(), '\0', 13));
                 mplew.write(0);
                 mplew.writeInt((buddy.getChannel() == -1) ? -1 : (buddy.getChannel() - 1));
-                mplew.writeAsciiString(StringUtil.getRightPaddedStr(buddy.getGroup(), '\0', 17));
+                mplew.writeAsciiString(StringUtil.padRight(buddy.getGroup(), '\0', 17));
             }
         }
         for (int x = 0; x < buddylist.size(); ++x) {
@@ -3657,12 +3657,12 @@ public class MaplePacketCreator {
         mplew.writeInt(cidFrom);
         mplew.writeMapleAsciiString(nameFrom);
         mplew.writeInt(cidFrom);
-        mplew.writeAsciiString(StringUtil.getRightPaddedStr(nameFrom, '\0', 13));
+        mplew.writeAsciiString(StringUtil.padRight(nameFrom, '\0', 13));
         mplew.write(1);
         mplew.write(5);
         mplew.write(0);
         mplew.writeShort(0);
-        mplew.writeAsciiString(StringUtil.getRightPaddedStr("群未定", '\0', 17));
+        mplew.writeAsciiString(StringUtil.padRight("群未定", '\0', 17));
         mplew.write(0);
         if (ServerConstants.PACKET_ERROR_OFF) {
             final ServerConstants ERROR = new ServerConstants();
@@ -4067,7 +4067,7 @@ public class MaplePacketCreator {
         mplew.write(39);
         mplew.writeInt(mgc.getGuildId());
         mplew.writeInt(mgc.getId());
-        mplew.writeAsciiString(StringUtil.getRightPaddedStr(mgc.getName(), '\0', 13));
+        mplew.writeAsciiString(StringUtil.padRight(mgc.getName(), '\0', 13));
         mplew.writeInt(mgc.getJobId());
         mplew.writeInt(mgc.getLevel());
         mplew.writeInt(mgc.getGuildRank());
@@ -6411,12 +6411,12 @@ public class MaplePacketCreator {
         mplew.writeInt(cidFrom);
         mplew.writeMapleAsciiString(nameFrom);
         mplew.writeInt(cidFrom);
-        mplew.writeAsciiString(StringUtil.getRightPaddedStr(nameFrom, '\0', 13));
+        mplew.writeAsciiString(StringUtil.padRight(nameFrom, '\0', 13));
         mplew.write(1);
         mplew.write(5);
         mplew.write(0);
         mplew.writeShort(0);
-        mplew.writeAsciiString(StringUtil.getRightPaddedStr("群未定", '\0', 17));
+        mplew.writeAsciiString(StringUtil.padRight("群未定", '\0', 17));
         mplew.write(0);
         if (ServerConstants.PACKET_ERROR_OFF) {
             final ServerConstants ERROR = new ServerConstants();

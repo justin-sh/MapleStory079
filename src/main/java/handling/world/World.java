@@ -12,6 +12,8 @@ import handling.channel.PlayerStorage;
 import handling.world.family.MapleFamily;
 import handling.world.family.MapleFamilyCharacter;
 import handling.world.guild.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import server.Timer;
 import server.maps.MapleMap;
 import server.maps.MapleMapItem;
@@ -30,6 +32,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
 public class World {
+
+    private static final Logger logger = LoggerFactory.getLogger(World.class);
+
     public static boolean isShutDown;
     private static final int CHANNELS_PER_THREAD = 3;
 
@@ -258,7 +263,7 @@ public class World {
 
     public static void registerRespawn() {
         Timer.WorldTimer.getInstance().register(new Respawn(), 5000L);
-        System.out.println("[刷怪线程] 已经启动...");
+        logger.info("[刷怪线程] 已经启动...");
     }
 
     public static void handleMap(final MapleMap map, final int numTimes, final int size) {
@@ -361,8 +366,7 @@ public class World {
                 }
             }
             switch (operation) {
-                case EXPEL:
-                case LEAVE: {
+                case EXPEL, LEAVE -> {
                     final int ch2 = Find.findChannel(target.getName());
                     if (ch2 <= 0) {
                         break;
@@ -373,7 +377,6 @@ public class World {
                         chr2.setParty(null);
                         break;
                     }
-                    break;
                 }
             }
         }
@@ -873,7 +876,7 @@ public class World {
         }
 
         public static void save() {
-            System.out.println("Saving guilds...");
+            logger.info("Saving guilds...");
             Guild.lock.writeLock().lock();
             try {
                 for (final MapleGuild a : Guild.guilds.values()) {
@@ -959,9 +962,9 @@ public class World {
         }
 
         static {
-            guilds = new LinkedHashMap<Integer, MapleGuild>();
+            guilds = new LinkedHashMap<>();
             Guild.lock = new ReentrantReadWriteLock();
-            System.out.println("加载 家族 :::");
+            logger.info("加载 家族");
             final Collection<MapleGuild> allGuilds = MapleGuild.loadAll();
             for (final MapleGuild g : allGuilds) {
                 if (g.isProper()) {
@@ -1368,7 +1371,7 @@ public class World {
         }
 
         public static void save() {
-            System.out.println("Saving alliances...");
+            logger.info("Saving alliances...");
             Alliance.lock.writeLock().lock();
             try {
                 for (final MapleGuildAlliance a : Alliance.alliances.values()) {
@@ -1382,7 +1385,7 @@ public class World {
         static {
             alliances = new LinkedHashMap<Integer, MapleGuildAlliance>();
             Alliance.lock = new ReentrantReadWriteLock();
-            System.out.println("加载 家族联盟 :::");
+            logger.info("加载 家族联盟 :::");
             final Collection<MapleGuildAlliance> allGuilds = MapleGuildAlliance.loadAll();
             for (final MapleGuildAlliance g : allGuilds) {
                 Alliance.alliances.put(g.getId(), g);
@@ -1440,7 +1443,7 @@ public class World {
         }
 
         public static void save() {
-            System.out.println("Saving families...");
+            logger.info("Saving families...");
             Family.lock.writeLock().lock();
             try {
                 for (final MapleFamily a : Family.families.values()) {
@@ -1492,7 +1495,7 @@ public class World {
         static {
             families = new LinkedHashMap<Integer, MapleFamily>();
             Family.lock = new ReentrantReadWriteLock();
-            System.out.println("加载 冒险学院 :::");
+            logger.info("加载 冒险学院 :::");
             final Collection<MapleFamily> allGuilds = MapleFamily.loadAll();
             for (final MapleFamily g : allGuilds) {
                 if (g.isProper()) {

@@ -1,6 +1,8 @@
 package server;
 
 import database.DatabaseConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -12,6 +14,9 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class ServerProperties {
+
+    private static final Logger logger = LoggerFactory.getLogger(ServerProperties.class);
+
     public static boolean showPacket;
     private static Properties props;
     private static String[] toLoad;
@@ -44,7 +49,7 @@ public class ServerProperties {
             ServerProperties.props.load(fr);
             fr.close();
         } catch (IOException ex) {
-            System.out.println("加载Settings错误：" + ex);
+            logger.error("load server Settings failed.", ex);
         }
         try {
             PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("SELECT * FROM auth_server_channel_ip");
@@ -54,7 +59,7 @@ public class ServerProperties {
             rs.close();
             ps.close();
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error("load auth server info from db failed!", ex);
             System.exit(0);
         }
     }

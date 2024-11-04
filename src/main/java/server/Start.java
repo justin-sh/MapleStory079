@@ -59,6 +59,7 @@ public class Start {
         System.setProperty("wzPath", wzPath);
         System.setProperty("scripts_path", scriptsPath);
         System.setProperty("server_name", "冒险岛");
+
         OtherSettings.getInstance();
         Start.instance.run();
     }

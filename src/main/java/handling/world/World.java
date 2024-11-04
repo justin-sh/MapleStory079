@@ -1160,7 +1160,7 @@ public class World {
 
         static {
             lock = new ReentrantReadWriteLock();
-            idToChannel = new HashMap<Integer, Integer>();
+            idToChannel = new HashMap<>();
             nameToChannel = new HashMap<String, Integer>();
         }
     }

@@ -9,12 +9,19 @@
         <Console name="CONSOLE">
             <PatternLayout pattern="%d [%t] %-5p %18.18c - %m%n"/>
         </Console>
+        <RollingFile name="FILE"
+                     fileName="logs/mxd079.log"
+                     filePattern="logs/mxd069-%d{yyyy-MM-dd}.log">
+            <PatternLayout pattern="%d [%t] %-5p %18.18c - %m%n"/>
+            <TimeBasedTriggeringPolicy/>
+        </RollingFile>
     </Appenders>
 
     <Loggers>
         <Logger name="com.justin.game.mxd079" level="DEBUG"/>
         <Root level="INFO">
             <AppenderRef ref="CONSOLE"/>
+            <AppenderRef ref="FILE"/>
         </Root>
     </Loggers>
 

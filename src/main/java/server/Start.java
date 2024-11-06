@@ -41,7 +41,7 @@ public class Start {
 
     private static final Logger logger = LoggerFactory.getLogger(Start.class);
 
-    public static boolean Check;
+    public static boolean init;
     private static RoyMS CashGui;
     public static Start instance;
     private static int maxUsers;
@@ -49,9 +49,23 @@ public class Start {
     private MapleClient c;
 
     public static void main(final String[] args) throws InterruptedException {
-        String homePath = System.getProperty("homePath");
-        String scriptsPath = System.getProperty("scriptsPath");
-        String wzPath = System.getProperty("wzPath");
+        Start.instance.init();
+        Start.instance.run();
+        boolean loadGui = Boolean.parseBoolean(ServerProperties.getProperty("RoyMS.loadGui", "false"));
+        if (loadGui) {
+            CashGui();
+        }
+    }
+
+    private void init(){
+        if(Start.init){
+            return;
+        }
+        Start.init = true;
+
+        String homePath = System.getProperty("homePath", "./config/");
+        String scriptsPath = System.getProperty("scriptsPath", "./scripts/");
+        String wzPath = System.getProperty("wzPath", "./scripts/wz");
         System.setProperty("server_property_file_path", homePath + "server.properties");
         System.setProperty("server_property_db_path", homePath + "db.properties");
         System.setProperty("server_property_shop_path", homePath + "shop.properties");
@@ -61,10 +75,9 @@ public class Start {
         System.setProperty("server_name", "冒险岛");
 
         OtherSettings.getInstance();
-        Start.instance.run();
     }
 
-    public void run() throws InterruptedException {
+    public void run() {
         final long start = System.currentTimeMillis();
         checkSingleInstance();
         if (Boolean.parseBoolean(ServerProperties.getProperty("RoyMS.Admin"))) {
@@ -75,20 +88,20 @@ public class Start {
             logger.info("加载 自动注册完成 :::");
         }
         try {
-            try (final PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("UPDATE accounts SET loggedin = 0")) {
-                ps.executeUpdate();
-            }
-            try (final PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("UPDATE accounts SET lastGainHM = 0")) {
+            try (final PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("UPDATE accounts SET loggedin = 0, lastGainHM = 0")) {
                 ps.executeUpdate();
             }
         } catch (SQLException ex) {
             throw new RuntimeException("[数据库异常] 请检查数据库链接。目前无法连接到MySQL数据库.");
         }
-        logger.info("服务端 开始启动...版本号：079");
+        logger.info("服务端 开始启动...");
         logger.info("当前操作系统: " + System.getProperty("os.name") + " " + System.getProperty("os.version"));
         logger.info("服务器地址: " + ServerProperties.getProperty("RoyMS.IP") + ":" + LoginServer.PORT);
         logger.info("游戏版本: " + ServerConstants.MAPLE_TYPE + " v." + ServerConstants.MAPLE_VERSION + "." + ServerConstants.MAPLE_PATCH);
         logger.info("主服务器: 蓝蜗牛");
+
+        Runtime.getRuntime().addShutdownHook(new Thread(new Shutdown()));
+
         World.init();
         runThread();
         loadData();
@@ -118,12 +131,7 @@ public class Start {
         final long seconds = now / 1000L;
         final long ms = now % 1000L;
         logger.info("加载完成, 耗时: " + seconds + "秒" + ms + "毫秒.");
-//        CashGui();
-        boolean loadGui = Boolean.parseBoolean(ServerProperties.getProperty("RoyMS.loadGui", "false"));
-        if (loadGui) {
-            logger.info("加载GUI工具");
-            CashGui();
-        }
+
     }
 
     public static void runThread() {
@@ -166,7 +174,6 @@ public class Start {
         MobSkillFactory.getInstance();
         MapleFamilyBuff.getBuffEntry();
         logger.info("加载SpeedRunner");
-        Runtime.getRuntime().addShutdownHook(new Thread(new Shutdown()));
         try {
             SpeedRunner.getInstance().loadSpeedRuns();
         } catch (SQLException e) {
@@ -252,7 +259,7 @@ public class Start {
             if (ex.getMessage().contains("Address already in use: JVM_Bind")) {
                 logger.error("在一台主机上同时只能启动一个进程(Only one instance allowed)。");
             }
-            System.exit(0);
+            throw new RuntimeException("在一台主机上同时只能启动一个进程(Only one instance allowed)。", ex);
         }
     }
 
@@ -295,59 +302,12 @@ public class Start {
     }
 
     public void startServer() throws InterruptedException {
-        final long start = System.currentTimeMillis();
-        checkSingleInstance();
-        logger.info("======================================");
-        logger.info(ServerProperties.getProperty("RoyMS.Admin"));
-        logger.info("========================");
-        if (Boolean.parseBoolean(ServerProperties.getProperty("RoyMS.Admin"))) {
-            logger.info(sectionString("[!!! 已开启只能管理员登录模式 !!!]"));
-        }
-        if (Boolean.parseBoolean(ServerProperties.getProperty("RoyMS.AutoRegister"))) {
-            logger.info("加载 自动注册完成 :::");
-        }
-        try (final PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("UPDATE accounts SET loggedin = 0")) {
-            ps.executeUpdate();
-        } catch (SQLException ex) {
-            throw new RuntimeException("[数据库异常] 请检查数据库链接。目前无法连接到MySQL数据库.");
-        }
-        logger.info("服务端 开始启动...");
-        logger.info("当前操作系统: " + System.getProperty("sun.desktop"));
-        logger.info("服务器地址: " + ServerProperties.getProperty("RoyMS.IP") + ":" + LoginServer.PORT);
-        logger.info("游戏版本: " + ServerConstants.MAPLE_TYPE + " v." + ServerConstants.MAPLE_VERSION + "." + ServerConstants.MAPLE_PATCH);
-        World.init();
-        runThread();
-        loadData();
-        logger.info("加载\"登入\"服务...");
-        LoginServer.run_startup_configurations();
-        logger.info("正在加载频道...");
-        ChannelServer.startChannel_Main();
-        logger.info("频道加载完成!");
-        logger.info("正在加载商城...");
-        CashShopServer.run_startup_configurations();
-        logger.info(sectionString("刷怪线程"));
-        World.registerRespawn();
-        Timer.CheatTimer.getInstance().register(AutobanManager.getInstance(), 60000L);
-        onlineTime(1);
-        memoryRecical(360);
-        MapleServerHandler.registerMBean();
-        LoginServer.setOn();
-        logger.info("经验倍率：" + Integer.parseInt(ServerProperties.getProperty("RoyMS.Exp")) + "  物品倍率：" + Integer.parseInt(ServerProperties.getProperty("RoyMS.Drop")) + "  金币倍率：" + Integer.parseInt(ServerProperties.getProperty("RoyMS.Meso")) + "  BOSS爆率：" + Integer.parseInt(ServerProperties.getProperty("RoyMS.BDrop")));
-        if (Boolean.parseBoolean(ServerProperties.getProperty("RoyMS.检测复制装备", "false"))) {
-            checkCopyItemFromSql();
-        }
-        if (Boolean.parseBoolean(ServerProperties.getProperty("RoyMS.防万能检测", "false"))) {
-            logger.info("启动防万能检测");
-            startCheck();
-        }
-        final long now = System.currentTimeMillis() - start;
-        final long seconds = now / 1000L;
-        final long ms = now % 1000L;
-        logger.info("加载完成, 耗时: " + seconds + "秒" + ms + "毫秒\r\n");
-        logger.info("服务端开启完毕，可以登入游戏了！");
+        this.init();
+        this.run();
     }
 
     public static void CashGui() {
+        logger.info("加载GUI工具");
         if (Start.CashGui != null) {
             Start.CashGui.dispose();
         }
@@ -415,7 +375,6 @@ public class Start {
     }
 
     static {
-        Start.Check = true;
         Start.instance = new Start();
         Start.maxUsers = 0;
     }

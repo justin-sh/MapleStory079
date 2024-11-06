@@ -592,7 +592,7 @@ public class HuaiMS extends JFrame {
 
     private void jButton10ActionPerformed(final ActionEvent evt) {
         try {
-            if (Start.Check) {
+            if (Start.init) {
                 Start.instance.startServer();
                 final String 输出 = "[服务器] 服务器启动成功！";
                 this.printChatLog(输出);

@@ -5,12 +5,17 @@ import handling.cashshop.CashShopServer;
 import handling.channel.ChannelServer;
 import handling.login.LoginServer;
 import handling.world.World;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tools.MaplePacketCreator;
 
 import java.sql.SQLException;
 import java.util.Set;
 
 public class ShutdownServer implements Runnable {
+
+    private static final Logger logger = LoggerFactory.getLogger(ShutdownServer.class);
+
     private static final ShutdownServer instance;
     public static boolean running;
     public int mode;
@@ -62,19 +67,19 @@ public class ShutdownServer implements Runnable {
                 cs2.setFinishShutdown();
                 cs2.shutdown();
             } catch (Exception e2) {
-                System.out.println("频道" + String.valueOf(channel) + " 关闭错误.");
+                System.out.println("频道" + channel + " 关闭错误.");
             }
         }
-        System.out.println("服务端关闭事件 1 已完成.");
-        System.out.println("服务端关闭事件 2 开始...");
+        logger.info("服务端关闭事件 1 已完成.");
+        logger.info("服务端关闭事件 2 开始...");
         try {
             LoginServer.shutdown();
-            System.out.println("登录伺服器关闭完成...");
+            logger.info("登录伺服器关闭完成...");
         } catch (Exception ex3) {
         }
         try {
             CashShopServer.shutdown();
-            System.out.println("商城伺服器关闭完成...");
+            logger.info("商城伺服器关闭完成...");
         } catch (Exception ex4) {
         }
         try {
@@ -82,11 +87,11 @@ public class ShutdownServer implements Runnable {
         } catch (SQLException ex5) {
         }
         Timer.PingTimer.getInstance().stop();
-        System.out.println("服务端关闭事件 2 已完成.");
+        logger.info("服务端关闭事件 2 已完成.");
         try {
             Thread.sleep(1000L);
         } catch (InterruptedException e) {
-            System.out.println("关闭服务端错误 - 2" + e);
+            logger.warn("关闭服务端错误 - 2", e);
         }
         System.exit(0);
     }

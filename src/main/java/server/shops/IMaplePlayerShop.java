@@ -8,10 +8,10 @@ import tools.Pair;
 import java.util.List;
 
 public interface IMaplePlayerShop {
-    public static final byte HIRED_MERCHANT = 1;
-    public static final byte PLAYER_SHOP = 2;
-    public static final byte OMOK = 3;
-    public static final byte MATCH_CARD = 4;
+    byte HIRED_MERCHANT = 1;
+    byte PLAYER_SHOP = 2;
+    byte OMOK = 3;
+    byte MATCH_CARD = 4;
 
     String getOwnerName();
 

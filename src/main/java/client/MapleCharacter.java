@@ -205,6 +205,9 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
     public int master;
     public boolean DebugMessage;
     public int ariantScore;
+    /**
+     * last hired merchant time
+     */
     public long lastGainHM;
     private long lastFishingTime;
     private int skillzq;

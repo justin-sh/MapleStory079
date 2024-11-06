@@ -321,10 +321,10 @@ public class PlayerInteractionHandler {
                 if (c.getChannelServer().isShutdown()) {
                     chr.dropMessage(1, "伺服器即将关闭所以不能整理商店.");
                     c.getSession().write((Object) MaplePacketCreator.enableActions());
-                    shop2.closeShop(shop2.getShopType() == 1, false);
+                    shop2.closeShop(shop2.getShopType() == IMaplePlayerShop.HIRED_MERCHANT, false);
                     return;
                 }
-                if (shop2.getShopType() == 1) {
+                if (shop2.getShopType() == IMaplePlayerShop.HIRED_MERCHANT) {
                     final HiredMerchant merchant3 = (HiredMerchant) shop2;
                     merchant3.setStoreid(c.getChannelServer().addMerchant(merchant3));
                     merchant3.setOpen(true);
@@ -334,7 +334,7 @@ public class PlayerInteractionHandler {
                     chr.setLastHM(System.currentTimeMillis());
                     break;
                 }
-                if (shop2.getShopType() == 2) {
+                if (shop2.getShopType() == IMaplePlayerShop.PLAYER_SHOP) {
                     shop2.setOpen(true);
                     shop2.setAvailable(true);
                     shop2.update();

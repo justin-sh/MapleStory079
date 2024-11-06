@@ -32,8 +32,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.concurrent.ScheduledFuture;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.concurrent.TimeUnit;
 
 public class RoyMS extends JFrame {
 
@@ -583,15 +582,11 @@ public class RoyMS extends JFrame {
 
     private void btnStartServerActionPerformed(final ActionEvent evt) {
         try {
-            if (Start.Check) {
-                Start.instance.startServer();
-                final String msg = "[服务器] 服务器启动成功！";
-                this.printChatLog(msg);
-            } else {
-                JOptionPane.showMessageDialog(null, "[服务器] 无法重复运行。");
-            }
-        } catch (InterruptedException ex) {
-            Logger.getLogger(RoyMS.class.getName()).log(Level.SEVERE, null, ex);
+            Start.instance.startServer();
+            final String msg = "[服务器] 服务器启动成功！";
+            this.printChatLog(msg);
+        } catch (Exception ex) {
+            logger.error("start server failed!", ex);
         }
     }
 
@@ -622,7 +617,7 @@ public class RoyMS extends JFrame {
     }
 
     private void btnShutdownServerActionPerformed(final ActionEvent evt) {
-        this.restart();
+        this.shutdownServer();
     }
 
     private void btnDisconnectAccountActionPerformed(final ActionEvent evt) {
@@ -737,29 +732,24 @@ public class RoyMS extends JFrame {
         this.printChatLog("更改账号: " + account + "的密码为 " + password);
     }
 
-    private void restart() {
+    private void shutdownServer() {
         try {
-            final String out = "关闭服务器倒数时间";
             this.minutesLeft = Integer.parseInt(this.txtShutdonwServerMinutes.getText());
             if (RoyMS.ts == null && (RoyMS.t == null || !RoyMS.t.isAlive())) {
                 RoyMS.t = new Thread(ShutdownServer.getInstance());
-                RoyMS.ts = Timer.EventTimer.getInstance().register(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (RoyMS.this.minutesLeft == 0) {
-                            ShutdownServer.getInstance();
-                            RoyMS.t.start();
-                            RoyMS.ts.cancel(false);
-                            return;
-                        }
-                        World.Broadcast.broadcastMessage(MaplePacketCreator.serverNotice(0, "服务器將在 " + RoyMS.this.minutesLeft + "分钟后关闭. 请尽快关闭雇佣商人安全下线.").getBytes());
-                        System.out.println("服务器將在 " + RoyMS.this.minutesLeft + "分钟后关闭.");
-                        RoyMS.this.minutesLeft--;
+                RoyMS.ts = Timer.EventTimer.getInstance().register(() -> {
+                    if (RoyMS.this.minutesLeft == 0) {
+                        RoyMS.t.start();
+                        RoyMS.ts.cancel(false);
+                        return;
                     }
-                }, 60000L);
+                    World.Broadcast.broadcastMessage(MaplePacketCreator.serverNotice(0, "服务器將在 " + RoyMS.this.minutesLeft + "分钟后关闭. 请尽快关闭雇佣商人安全下线.").getBytes());
+                    logger.info("服务器將在 " + RoyMS.this.minutesLeft + "分钟后关闭.");
+                    RoyMS.this.minutesLeft--;
+                }, TimeUnit.MINUTES.toMillis(1));
             }
             this.txtShutdonwServerMinutes.setText("关闭服务器倒数时间");
-            this.printChatLog(out);
+            this.printChatLog("关闭服务器...");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "错误!\r\n" + e);
         }

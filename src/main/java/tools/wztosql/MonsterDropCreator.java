@@ -1,6 +1,5 @@
 package tools.wztosql;
 
-import handling.channel.handler.InventoryHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import provider.MapleData;

@@ -22,7 +22,6 @@ import tools.data.input.SeekableLittleEndianAccessor;
 import tools.packet.MTSCSPacket;
 import tools.packet.PetPacket;
 import tools.packet.PlayerShopPacket;
-import tools.packet.UIPacket;
 
 import java.awt.*;
 import java.util.List;

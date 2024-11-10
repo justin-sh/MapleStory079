@@ -8,7 +8,6 @@ import constants.GameConstants;
 import constants.OtherSettings;
 import handling.cashshop.CashShopServer;
 import handling.channel.ChannelServer;
-import handling.channel.handler.HiredMerchantHandler;
 import handling.login.LoginServer;
 import handling.world.CharacterTransfer;
 import handling.world.World;

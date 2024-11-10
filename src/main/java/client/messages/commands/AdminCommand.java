@@ -33,7 +33,6 @@ import server.quest.MapleQuest;
 import tools.*;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.MobPacket;
-import tools.wztosql.ConvertOpcodes;
 
 import java.awt.*;
 import java.io.File;
@@ -3467,7 +3466,7 @@ public class AdminCommand {
             try {
                 con = DatabaseConnection.getConnection();
             } catch (Exception ex) {
-                logger.info(ex);
+                logger.error("DB get connection failed.", ex);
                 return 0;
             }
             try (final PreparedStatement ps = (PreparedStatement) con.prepareStatement("INSERT INTO accounts (name, password) VALUES (?, ?)")) {
@@ -3476,7 +3475,7 @@ public class AdminCommand {
                 ps.executeUpdate();
                 ps.close();
             } catch (SQLException ex2) {
-                logger.info(ex2);
+                logger.error("save new account failed.", ex2);
                 return 0;
             }
             c.getPlayer().dropMessage("[注册完成]账号: " + acc + " 密码: " + password);

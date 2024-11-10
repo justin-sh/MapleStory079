@@ -602,7 +602,7 @@ public class HuaiMS extends JFrame {
                 JOptionPane.showMessageDialog(null, "[服务器] 无法重复运行。");
             }
         } catch (InterruptedException ex) {
-            Logger.getLogger(HuaiMS.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("start server failed.", ex);
         }
     }
 

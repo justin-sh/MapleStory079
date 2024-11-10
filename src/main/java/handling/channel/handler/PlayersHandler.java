@@ -8,7 +8,6 @@ import client.anticheat.CheatingOffense;
 import client.inventory.IItem;
 import client.inventory.MapleInventoryType;
 import constants.GameConstants;
-import handling.MapleServerHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scripting.NPCScriptManager;

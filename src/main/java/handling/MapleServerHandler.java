@@ -15,6 +15,8 @@ import handling.world.World;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import server.MTSStorage;
 import server.Randomizer;
 import server.ServerProperties;
@@ -38,6 +40,9 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class MapleServerHandler extends IoHandlerAdapter implements MapleServerHandlerMBean {
+
+    private static final Logger logger = LoggerFactory.getLogger(MapleServerHandler.class);
+
     private static boolean Log_Packets;
     private static String nl;
     private static File loggedIPs;
@@ -81,8 +86,7 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
                 }
             }
         } catch (IOException e) {
-            System.out.println("无法加载登录IP数据包。");
-            System.out.println(e);
+            logger.warn("无法加载登录IP数据包。", e);
         }
     }
 
@@ -120,8 +124,7 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
             mBeanServer.registerMBean(mbean, new ObjectName("handling:type=MapleServerHandler"));
         } catch (InstanceAlreadyExistsException | MBeanRegistrationException | MalformedObjectNameException |
                  NotCompliantMBeanException e) {
-            System.out.println("Error registering PacketLog MBean");
-            e.printStackTrace();
+            logger.warn("Error registering PacketLog MBean", e);
         }
     }
 
@@ -155,7 +158,7 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
                 MapleServerHandler.Packet_Log_Lock.readLock().unlock();
             }
         } catch (IOException ex) {
-            System.out.println("Error writing log to file.");
+            logger.warn("Error writing log to file.", ex);
         }
     }
 
@@ -185,29 +188,29 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
                 count = 1;
             }
             if (count >= 10) {
-                System.out.print("自动断开连接A2");
+                logger.info("自动断开连接A2。");
                 this.BlockedIP.add(address);
                 this.tracker.remove(address);
-                session.close(true);
+                session.closeNow();
                 return;
             }
         }
         this.tracker.put(address, new Pair<Long, Byte>(System.currentTimeMillis(), count));
         if (this.channel > -1) {
             if (ChannelServer.getInstance(this.channel).isShutdown()) {
-                System.out.print("频道服务器尚未开启,发现连接进入，该连接被断开");
-                session.close(true);
+                logger.info("频道服务器尚未开启,发现连接进入，该连接被断开。");
+                session.closeNow();
                 return;
             }
         } else if (this.cs) {
             if (CashShopServer.isShutdown()) {
-                System.out.print("商城服务器尚未开启,发现连接进入，该连接被断开");
-                session.close(true);
+                logger.info("商城服务器尚未开启,发现连接进入，该连接被断开。");
+                session.closeNow();
                 return;
             }
         } else if (LoginServer.isShutdown()) {
-            System.out.print("登录服务器尚未开启,发现连接进入，该连接被断开");
-            session.close(true);
+            logger.info("登录服务器尚未开启,发现连接进入，该连接被断开。");
+            session.closeNow();
             return;
         }
         final byte[] serverRecv = {70, 114, 122, (byte) Randomizer.nextInt(255)};
@@ -231,7 +234,7 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
             sb.append("[登录服务器]");
         }
         sb.append("IoSession opened ").append(address);
-        System.out.println(sb.toString());
+        logger.info(sb.toString());
         World.Client.addClient(client);
         final FileWriter fw = isLoggedIP(session);
         if (fw != null) {
@@ -318,7 +321,7 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
             if (MapleServerHandler.debugMode) {
                 final StringBuilder sb2 = new StringBuilder("Received data 未處理 : ");
                 sb2.append(HexTool.toString((byte[]) message)).append("\n").append(HexTool.toStringFromAscii((byte[]) message));
-                System.out.println(sb2.toString());
+                logger.info(sb2.toString());
             }
         } catch (RejectedExecutionException ex) {
             ex.printStackTrace();
@@ -335,7 +338,7 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
             super.sessionIdle(session, status);
             return;
         }
-        session.close(true);
+        session.closeNow();
     }
 
     public static boolean isSpamHeader(final RecvPacketOpcode header) {
@@ -515,7 +518,7 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
             case CHANGE_MAP: {
                 if (cs) {
                     if (ServerConstants.调试输出封包) {
-                        System.out.println("退出商城");
+                        logger.info("退出商城");
                     }
                     CashShopOperation.LeaveCS(slea, c, c.getPlayer());
                     break;

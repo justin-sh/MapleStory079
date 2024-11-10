@@ -2,6 +2,8 @@ package tools;
 
 import client.inventory.MapleInventoryType;
 import database.DatabaseConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
@@ -18,6 +20,7 @@ import java.sql.SQLException;
 import java.util.*;
 
 public class CashShopDumper {
+    private static final Logger logger = LoggerFactory.getLogger(CashShopDumper.class);
     private static final MapleDataProvider data;
 
     public static CashItemInfo.CashModInfo getModInfo(final int sn) {
@@ -72,7 +75,7 @@ public class CashShopDumper {
                     check = true;
                 }
                 if (check) {
-                    System.out.println(MapleItemInformationProvider.getInstance().getName(itemId));
+                    logger.info(MapleItemInformationProvider.getInstance().getName(itemId));
                 } else {
                     final PreparedStatement ps = con.prepareStatement("INSERT INTO cashshop_modified_items (serial, showup,itemid,priority,period,gender,count,meso,discount_price,mark, unk_1, unk_2, unk_3) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                     ps.setInt(1, sn);

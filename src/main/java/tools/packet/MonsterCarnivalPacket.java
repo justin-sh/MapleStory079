@@ -4,14 +4,18 @@ import client.MapleCharacter;
 import constants.ServerConstants;
 import handling.MaplePacket;
 import handling.SendPacketOpcode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import server.MapleCarnivalParty;
 import tools.data.output.MaplePacketLittleEndianWriter;
 
 public class MonsterCarnivalPacket {
+    private static final Logger logger = LoggerFactory.getLogger(MTSCSPacket.class);
+    
     public static MaplePacket startMonsterCarnival(final MapleCharacter chr, final int enemyavailable, final int enemytotal) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("startMonsterCarnival--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("startMonsterCarnival--------------------");
         }
         mplew.writeShort(SendPacketOpcode.MONSTER_CARNIVAL_START.getValue());
         final MapleCarnivalParty friendly = chr.getCarnivalParty();
@@ -33,8 +37,8 @@ public class MonsterCarnivalPacket {
 
     public static MaplePacket playerDiedMessage(final String name, final int lostCP, final int team) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("playerDiedMessage--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("playerDiedMessage--------------------");
         }
         mplew.writeShort(SendPacketOpcode.MONSTER_CARNIVAL_DIED.getValue());
         mplew.write(team);
@@ -49,8 +53,8 @@ public class MonsterCarnivalPacket {
 
     public static MaplePacket CPUpdate(final boolean party, final int curCP, final int totalCP, final int team) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("CPUpdate--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("CPUpdate--------------------");
         }
         if (!party) {
             mplew.writeShort(SendPacketOpcode.MONSTER_CARNIVAL_OBTAINED_CP.getValue());
@@ -69,8 +73,8 @@ public class MonsterCarnivalPacket {
 
     public static MaplePacket playerSummoned(final String name, final int tab, final int number) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("playerSummoned--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("playerSummoned--------------------");
         }
         mplew.writeShort(SendPacketOpcode.MONSTER_CARNIVAL_SUMMON.getValue());
         mplew.write(tab);

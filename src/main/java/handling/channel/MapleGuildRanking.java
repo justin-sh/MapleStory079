@@ -2,6 +2,7 @@ package handling.channel;
 
 import client.MapleClient;
 import database.DatabaseConnection;
+import org.slf4j.LoggerFactory;
 import server.Timer;
 import tools.MaplePacketCreator;
 
@@ -13,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class MapleGuildRanking {
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(MapleGuildRanking.class);
     private static final MapleGuildRanking instance;
     private final List<GuildRankingInfo> ranks;
     private final List<levelRankingInfo> ranks1;
@@ -76,7 +78,7 @@ public class MapleGuildRanking {
             }
             rs.close();
         } catch (SQLException e) {
-            System.err.println("家族排行错误" + e);
+            logger.error("家族排行错误", e);
         }
     }
 
@@ -89,7 +91,7 @@ public class MapleGuildRanking {
             ps.close();
             rs.close();
         } catch (Exception e) {
-            System.out.println("failed to display guild ranks." + e);
+            logger.error("failed to display guild ranks.", e);
         }
     }
 
@@ -102,7 +104,7 @@ public class MapleGuildRanking {
             ps.close();
             rs.close();
         } catch (Exception e) {
-            System.out.println("failed to display guild ranks." + e);
+            logger.error("failed to display guild ranks.", e);
         }
     }
 
@@ -119,7 +121,7 @@ public class MapleGuildRanking {
             ps.close();
             rs.close();
         } catch (SQLException e) {
-            System.err.println("人物排行错误");
+            logger.error("人物排行错误", e);
         }
     }
 
@@ -134,7 +136,7 @@ public class MapleGuildRanking {
             }
             rs.close();
         } catch (SQLException e) {
-            System.err.println("金币排行错误");
+            logger.error("金币排行错误", e);
         }
     }
 

@@ -67,7 +67,7 @@ public class ShutdownServer implements Runnable {
                 cs2.setFinishShutdown();
                 cs2.shutdown();
             } catch (Exception e2) {
-                System.out.println("频道" + channel + " 关闭错误.");
+                logger.warn("频道" + channel + " 关闭错误.", e2);
             }
         }
         logger.info("服务端关闭事件 1 已完成.");

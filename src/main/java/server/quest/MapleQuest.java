@@ -3,6 +3,9 @@ package server.quest;
 import client.MapleCharacter;
 import client.MapleQuestStatus;
 import constants.GameConstants;
+import handling.cashshop.handler.CashShopOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
@@ -17,6 +20,9 @@ import java.io.Serializable;
 import java.util.*;
 
 public class MapleQuest implements Serializable {
+
+    private static final Logger logger = LoggerFactory.getLogger(MapleQuest.class);
+    
     private static final long serialVersionUID = 9179541993413738569L;
     private static final Map<Integer, MapleQuest> quests;
     private static MapleDataProvider questData;
@@ -144,7 +150,7 @@ public class MapleQuest implements Serializable {
                 ex.printStackTrace();
                 FileoutputUtil.outputFileError(FileoutputUtil.ScriptEx_Log, ex);
                 FileoutputUtil.log(FileoutputUtil.ScriptEx_Log, "Caused by questID " + id);
-                System.out.println("Caused by questID " + id);
+                logger.info("Caused by questID " + id);
                 return new MapleCustomQuest(id);
             }
         }

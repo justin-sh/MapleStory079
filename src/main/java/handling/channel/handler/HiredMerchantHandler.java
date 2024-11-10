@@ -8,6 +8,8 @@ import client.inventory.MapleInventoryType;
 import constants.GameConstants;
 import database.DatabaseConnection;
 import handling.world.World;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import server.MapleInventoryManipulator;
 import server.MapleItemInformationProvider;
 import server.MerchItemPackage;
@@ -26,6 +28,9 @@ import java.util.List;
 import java.util.Map;
 
 public class HiredMerchantHandler {
+    
+    private static final Logger logger = LoggerFactory.getLogger(HiredMerchantHandler.class);
+    
     public static final void UseHiredMerchant(final SeekableLittleEndianAccessor slea, final MapleClient c) {
         if (c.getPlayer().getMap().allowPersonalShop()) {
             final byte state = checkExistance(c.getPlayer().getAccountID(), c.getPlayer().getId());
@@ -146,7 +151,7 @@ public class HiredMerchantHandler {
                         if (chr.isGM()) {
                             chr.dropMessage(6, "[雇佣] " + chr.getName() + " 雇佣取回获得金币: " + pack2.getMesos() + " 时间: " + FileoutputUtil.CurrentReadable_Date());
                         }
-                        System.out.println("[雇佣] " + chr.getName() + " 雇佣取回获得金币: " + pack2.getMesos() + " 时间: " + FileoutputUtil.CurrentReadable_Date());
+                        logger.info("[雇佣] " + chr.getName() + " 雇佣取回获得金币: " + pack2.getMesos() + " 时间: " + FileoutputUtil.CurrentReadable_Date());
                         FileoutputUtil.hiredMerchLog(chr.getName(), "雇佣取回获得金币: " + pack2.getMesos());
                     }
                     for (final IItem item : pack2.getItems()) {
@@ -167,7 +172,7 @@ public class HiredMerchantHandler {
                 break;
             }
             default: {
-                System.out.println("弗兰德里：雇佣商店未知的操作类型 " + operation);
+                logger.info("弗兰德里：雇佣商店未知的操作类型 " + operation);
                 break;
             }
         }
@@ -199,7 +204,7 @@ public class HiredMerchantHandler {
 
     private static boolean check(final MapleCharacter chr, final MerchItemPackage pack) {
         if (chr.getMeso() + pack.getMesos() < 0) {
-            System.out.println("[雇佣] " + chr.getName() + " 雇佣取回道具金币检测错误 时间: " + FileoutputUtil.CurrentReadable_Date());
+            logger.info("[雇佣] " + chr.getName() + " 雇佣取回道具金币检测错误 时间: " + FileoutputUtil.CurrentReadable_Date());
             FileoutputUtil.hiredMerchLog(chr.getName(), "雇佣取回道具金币检测错误");
             return false;
         }
@@ -235,13 +240,13 @@ public class HiredMerchantHandler {
                 }
             }
             if (MapleItemInformationProvider.getInstance().isPickupRestricted(item.getItemId()) && chr.haveItem(item.getItemId(), 1)) {
-                System.out.println("[雇佣] " + chr.getName() + " 雇佣取回道具是否可以捡取错误 时间: " + FileoutputUtil.CurrentReadable_Date());
+                logger.info("[雇佣] " + chr.getName() + " 雇佣取回道具是否可以捡取错误 时间: " + FileoutputUtil.CurrentReadable_Date());
                 FileoutputUtil.hiredMerchLog(chr.getName(), "雇佣取回道具是否可以捡取错误");
                 return false;
             }
         }
         if (chr.getInventory(MapleInventoryType.EQUIP).getNumFreeSlot() < eq || chr.getInventory(MapleInventoryType.USE).getNumFreeSlot() < use || chr.getInventory(MapleInventoryType.SETUP).getNumFreeSlot() < setup || chr.getInventory(MapleInventoryType.ETC).getNumFreeSlot() < etc || chr.getInventory(MapleInventoryType.CASH).getNumFreeSlot() < cash) {
-            System.out.println("[雇佣] " + chr.getName() + " 雇佣取回道具背包空间不够 时间: " + FileoutputUtil.CurrentReadable_Date());
+            logger.info("[雇佣] " + chr.getName() + " 雇佣取回道具背包空间不够 时间: " + FileoutputUtil.CurrentReadable_Date());
             FileoutputUtil.hiredMerchLog(chr.getName(), "雇佣取回道具背包空间不够");
             return false;
         }
@@ -260,7 +265,7 @@ public class HiredMerchantHandler {
             ItemLoader.HIRED_MERCHANT.saveItems(null, packageid, accid, charid);
             return true;
         } catch (SQLException e) {
-            System.out.println("删除弗洛兰德道具信息出错" + e);
+            logger.info("删除弗洛兰德道具信息出错" + e);
             return false;
         }
     }
@@ -275,7 +280,7 @@ public class HiredMerchantHandler {
             ps.close();
             return true;
         } catch (SQLException e) {
-            System.out.println("删除弗洛兰德道具信息出错" + e);
+            logger.info("删除弗洛兰德道具信息出错" + e);
             return false;
         }
     }
@@ -315,7 +320,7 @@ public class HiredMerchantHandler {
             FileoutputUtil.hiredMerchLog(chr.getName(), "弗洛兰德取回最后返回 金币: " + mesos + " 道具数量: " + items.size());
             return pack;
         } catch (SQLException e) {
-            System.out.println("加载弗洛兰德道具信息出错" + e);
+            logger.info("加载弗洛兰德道具信息出错" + e);
             return null;
         }
     }

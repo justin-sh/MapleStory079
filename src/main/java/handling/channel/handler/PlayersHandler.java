@@ -8,6 +8,9 @@ import client.anticheat.CheatingOffense;
 import client.inventory.IItem;
 import client.inventory.MapleInventoryType;
 import constants.GameConstants;
+import handling.MapleServerHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import scripting.NPCScriptManager;
 import scripting.ReactorScriptManager;
 import server.MapleInventoryManipulator;
@@ -21,6 +24,7 @@ import tools.data.input.SeekableLittleEndianAccessor;
 
 
 public class PlayersHandler {
+    private static final Logger logger = LoggerFactory.getLogger(PlayersHandler.class);
     public static void Note(final SeekableLittleEndianAccessor slea, final MapleCharacter chr) {
         final byte type = slea.readByte();
         switch (type) {
@@ -52,7 +56,7 @@ public class PlayersHandler {
                 break;
             }
             default: {
-                System.out.println("Unhandled note action, " + type + "");
+                logger.info("Unhandled note action, " + type + "");
                 break;
             }
         }

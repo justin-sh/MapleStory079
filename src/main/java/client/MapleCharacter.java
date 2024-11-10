@@ -16,6 +16,7 @@ import handling.world.family.MapleFamilyCharacter;
 import handling.world.guild.MapleGuild;
 import handling.world.guild.MapleGuildCharacter;
 import org.apache.mina.core.session.IoSession;
+import org.slf4j.LoggerFactory;
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
@@ -47,10 +48,11 @@ import java.util.*;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Serializable {
+
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(MapleCharacter.class);
+
     private static final long serialVersionUID = 845748950829L;
     private static final String[] ariantroomleader;
     private static final int[] ariantroomslot;
@@ -296,7 +298,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             rs.close();
             ps.close();
         } catch (SQLException e) {
-            System.err.println("Error getting character default" + e);
+            logger.warn("Error getting character default", e);
         }
         return ret;
     }
@@ -831,8 +833,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
                 }
             }
         } catch (SQLException ess) {
-            ess.printStackTrace();
-            System.out.println("加载角色数据信息出错...");
+            logger.warn("加载角色数据信息出错...", ess);
             FileoutputUtil.outputFileError("logs/Packet_Except.log", ess);
         } finally {
             try {
@@ -965,15 +966,13 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             con.commit();
         } catch (DatabaseException ex2) {
         } catch (SQLException e) {
-            e.printStackTrace();
             FileoutputUtil.outputFileError("logs/Packet_Except.log", e);
-            System.err.println("[charsave] Error saving character data");
+            logger.error("[charsave] Error saving character data", e);
             try {
                 con.rollback();
             } catch (SQLException ex) {
-                e.printStackTrace();
                 FileoutputUtil.outputFileError("logs/Packet_Except.log", ex);
-                System.err.println("[charsave] Error Rolling Back");
+                logger.error("[charsave] Error Rolling Back", ex);
             }
             try {
                 if (pse != null) {
@@ -988,9 +987,8 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
                 con.setAutoCommit(true);
                 con.setTransactionIsolation(4);
             } catch (SQLException e2) {
-                e2.printStackTrace();
                 FileoutputUtil.outputFileError("logs/Packet_Except.log", e2);
-                System.err.println("[charsave] Error going back to autocommit mode");
+                logger.error("[charsave] Error going back to autocommit mode", e2);
             }
         } finally {
             try {
@@ -1006,9 +1004,8 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
                 con.setAutoCommit(true);
                 con.setTransactionIsolation(4);
             } catch (SQLException e3) {
-                e3.printStackTrace();
                 FileoutputUtil.outputFileError("logs/Packet_Except.log", e3);
-                System.err.println("[charsave] Error going back to autocommit mode");
+                logger.error("[charsave] Error going back to autocommit mode", e3);
             }
         }
     }
@@ -1083,7 +1080,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             return ret;
         } catch (SQLException ex) {
-            System.err.println("Error while banning" + ex);
+            logger.error("Error while banning", ex);
             return false;
         }
     }
@@ -1758,12 +1755,12 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
         } catch (DatabaseException ex3) {
         } catch (UnsupportedOperationException e) {
             FileoutputUtil.outputFileError(FileoutputUtil.PacketEx_Log, e);
-            System.err.println(MapleClient.getLogMessage(this, "[charsave] 保存角色数据出现错误") + e);
+            logger.error(MapleClient.getLogMessage(this, "[charsave] 保存角色数据出现错误"), e);
             try {
                 con.rollback();
             } catch (SQLException ex) {
                 FileoutputUtil.outputFileError(FileoutputUtil.PacketEx_Log, ex);
-                System.err.println(MapleClient.getLogMessage(this, "[charsave] 保存角色数据出现错误") + e);
+                logger.error(MapleClient.getLogMessage(this, "[charsave] 保存角色数据出现错误"), e);
             }
             try {
                 if (ps != null) {
@@ -1785,7 +1782,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
                 con.setTransactionIsolation(4);
             } catch (SQLException e2) {
                 FileoutputUtil.outputFileError(FileoutputUtil.PacketEx_Log, e2);
-                System.err.println(MapleClient.getLogMessage(this, "[charsave] Error going back to autocommit mode") + e2);
+                logger.error(MapleClient.getLogMessage(this, "[charsave] Error going back to autocommit mode"), e2);
             }
         } finally {
             try {
@@ -1808,7 +1805,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
                 con.setTransactionIsolation(4);
             } catch (SQLException e3) {
                 FileoutputUtil.outputFileError(FileoutputUtil.PacketEx_Log, e3);
-                System.err.println(MapleClient.getLogMessage(this, "[charsave] Error going back to autocommit mode") + e3);
+                logger.error(MapleClient.getLogMessage(this, "[charsave] Error going back to autocommit mode"), e3);
             }
         }
     }
@@ -3943,7 +3940,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.execute();
             ps.close();
         } catch (SQLException ex) {
-            System.err.println("Error while tempbanning" + ex);
+            logger.error("Error while tempbanning", ex);
         }
     }
 
@@ -3977,7 +3974,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
                 psa.close();
             }
         } catch (SQLException ex) {
-            System.err.println("Error while banning" + ex);
+            logger.error("Error while banning", ex);
             return false;
         }
         this.client.getSession().close(true);
@@ -4293,7 +4290,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.execute();
             ps.close();
         } catch (SQLException e) {
-            System.err.println("ERROR writing famelog for char " + this.getName() + " to " + to.getName() + e);
+            logger.error("ERROR writing famelog for char " + this.getName() + " to " + to.getName(), e);
         }
     }
 
@@ -4571,8 +4568,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.execute();
             ps.close();
         } catch (SQLException se) {
-            System.out.println("SQLException: " + se.getLocalizedMessage());
-            se.printStackTrace();
+            logger.warn("save family failed.", se);
         }
     }
 
@@ -4781,7 +4777,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
                 rs.close();
                 this.deleteWhereCharacterId(con, "DELETE FROM skills_cooldowns WHERE charid = ?");
             } catch (SQLException e) {
-                System.err.println("Error while retriving cooldown from SQL storage");
+                logger.error("Error while retriving cooldown from SQL storage", e);
             }
         }
     }
@@ -4875,7 +4871,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             rs.close();
             ps.close();
         } catch (SQLException e) {
-            System.err.println("Unable to show note" + e);
+            logger.error("Unable to show note", e);
         }
     }
 
@@ -4897,7 +4893,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.execute();
             ps.close();
         } catch (SQLException e) {
-            System.err.println("Unable to delete note" + e);
+            logger.error("Unable to delete note", e);
         }
     }
 
@@ -5238,7 +5234,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             return count;
         } catch (SQLException Ex) {
-            System.err.println("Error while read bosslog." + Ex);
+            logger.error("Error while read bosslog.", Ex);
             return -1;
         }
     }
@@ -5258,7 +5254,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             return type;
         } catch (SQLException Ex) {
-            System.err.println("Error while read bosslog." + Ex);
+            logger.error("Error while read bosslog.", Ex);
             return -1;
         }
     }
@@ -5278,7 +5274,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             return channel;
         } catch (SQLException Ex) {
-            System.err.println("Error while read bosslog." + Ex);
+            logger.error("Error while read bosslog.", Ex);
             return 0;
         }
     }
@@ -5304,7 +5300,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.executeUpdate();
             ps.close();
         } catch (SQLException Ex) {
-            System.err.println("Error while set bosslog." + Ex);
+            logger.error("Error while update bosslog.", Ex);
         }
     }
 
@@ -5324,7 +5320,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.executeUpdate();
             ps.close();
         } catch (SQLException Ex) {
-            System.err.println("Error while reset bosslog." + Ex);
+            logger.error("Error while reset bosslog.", Ex);
         }
     }
 
@@ -5870,7 +5866,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
         ret.maplepoints = this.maplepoints;
         ret.clone = true;
         ret.client.setChannel(this.client.getChannel());
-        System.out.println("cloneLooks输出：" + this.client.getChannel());
+        logger.info("cloneLooks输出：" + this.client.getChannel());
         while (this.map.getCharacterById(ret.id) != null || this.client.getChannelServer().getPlayerStorage().getCharacterById(ret.id) != null) {
             final MapleCharacter mapleCharacter = ret;
             ++mapleCharacter.id;
@@ -6047,7 +6043,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
         try {
             this.client.getSession().write(MaplePacketCreator.getChannelChange(InetAddress.getByName(socket[0]), Integer.parseInt(toch.getIP().split(":")[1])));
         } catch (UnknownHostException ex) {
-            Logger.getLogger(MapleCharacter.class.getName()).log(Level.SEVERE, null, ex);
+            logger.warn("Unknown host", ex);
         }
         this.saveToDB(false, false);
         this.getMap().removePlayer(this);
@@ -6270,8 +6266,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             this.pqStartTime = System.currentTimeMillis();
             this.updateOneInfo(questid, "try", String.valueOf(Integer.parseInt(this.getOneInfo(questid, "try")) + 1));
         } catch (NumberFormatException e) {
-            e.printStackTrace();
-            System.out.println("tryPartyQuest error");
+            logger.warn("tryPartyQuest error", e);
         }
     }
 
@@ -6296,8 +6291,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
                 this.pqStartTime = 0L;
             }
         } catch (NumberFormatException e) {
-            e.printStackTrace();
-            System.out.println("endPartyQuest error");
+            logger.warn("endPartyQuest error", e);
         }
     }
 
@@ -7255,7 +7249,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             rs.close();
         } catch (SQLException ex) {
-            System.err.println("查询全民夺宝信息错误: " + ex);
+            logger.warn("查询全民夺宝信息错误.", ex);
         }
         return pay;
     }
@@ -7272,7 +7266,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             rs.close();
         } catch (SQLException ex) {
-            System.err.println("查询全民夺宝信息Name错误: " + ex);
+            logger.warn("查询全民夺宝信息Name错误.", ex);
         }
         return pay;
     }
@@ -7289,7 +7283,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             rs.close();
         } catch (SQLException ex) {
-            System.err.println("查询全民夺宝信息Id错误: " + ex);
+            logger.warn("查询全民夺宝信息Id错误.", ex);
         }
         return pay;
     }
@@ -7321,7 +7315,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps2.cancel();
             return 1;
         } catch (SQLException ex) {
-            System.err.println("数据库操作错误，方法:玩家获得物品(int id,String name) " + ex);
+            logger.error("数据库操作错误，方法:玩家获得物品(int id,String name) ", ex);
             return 0;
         }
     }
@@ -7342,7 +7336,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             rs.close();
         } catch (SQLException ex) {
-            System.err.println("查询全民夺宝信息Id错误: " + ex);
+            logger.error("查询全民夺宝信息Id错误.", ex);
         }
         return pay;
     }
@@ -7357,7 +7351,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             ps2.cancel();
         } catch (SQLException ex) {
-            System.err.println("数据库操作错误，全民夺宝删除 " + ex);
+            logger.error("数据库操作错误，全民夺宝删除", ex);
         }
     }
 
@@ -7370,7 +7364,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             psu.executeUpdate();
             psu.close();
         } catch (SQLException ex) {
-            System.err.println("参加全民夺宝发生了错误: " + ex);
+            logger.error("参加全民夺宝发生了错误.", ex);
         }
     }
 
@@ -7409,7 +7403,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             return sjrw;
         } catch (SQLException Ex) {
-            System.err.println("获取角色帐号的0点出现错误 - 数据库查询失败" + Ex);
+            logger.warn("获取角色帐号的0点出现错误 - 数据库查询失败", Ex);
             return -1;
         }
     }
@@ -7433,7 +7427,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.executeUpdate();
             ps.close();
         } catch (SQLException Ex) {
-            System.err.println("更新角色帐号的在线时间出现错误 - 数据库更新失败." + Ex);
+            logger.error("更新角色帐号的在线时间出现错误 - 数据库更新失败.", Ex);
         }
     }
 
@@ -7472,7 +7466,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             return fbrw;
         } catch (SQLException Ex) {
-            System.err.println("获取角色帐号的在线时间点出现错误 - 数据库查询失败" + Ex);
+            logger.error("获取角色帐号的在线时间点出现错误 - 数据库查询失败", Ex);
             return -1;
         }
     }
@@ -7496,7 +7490,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.executeUpdate();
             ps.close();
         } catch (SQLException Ex) {
-            System.err.println("更新角色帐号的在线时间出现错误 - 数据库更新失败." + Ex);
+            logger.error("更新角色帐号的在线时间出现错误 - 数据库更新失败.", Ex);
         }
     }
 
@@ -7535,7 +7529,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             return fbrwa;
         } catch (SQLException Ex) {
-            System.err.println("获取角色帐号的在线时间点出现错误 - 数据库查询失败" + Ex);
+            logger.error("获取角色帐号的在线时间点出现错误 - 数据库查询失败", Ex);
             return -1;
         }
     }
@@ -7559,7 +7553,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.executeUpdate();
             ps.close();
         } catch (SQLException Ex) {
-            System.err.println("更新角色帐号的在线时间出现错误 - 数据库更新失败." + Ex);
+            logger.error("更新角色帐号的在线时间出现错误 - 数据库更新失败.", Ex);
         }
     }
 
@@ -7598,7 +7592,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             return sgrw;
         } catch (SQLException Ex) {
-            System.err.println("获取角色帐号的在线时间点出现错误 - 数据库查询失败" + Ex);
+            logger.error("获取角色帐号的在线时间点出现错误 - 数据库查询失败", Ex);
             return -1;
         }
     }
@@ -7622,7 +7616,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.executeUpdate();
             ps.close();
         } catch (SQLException Ex) {
-            System.err.println("更新角色帐号的在线时间出现错误 - 数据库更新失败." + Ex);
+            logger.error("更新角色帐号的在线时间出现错误 - 数据库更新失败.", Ex);
         }
     }
 
@@ -7661,7 +7655,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             return sgrwa;
         } catch (SQLException Ex) {
-            System.err.println("获取角色帐号的在线时间点出现错误 - 数据库查询失败" + Ex);
+            logger.error("获取角色帐号的在线时间点出现错误 - 数据库查询失败", Ex);
             return -1;
         }
     }
@@ -7685,7 +7679,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.executeUpdate();
             ps.close();
         } catch (SQLException Ex) {
-            System.err.println("更新角色帐号的在线时间出现错误 - 数据库更新失败." + Ex);
+            logger.error("更新角色帐号的在线时间出现错误 - 数据库更新失败.", Ex);
         }
     }
 
@@ -7724,7 +7718,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             return sbossrw;
         } catch (SQLException Ex) {
-            System.err.println("获取角色帐号的在线时间点出现错误 - 数据库查询失败" + Ex);
+            logger.error("获取角色帐号的在线时间点出现错误 - 数据库查询失败", Ex);
             return -1;
         }
     }
@@ -7748,7 +7742,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.executeUpdate();
             ps.close();
         } catch (SQLException Ex) {
-            System.err.println("更新角色帐号的在线时间出现错误 - 数据库更新失败." + Ex);
+            logger.error("更新角色帐号的在线时间出现错误 - 数据库更新失败.", Ex);
         }
     }
 
@@ -7787,7 +7781,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             return sbossrwa;
         } catch (SQLException Ex) {
-            System.err.println("获取角色帐号的在线时间点出现错误 - 数据库查询失败" + Ex);
+            logger.error("获取角色帐号的在线时间点出现错误 - 数据库查询失败", Ex);
             return -1;
         }
     }
@@ -7811,7 +7805,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.executeUpdate();
             ps.close();
         } catch (SQLException Ex) {
-            System.err.println("更新角色帐号的在线时间出现错误 - 数据库更新失败." + Ex);
+            logger.error("更新角色帐号的在线时间出现错误 - 数据库更新失败.", Ex);
         }
     }
 
@@ -7850,7 +7844,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             return lb;
         } catch (SQLException Ex) {
-            System.err.println("获取角色帐号的在线时间点出现错误 - 数据库查询失败" + Ex);
+            logger.error("获取角色帐号的在线时间点出现错误 - 数据库查询失败", Ex);
             return -1;
         }
     }
@@ -7874,7 +7868,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.executeUpdate();
             ps.close();
         } catch (SQLException Ex) {
-            System.err.println("更新角色帐号的在线时间出现错误 - 数据库更新失败." + Ex);
+            logger.error("更新角色帐号的在线时间出现错误 - 数据库更新失败.", Ex);
         }
     }
 
@@ -7913,7 +7907,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             return gamePoints;
         } catch (SQLException Ex) {
-            System.err.println("获取角色帐号的在线时间点出现错误 - 数据库查询失败" + Ex);
+            logger.error("获取角色帐号的在线时间点出现错误 - 数据库查询失败", Ex);
             return -1;
         }
     }
@@ -7953,7 +7947,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             return gamePointsPD;
         } catch (SQLException Ex) {
-            System.err.println("获取角色帐号的在线时间点出现错误 - 数据库查询失败" + Ex);
+            logger.error("获取角色帐号的在线时间点出现错误 - 数据库查询失败", Ex);
             return -1;
         }
     }
@@ -7982,7 +7976,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.executeUpdate();
             ps.close();
         } catch (SQLException Ex) {
-            System.err.println("更新角色帐号的在线时间出现错误 - 数据库更新失败." + Ex);
+            logger.error("更新角色帐号的在线时间出现错误 - 数据库更新失败.", Ex);
         }
     }
 
@@ -8000,7 +7994,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.executeUpdate();
             ps.close();
         } catch (SQLException Ex) {
-            System.err.println("更新角色帐号的在线时间出现错误 - 数据库更新失败." + Ex);
+            logger.error("更新角色帐号的在线时间出现错误 - 数据库更新失败.", Ex);
         }
     }
 
@@ -8039,7 +8033,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             return gamePointsRQ;
         } catch (SQLException Ex) {
-            System.err.println("获取角色帐号的在线时间点出现错误 - 数据库查询失败" + Ex);
+            logger.error("获取角色帐号的在线时间点出现错误 - 数据库查询失败", Ex);
             return -1;
         }
     }
@@ -8063,7 +8057,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.executeUpdate();
             ps.close();
         } catch (SQLException Ex) {
-            System.err.println("更新角色帐号的在线时间出现错误 - 数据库更新失败." + Ex);
+            logger.error("更新角色帐号的在线时间出现错误 - 数据库更新失败.", Ex);
         }
     }
 
@@ -8102,7 +8096,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             return gamePointsRQ;
         } catch (SQLException Ex) {
-            System.err.println("获取角色帐号的在线时间点出现错误 - 数据库查询失败" + Ex);
+            logger.error("获取角色帐号的在线时间点出现错误 - 数据库查询失败", Ex);
             return -1;
         }
     }
@@ -8126,7 +8120,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.executeUpdate();
             ps.close();
         } catch (SQLException Ex) {
-            System.err.println("更新角色帐号的在线时间出现错误 - 数据库更新失败." + Ex);
+            logger.error("更新角色帐号的在线时间出现错误 - 数据库更新失败.", Ex);
         }
     }
 
@@ -8172,7 +8166,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             rs.close();
         } catch (SQLException ex) {
-            System.err.println("获取充值信息发生错误: " + ex);
+            logger.error("获取充值信息发生错误.", ex);
         }
         return pay;
     }
@@ -8195,7 +8189,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             return 1;
         } catch (SQLException ex) {
-            System.err.println("加减充值信息发生错误: " + ex);
+            logger.error("加减充值信息发生错误.", ex);
             return 0;
         }
     }
@@ -8218,7 +8212,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             return 1;
         } catch (SQLException ex) {
-            System.err.println("加减充值信息发生错误: " + ex);
+            logger.error("加减充值信息发生错误.", ex);
             return -1;
         }
     }
@@ -8240,7 +8234,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             return 1;
         } catch (SQLException ex) {
-            System.err.println("加减消费奖励信息发生错误: " + ex);
+            logger.error("加减消费奖励信息发生错误.", ex);
             return -1;
         }
     }
@@ -8283,7 +8277,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             rs.close();
         } catch (SQLException ex) {
-            System.err.println("获取钓鱼积分信息发生错误: " + ex);
+            logger.error("获取钓鱼积分信息发生错误.", ex);
         }
         return jf;
     }
@@ -8306,7 +8300,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             return 1;
         } catch (SQLException ex) {
-            System.err.println("加减钓鱼积分信息发生错误: " + ex);
+            logger.error("加减钓鱼积分信息发生错误.", ex);
             return 0;
         }
     }
@@ -8329,7 +8323,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             ps.close();
             return 1;
         } catch (SQLException ex) {
-            System.err.println("加减钓鱼积分信息发生错误: " + ex);
+            logger.error("加减钓鱼积分信息发生错误.", ex);
             return -1;
         }
     }
@@ -8409,7 +8403,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
             rs.close();
             ps.close();
         } catch (SQLException se) {
-            System.err.println("获取雇佣商店金币发生错误" + se);
+            logger.error("获取雇佣商店金币发生错误", se);
         }
         return mesos;
     }
@@ -8421,11 +8415,11 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements Se
     public void startCheck() {
         final String mac = this.client.getMac();
         if (!this.client.isBanndMac2(mac) && this.client.getHandSome(this.client.getAccountName()) == this.client.getHandSome2()) {
-            System.out.println("[作弊] 检测到玩家 " + this.getName() + " 登录器关闭，系统对其进行断开连接处理。");
+            logger.info("[作弊] 检测到玩家 " + this.getName() + " 登录器关闭，系统对其进行断开连接处理。");
             FileoutputUtil.packetLog("logs/防万能检测.txt", "玩家名称：" + this.getName() + " 账号在数据库的ID：" + this.getAccountID() + "检测到其与登录器断开连接。服务器对他执行断线处理。他的MAC地址：" + this.getClient().getMac() + "\r\n");
             this.sendPolice();
         } else if (this.client.getHandSome(this.client.getAccountName()) == 100) {
-            System.out.println("[发现偷渡者] 检测到玩家 " + this.getName() + " 非法进入游戏");
+            logger.info("[发现偷渡者] 检测到玩家 " + this.getName() + " 非法进入游戏");
             FileoutputUtil.packetLog("logs/防万能检测.txt", "玩家名称：" + this.getName() + " 账号在数据库的ID：" + this.getAccountID() + "检测到其非法进入游戏。服务器对他执行断线处理。他的MAC地址：" + this.getClient().getMac() + "\r\n");
             this.sendPolice();
         }

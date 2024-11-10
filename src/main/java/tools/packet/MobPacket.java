@@ -5,6 +5,8 @@ import client.status.MonsterStatusEffect;
 import constants.ServerConstants;
 import handling.MaplePacket;
 import handling.SendPacketOpcode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import server.life.MapleMonster;
 import server.life.MobSkill;
 import server.movement.LifeMovementFragment;
@@ -18,10 +20,11 @@ import java.util.List;
 import java.util.Map;
 
 public class MobPacket {
+    private static final Logger logger = LoggerFactory.getLogger(MobPacket.class);
     public static MaplePacket damageMonster(final int oid, final long damage) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("damageMonster--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("damageMonster--------------------");
         }
         mplew.writeShort(SendPacketOpcode.DAMAGE_MONSTER.getValue());
         mplew.writeInt(oid);
@@ -40,8 +43,8 @@ public class MobPacket {
 
     public static MaplePacket damageFriendlyMob(final MapleMonster mob, final long damage, final boolean display) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("damageFriendlyMob--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("damageFriendlyMob--------------------");
         }
         mplew.writeShort(SendPacketOpcode.DAMAGE_MONSTER.getValue());
         mplew.writeInt(mob.getObjectId());
@@ -58,8 +61,8 @@ public class MobPacket {
 
     public static MaplePacket killMonster(final int oid, final int animation) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("killMonster--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("killMonster--------------------");
         }
         mplew.writeShort(SendPacketOpcode.KILL_MONSTER.getValue());
         mplew.writeInt(oid);
@@ -76,8 +79,8 @@ public class MobPacket {
 
     public static MaplePacket healMonster(final int oid, final int heal) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("healMonster--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("healMonster--------------------");
         }
         mplew.writeShort(SendPacketOpcode.DAMAGE_MONSTER.getValue());
         mplew.writeInt(oid);
@@ -92,8 +95,8 @@ public class MobPacket {
 
     public static MaplePacket showMonsterHP(final int oid, final int remhppercentage) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("showMonsterHP--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("showMonsterHP--------------------");
         }
         mplew.writeShort(SendPacketOpcode.SHOW_MONSTER_HP.getValue());
         mplew.writeInt(oid);
@@ -107,8 +110,8 @@ public class MobPacket {
 
     public static MaplePacket showBossHP(final MapleMonster mob) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("showBossHPA--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("showBossHPA--------------------");
         }
         mplew.writeShort(SendPacketOpcode.BOSS_ENV.getValue());
         mplew.write(5);
@@ -134,8 +137,8 @@ public class MobPacket {
 
     public static MaplePacket showBossHP(final int monsterId, final long currentHp, final long maxHp) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("showBossHPB--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("showBossHPB--------------------");
         }
         mplew.writeShort(SendPacketOpcode.BOSS_ENV.getValue());
         mplew.write(5);
@@ -161,8 +164,8 @@ public class MobPacket {
 
     public static MaplePacket moveMonster(final boolean useskill, final int skill, final int skill1, final int skill2, final int skill3, final int skill4, final int oid, final Point startPos, final Point endPos, final List<LifeMovementFragment> moves) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("moveMonster--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("moveMonster--------------------");
         }
         mplew.writeShort(SendPacketOpcode.MOVE_MONSTER.getValue());
         mplew.writeInt(oid);
@@ -179,8 +182,8 @@ public class MobPacket {
     }
 
     private static void serializeMovementList(final LittleEndianWriter lew, final List<LifeMovementFragment> moves) {
-        if (ServerConstants.调试输出封包) {
-            System.out.println("serializeMovementList--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("serializeMovementList--------------------");
         }
         lew.write(moves.size());
         for (final LifeMovementFragment move : moves) {
@@ -226,8 +229,8 @@ public class MobPacket {
     }
 
     public static void addMonsterStatus(final MaplePacketLittleEndianWriter mplew, final MapleMonster life) {
-        if (ServerConstants.调试输出封包) {
-            System.out.println("addMonsterStatus--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("addMonsterStatus--------------------");
         }
         if (life.getStati().size() <= 0) {
             life.addEmpty();
@@ -327,8 +330,8 @@ public class MobPacket {
 
     public static MaplePacket stopControllingMonster(final int oid) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("stopControllingMonster--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("stopControllingMonster--------------------");
         }
         mplew.writeShort(SendPacketOpcode.SPAWN_MONSTER_CONTROL.getValue());
         mplew.write(0);
@@ -342,8 +345,8 @@ public class MobPacket {
 
     public static MaplePacket makeMonsterInvisible(final MapleMonster life) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("makeMonsterInvisible--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("makeMonsterInvisible--------------------");
         }
         mplew.writeShort(SendPacketOpcode.SPAWN_MONSTER_CONTROL.getValue());
         mplew.write(0);
@@ -357,8 +360,8 @@ public class MobPacket {
 
     public static MaplePacket makeMonsterReal(final MapleMonster life) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("makeMonsterReal--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("makeMonsterReal--------------------");
         }
         mplew.writeShort(SendPacketOpcode.SPAWN_MONSTER.getValue());
         mplew.writeInt(life.getObjectId());
@@ -381,8 +384,8 @@ public class MobPacket {
 
     public static MaplePacket moveMonsterResponse(final int objectid, final short moveid, final int currentMp, final boolean useSkills, final int skillId, final int skillLevel) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("moveMonsterResponse--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("moveMonsterResponse--------------------");
         }
         mplew.writeShort(SendPacketOpcode.MOVE_MONSTER_RESPONSE.getValue());
         mplew.writeInt(objectid);
@@ -399,8 +402,8 @@ public class MobPacket {
     }
 
     private static long getSpecialLongMask(final Collection<MonsterStatus> statups) {
-        if (ServerConstants.调试输出封包) {
-            System.out.println("getSpecialLongMask--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("getSpecialLongMask--------------------");
         }
         long mask = 0L;
         for (final MonsterStatus statup : statups) {
@@ -412,8 +415,8 @@ public class MobPacket {
     }
 
     private static long getLongMask(final Collection<MonsterStatus> statups) {
-        if (ServerConstants.调试输出封包) {
-            System.out.println("getLongMask--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("getLongMask--------------------");
         }
         long mask = 0L;
         for (final MonsterStatus statup : statups) {
@@ -425,8 +428,8 @@ public class MobPacket {
     }
 
     private static long getLongMask_NoRef(final Collection<MonsterStatus> statups) {
-        if (ServerConstants.调试输出封包) {
-            System.out.println("getLongMask_NoRef--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("getLongMask_NoRef--------------------");
         }
         long mask = 0L;
         boolean ignore_imm = false;
@@ -457,8 +460,8 @@ public class MobPacket {
 
     public static MaplePacket applyMonsterStatus(final int oid, final MonsterStatus mse, final int x, final MobSkill skil) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("applyMonsterStatus--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("applyMonsterStatus--------------------");
         }
         mplew.writeShort(SendPacketOpcode.APPLY_MONSTER_STATUS.getValue());
         mplew.writeInt(oid);
@@ -479,8 +482,8 @@ public class MobPacket {
 
     public static MaplePacket applyMonsterStatus(final int oid, final MonsterStatusEffect mse) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("applyMonsterStatusA--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("applyMonsterStatusA--------------------");
         }
         mplew.writeShort(SendPacketOpcode.APPLY_MONSTER_STATUS.getValue());
         mplew.writeInt(oid);
@@ -505,8 +508,8 @@ public class MobPacket {
 
     public static MaplePacket applyMonsterStatus(final int oid, final Map<MonsterStatus, Integer> stati, final List<Integer> reflection, final MobSkill skil) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("applyMonsterStatusB--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("applyMonsterStatusB--------------------");
         }
         mplew.writeShort(SendPacketOpcode.APPLY_MONSTER_STATUS.getValue());
         mplew.writeInt(oid);
@@ -537,8 +540,8 @@ public class MobPacket {
 
     public static MaplePacket cancelMonsterStatus(final int oid, final MonsterStatus stat) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("cancelMonsterStatus--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("cancelMonsterStatus--------------------");
         }
         mplew.writeShort(SendPacketOpcode.CANCEL_MONSTER_STATUS.getValue());
         mplew.writeInt(oid);
@@ -554,8 +557,8 @@ public class MobPacket {
 
     public static MaplePacket talkMonster(final int oid, final int itemId, final String msg) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("talkMonster--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("talkMonster--------------------");
         }
         mplew.writeShort(SendPacketOpcode.TALK_MONSTER.getValue());
         mplew.writeInt(oid);
@@ -576,8 +579,8 @@ public class MobPacket {
 
     public static MaplePacket removeTalkMonster(final int oid) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("removeTalkMonster--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("removeTalkMonster--------------------");
         }
         mplew.writeShort(SendPacketOpcode.REMOVE_TALK_MONSTER.getValue());
         mplew.writeInt(oid);

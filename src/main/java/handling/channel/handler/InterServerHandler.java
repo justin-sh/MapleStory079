@@ -1,12 +1,14 @@
 package handling.channel.handler;
 
 import client.*;
+import client.messages.commands.AdminCommand;
 import database.DatabaseConnection;
 import handling.MaplePacket;
 import handling.cashshop.CashShopServer;
 import handling.channel.ChannelServer;
 import handling.world.*;
 import handling.world.guild.MapleGuild;
+import org.slf4j.LoggerFactory;
 import scripting.EventInstanceManager;
 import scripting.EventManager;
 import scripting.NPCScriptManager;
@@ -31,6 +33,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class InterServerHandler {
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(InterServerHandler.class);
     public static void EnterCS(final MapleClient c, final MapleCharacter chr) {
         if (c.getPlayer().getMap().getId() != 180000001) {
             if (!c.getChannelServer().WarpCSShop()) {
@@ -192,7 +195,7 @@ public class InterServerHandler {
             System.out.print("自动断开连接2");
             c.setPlayer(null);
             c.getSession().close(true);
-            System.out.println(msg);
+            logger.info(msg);
             return;
         }
         c.updateLoginState(MapleClient.LOGIN_LOGGEDIN, c.getSessionIPAddress());
@@ -376,7 +379,7 @@ public class InterServerHandler {
             c.getPlayer().resetBossLog("普通扎昆");
         }
         player.checkCopyItems();
-        System.out.println("login: " + DateUtil.getCurrentDateStr() + "[服务端-用户:][名字:" + c.getPlayer().getName() + "][  等级:" + c.getPlayer().getLevel() + "] 进入游戏.");
+        logger.info("login: " + DateUtil.getCurrentDateStr() + "[服务端-用户:][名字:" + c.getPlayer().getName() + "][  等级:" + c.getPlayer().getLevel() + "] 进入游戏.");
     }
 
     public static void ChangeChannel(final SeekableLittleEndianAccessor slea, final MapleClient c, final MapleCharacter chr) {

@@ -3,6 +3,8 @@ package tools.wztosql;
 import client.inventory.MapleInventoryType;
 import constants.GameConstants;
 import database.DatabaseConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import provider.*;
 import tools.Pair;
 
@@ -13,6 +15,7 @@ import java.sql.ResultSet;
 import java.util.*;
 
 public class DumpItems {
+    private static final Logger logger = LoggerFactory.getLogger(DumpItems.class);
     private final MapleDataProvider item;
     private final MapleDataProvider string;
     private final MapleDataProvider character;
@@ -66,7 +69,7 @@ public class DumpItems {
             try {
                 this.dumpItems(psa, psr, ps, pse);
             } catch (Exception e) {
-                System.out.println(this.id + " quest.");
+                logger.info(this.id + " quest.");
                 this.hadError = true;
             } finally {
                 psr.executeBatch();
@@ -366,7 +369,6 @@ public class DumpItems {
                                             psa.setString(3, "con:" + conK.getName());
                                             psa.setString(4, conK.getData().toString());
                                             psa.addBatch();
-                                            continue;
                                         }
                                     }
                                 }
@@ -380,7 +382,7 @@ public class DumpItems {
                         continue;
                     }
                     default: {
-                        System.out.println("UNKNOWN EQ ADDITION : " + d2.getName() + " from " + this.id);
+                        logger.info("UNKNOWN EQ ADDITION : " + d2.getName() + " from " + this.id);
                         continue;
                     }
                 }
@@ -420,17 +422,17 @@ public class DumpItems {
             this.delete("DELETE FROM wz_itemequipdata");
             this.delete("DELETE FROM wz_itemadddata");
             this.delete("DELETE FROM wz_itemrewarddata");
-            System.out.println("Deleted wz_itemdata successfully.");
+            logger.info("Deleted wz_itemdata successfully.");
         }
-        System.out.println("Adding into wz_itemdata.....");
+        logger.info("Adding into wz_itemdata.....");
         this.dumpItems(this.item, psa, psr, ps, pse, false);
         this.dumpItems(this.character, psa, psr, ps, pse, true);
-        System.out.println("Done wz_itemdata...");
+        logger.info("Done wz_itemdata...");
         if (!this.subMain.isEmpty()) {
-            System.out.println(this.subMain.toString());
+            logger.info(this.subMain.toString());
         }
         if (!this.subCon.isEmpty()) {
-            System.out.println(this.subCon.toString());
+            logger.info(this.subCon.toString());
         }
     }
 
@@ -450,13 +452,13 @@ public class DumpItems {
         int currentQuest = 0;
         try {
             final DumpItems dq = new DumpItems(update);
-            System.out.println("Dumping Items");
+            logger.info("Dumping Items");
             dq.dumpItems();
             hadError |= dq.isHadError();
             currentQuest = dq.currentId();
         } catch (Exception e) {
             hadError = true;
-            System.out.println(currentQuest + " quest.");
+            logger.info(currentQuest + " quest.");
         }
         final long endTime = System.currentTimeMillis();
         final double elapsedSeconds = (endTime - startTime) / 1000.0;
@@ -466,7 +468,7 @@ public class DumpItems {
         if (hadError) {
             withErrors = " with errors";
         }
-        System.out.println("Finished" + withErrors + " in " + elapsedMinutes + " minutes " + elapsedSecs + " seconds");
+        logger.info("Finished" + withErrors + " in " + elapsedMinutes + " minutes " + elapsedSecs + " seconds");
     }
 
     protected final MapleData getStringData(final int itemId) {

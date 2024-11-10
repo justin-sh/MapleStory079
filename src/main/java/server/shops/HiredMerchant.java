@@ -92,7 +92,7 @@ public class HiredMerchant extends AbstractPlayerStore {
                 if (chr != null) {
                     chr.dropMessage(-5, "您雇佣商店里面的道具: " + itemText);
                 }
-                System.out.println("[雇佣] " + ((chr != null) ? chr.getName() : this.getOwnerName()) + " 雇佣商店卖出: " + newItem.getItemId() + " - " + itemText + " 价格: " + theQuantity);
+                logger.info("[雇佣] " + ((chr != null) ? chr.getName() : this.getOwnerName()) + " 雇佣商店卖出: " + newItem.getItemId() + " - " + itemText + " 价格: " + theQuantity);
             } else {
                 c.getPlayer().dropMessage(1, "金币不足.");
                 c.getSession().write(MaplePacketCreator.enableActions());

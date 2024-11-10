@@ -3,6 +3,8 @@ package handling.channel.handler;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleDisease;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import server.MapleCarnivalFactory;
 import server.Randomizer;
 import server.life.MapleLifeFactory;
@@ -15,6 +17,9 @@ import tools.packet.MonsterCarnivalPacket;
 import java.util.List;
 
 public class MonsterCarnivalHandler {
+    
+    private static final Logger logger = LoggerFactory.getLogger(MonsterCarnivalHandler.class);
+    
     public static void MonsterCarnival(final SeekableLittleEndianAccessor slea, final MapleClient c) {
         if (c.getPlayer().getCarnivalParty() == null) {
             c.getSession().write(MaplePacketCreator.enableActions());
@@ -32,12 +37,12 @@ public class MonsterCarnivalHandler {
                 }
                 final MapleMonster mons = MapleLifeFactory.getMonster(mobs.get(num).left);
                 if (c.getPlayer().isGM()) {
-                    System.out.println("tab：" + tab);
-                    System.out.println("num：" + num);
-                    System.out.println("mons：" + mons);
-                    System.out.println("num：" + num);
-                    System.out.println("判断A：" + mons != null);
-                    System.out.println("判断B：" + c.getPlayer().getMap().makeCarnivalSpawn(c.getPlayer().getCarnivalParty().getTeam(), mons, num));
+                    logger.info("tab：" + tab);
+                    logger.info("num：" + num);
+                    logger.info("mons：" + mons);
+                    logger.info("num：" + num);
+                    logger.info("判断A：" + (mons != null));
+                    logger.info("判断B：" + c.getPlayer().getMap().makeCarnivalSpawn(c.getPlayer().getCarnivalParty().getTeam(), mons, num));
                 }
                 if (mons != null && c.getPlayer().getMap().makeCarnivalSpawn(c.getPlayer().getCarnivalParty().getTeam(), mons, num)) {
                     c.getPlayer().getCarnivalParty().useCP(c.getPlayer(), mobs.get(num).right);

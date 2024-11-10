@@ -2,6 +2,8 @@ package handling.channel.handler;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
@@ -9,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BeanGame {
+    
+    private static final Logger logger = LoggerFactory.getLogger(BeanGame.class);
+    
     public static void BeanGame1(final SeekableLittleEndianAccessor slea, final MapleClient c) {
         final MapleCharacter chr = c.getPlayer();
         final List<Beans> beansInfo = new ArrayList<Beans>();
@@ -59,7 +64,7 @@ public class BeanGame {
             final byte Type = (byte) (slea.readByte() + 1);
             c.getSession().write(MaplePacketCreator.showBeans(力度, size, Pos, Type));
         } else {
-            System.out.println("未處理的類型【" + type + "】\n包" + slea.toString());
+            logger.info("未處理的類型【" + type + "】\n包" + slea.toString());
         }
     }
 

@@ -15,9 +15,17 @@ public class ServerConstants {
     public static int MTS_TAX;
     public static int MTS_MESO;
     public static int CHANNEL_COUNT;
-    public static boolean 封包显示;
-    public static boolean 调试输出封包;
-    public static boolean 自动注册;
+
+    /**
+     * 封包显示
+     */
+    public static boolean isShowPacket;
+
+    /**
+     * 调试输出封包
+     */
+    public static boolean isDebugPacket;
+    public static boolean isAutoRegister;
     public static boolean PACKET_ERROR_OFF;
     public static boolean Super_password;
     public static boolean clientAutoDisconnect;
@@ -52,12 +60,12 @@ public class ServerConstants {
     }
 
     public static boolean getAutoReg() {
-        return ServerConstants.自动注册;
+        return ServerConstants.isAutoRegister;
     }
 
     public static String ChangeAutoReg() {
-        ServerConstants.自动注册 = !getAutoReg();
-        return ServerConstants.自动注册 ? "开启" : "关闭";
+        ServerConstants.isAutoRegister = !getAutoReg();
+        return ServerConstants.isAutoRegister ? "开启" : "关闭";
     }
 
     public static byte Class_Bonus_EXP(final int job) {
@@ -96,9 +104,9 @@ public class ServerConstants {
         ServerConstants.MTS_TAX = 10;
         ServerConstants.MTS_MESO = 5000;
         ServerConstants.CHANNEL_COUNT = 200;
-        ServerConstants.封包显示 = Boolean.parseBoolean(ServerProperties.getProperty("RoyMS.封包显示", "false"));
-        ServerConstants.调试输出封包 = Boolean.parseBoolean(ServerProperties.getProperty("RoyMS.调试输出封包", "false"));
-        ServerConstants.自动注册 = Boolean.parseBoolean(ServerProperties.getProperty("RoyMS.AutoRegister", "false"));
+        ServerConstants.isShowPacket = Boolean.parseBoolean(ServerProperties.getProperty("RoyMS.封包显示", "false"));
+        ServerConstants.isDebugPacket = Boolean.parseBoolean(ServerProperties.getProperty("RoyMS.调试输出封包", "false"));
+        ServerConstants.isAutoRegister = Boolean.parseBoolean(ServerProperties.getProperty("RoyMS.AutoRegister", "false"));
         ServerConstants.PACKET_ERROR_OFF = Boolean.parseBoolean(ServerProperties.getProperty("RoyMS.记录38错误", "false"));
         ServerConstants.Super_password = false;
         ServerConstants.clientAutoDisconnect = true;

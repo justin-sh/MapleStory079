@@ -6,6 +6,8 @@ import client.inventory.*;
 import constants.GameConstants;
 import handling.world.MaplePartyCharacter;
 import handling.world.World;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import scripting.NPCScriptManager;
 import server.*;
 import server.life.MapleLifeFactory;
@@ -20,6 +22,7 @@ import tools.data.input.SeekableLittleEndianAccessor;
 import tools.packet.MTSCSPacket;
 import tools.packet.PetPacket;
 import tools.packet.PlayerShopPacket;
+import tools.packet.UIPacket;
 
 import java.awt.*;
 import java.util.List;
@@ -28,6 +31,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.locks.Lock;
 
 public class InventoryHandler {
+    private static final Logger logger = LoggerFactory.getLogger(InventoryHandler.class);
+    
     public static int OWL_ID;
 
     public static void ItemMove(final SeekableLittleEndianAccessor slea, final MapleClient c) {
@@ -1238,10 +1243,10 @@ public class InventoryHandler {
                     }
                     if (c.getPlayer().isPlayer()) {
                         c.getPlayer().getMap().broadcastMessage(MaplePacketCreator.serverNotice(2, sb.toString()));
-                        System.out.println("[玩家廣播頻道 " + c.getPlayer().getName() + "] : " + message);
+                        logger.info("[玩家廣播頻道 " + c.getPlayer().getName() + "] : " + message);
                     } else if (c.getPlayer().isGM()) {
                         c.getPlayer().getMap().broadcastMessage(MaplePacketCreator.serverNotice(2, sb.toString()));
-                        System.out.println("[ＧＭ廣播頻道 " + c.getPlayer().getName() + "] : " + message);
+                        logger.info("[ＧＭ廣播頻道 " + c.getPlayer().getName() + "] : " + message);
                     }
                     used = true;
                     break;
@@ -1276,10 +1281,10 @@ public class InventoryHandler {
                     sb2.append(message);
                     if (c.getPlayer().isPlayer()) {
                         c.getPlayer().getMap().broadcastMessage(MaplePacketCreator.serverNotice(2, sb2.toString()));
-                        System.out.println("[玩家廣播頻道 " + c.getPlayer().getName() + "] : " + message);
+                        logger.info("[玩家廣播頻道 " + c.getPlayer().getName() + "] : " + message);
                     } else if (c.getPlayer().isGM()) {
                         c.getPlayer().getMap().broadcastMessage(MaplePacketCreator.serverNotice(2, sb2.toString()));
-                        System.out.println("[ＧＭ廣播頻道 " + c.getPlayer().getName() + "] : " + message);
+                        logger.info("[ＧＭ廣播頻道 " + c.getPlayer().getName() + "] : " + message);
                     }
                     used = true;
                     break;
@@ -1317,10 +1322,10 @@ public class InventoryHandler {
                     }
                     if (c.getPlayer().isPlayer()) {
                         World.Broadcast.broadcastSmega(MaplePacketCreator.tripleSmega(messages, ear3, c.getChannel()).getBytes());
-                        System.out.println("[玩家廣播頻道 " + c.getPlayer().getName() + "] : " + messages);
+                        logger.info("[玩家廣播頻道 " + c.getPlayer().getName() + "] : " + messages);
                     } else if (c.getPlayer().isGM()) {
                         World.Broadcast.broadcastSmega(MaplePacketCreator.tripleSmega(messages, ear3, c.getChannel()).getBytes());
-                        System.out.println("[ＧＭ廣播頻道 " + c.getPlayer().getName() + "] : " + messages);
+                        logger.info("[ＧＭ廣播頻道 " + c.getPlayer().getName() + "] : " + messages);
                     }
                     used = true;
                     break;
@@ -1355,10 +1360,10 @@ public class InventoryHandler {
                     }
                     if (c.getPlayer().isPlayer()) {
                         World.Broadcast.broadcastSmega(MaplePacketCreator.serverNotice(11, c.getChannel(), sb.toString(), ear).getBytes());
-                        System.out.println("[玩家廣播頻道 " + c.getPlayer().getName() + "] : " + message);
+                        logger.info("[玩家廣播頻道 " + c.getPlayer().getName() + "] : " + message);
                     } else if (c.getPlayer().isGM()) {
                         World.Broadcast.broadcastSmega(MaplePacketCreator.serverNotice(11, c.getChannel(), sb.toString(), ear).getBytes());
-                        System.out.println("[ＧＭ廣播頻道 " + c.getPlayer().getName() + "] : " + message);
+                        logger.info("[ＧＭ廣播頻道 " + c.getPlayer().getName() + "] : " + message);
                     }
                     used = true;
                     break;
@@ -1393,10 +1398,10 @@ public class InventoryHandler {
                     }
                     if (c.getPlayer().isPlayer()) {
                         World.Broadcast.broadcastSmega(MaplePacketCreator.serverNotice(12, c.getChannel(), sb.toString(), ear).getBytes());
-                        System.out.println("[玩家廣播頻道 " + c.getPlayer().getName() + "] : " + message);
+                        logger.info("[玩家廣播頻道 " + c.getPlayer().getName() + "] : " + message);
                     } else if (c.getPlayer().isGM()) {
                         World.Broadcast.broadcastSmega(MaplePacketCreator.serverNotice(12, c.getChannel(), sb.toString(), ear).getBytes());
-                        System.out.println("[ＧＭ廣播頻道 " + c.getPlayer().getName() + "] : " + message);
+                        logger.info("[ＧＭ廣播頻道 " + c.getPlayer().getName() + "] : " + message);
                     }
                     used = true;
                     break;
@@ -1431,10 +1436,10 @@ public class InventoryHandler {
                     }
                     if (c.getPlayer().isPlayer()) {
                         World.Broadcast.broadcastSmega(MaplePacketCreator.serverNotice(3, c.getChannel(), sb.toString(), ear).getBytes());
-                        System.out.println("[玩家廣播頻道 " + c.getPlayer().getName() + "] : " + message);
+                        logger.info("[玩家廣播頻道 " + c.getPlayer().getName() + "] : " + message);
                     } else if (c.getPlayer().isGM()) {
                         World.Broadcast.broadcastSmega(MaplePacketCreator.serverNotice(3, c.getChannel(), sb.toString(), ear).getBytes());
-                        System.out.println("[ＧＭ廣播頻道 " + c.getPlayer().getName() + "] : " + message);
+                        logger.info("[ＧＭ廣播頻道 " + c.getPlayer().getName() + "] : " + message);
                     }
                     used = true;
                     break;
@@ -1475,10 +1480,10 @@ public class InventoryHandler {
                     }
                     if (c.getPlayer().isPlayer()) {
                         World.Broadcast.broadcastSmega(MaplePacketCreator.itemMegaphone(sb.toString(), ear, c.getChannel(), item3).getBytes());
-                        System.out.println("[玩家廣播頻道 " + c.getPlayer().getName() + "] : " + message);
+                        logger.info("[玩家廣播頻道 " + c.getPlayer().getName() + "] : " + message);
                     } else if (c.getPlayer().isGM()) {
                         World.Broadcast.broadcastSmega(MaplePacketCreator.itemMegaphone(sb.toString(), ear, c.getChannel(), item3).getBytes());
-                        System.out.println("[ＧＭ廣播頻道 " + c.getPlayer().getName() + "] : " + message);
+                        logger.info("[ＧＭ廣播頻道 " + c.getPlayer().getName() + "] : " + message);
                     }
                     used = true;
                     break;
@@ -1537,7 +1542,7 @@ public class InventoryHandler {
                     final MapleCharacter chr = c.getPlayer();
                     final int color = (itemId - 5152100) * 100;
                     if (chr.isGM()) {
-                        System.out.println("使用一次性隐形眼镜 - 道具: " + itemId + " 颜色: " + color);
+                        logger.info("使用一次性隐形眼镜 - 道具: " + itemId + " 颜色: " + color);
                     }
                     if (color >= 0) {
                         changeFace(chr, color);
@@ -1803,10 +1808,10 @@ public class InventoryHandler {
                     }
                     if (c.getPlayer().isPlayer()) {
                         World.Broadcast.broadcastSmega(MaplePacketCreator.getAvatarMega(c.getPlayer(), c.getChannel(), itemId, text, ear2).getBytes());
-                        System.out.println("[玩家廣播頻道 " + c.getPlayer().getName() + "] : " + text);
+                        logger.info("[玩家廣播頻道 " + c.getPlayer().getName() + "] : " + text);
                     } else if (c.getPlayer().isGM()) {
                         World.Broadcast.broadcastSmega(MaplePacketCreator.getAvatarMega(c.getPlayer(), c.getChannel(), itemId, text, ear2).getBytes());
-                        System.out.println("[ＧＭ廣播頻道 " + c.getPlayer().getName() + "] : " + text);
+                        logger.info("[ＧＭ廣播頻道 " + c.getPlayer().getName() + "] : " + text);
                     }
                     used = true;
                     break;
@@ -1879,8 +1884,8 @@ public class InventoryHandler {
                             break Label_10360;
                         }
                         default: {
-                            System.out.println("Unhandled CS item : " + itemId);
-                            System.out.println(slea.toString(true));
+                            logger.info("Unhandled CS item : " + itemId);
+                            logger.info(slea.toString(true));
                             break Label_10360;
                         }
                     }

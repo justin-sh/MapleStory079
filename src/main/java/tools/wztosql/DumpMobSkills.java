@@ -1,6 +1,8 @@
 package tools.wztosql;
 
 import database.DatabaseConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DumpMobSkills {
+    private static final Logger logger = LoggerFactory.getLogger(DumpMobSkills.class);
     private final MapleDataProvider skill;
     protected boolean hadError;
     protected boolean update;
@@ -33,14 +36,13 @@ public class DumpMobSkills {
         int currentQuest = 0;
         try {
             final DumpMobSkills dq = new DumpMobSkills(update);
-            System.out.println("Dumping mobskills");
+            logger.info("Dumping mobskills");
             dq.dumpMobSkills();
             hadError |= dq.isHadError();
             currentQuest = dq.currentId();
         } catch (Exception e) {
             hadError = true;
-            System.out.println(e);
-            System.out.println(currentQuest + " skill.");
+            logger.warn(currentQuest + " skill.", e);
         }
         final long endTime = System.currentTimeMillis();
         final double elapsedSeconds = (endTime - startTime) / 1000.0;
@@ -50,7 +52,7 @@ public class DumpMobSkills {
         if (hadError) {
             withErrors = " with errors";
         }
-        System.out.println("Finished" + withErrors + " in " + elapsedMinutes + " minutes " + elapsedSecs + " seconds");
+        logger.info("Finished" + withErrors + " in " + elapsedMinutes + " minutes " + elapsedSecs + " seconds");
     }
 
     public DumpMobSkills(final boolean update) throws Exception {
@@ -75,8 +77,7 @@ public class DumpMobSkills {
             try {
                 this.dumpMobSkills(ps);
             } catch (Exception e) {
-                System.out.println(this.id + " skill.");
-                System.out.println(e);
+                logger.warn(this.id + " skill.", e);
                 this.hadError = true;
             } finally {
                 ps.executeBatch();
@@ -103,10 +104,10 @@ public class DumpMobSkills {
     public void dumpMobSkills(final PreparedStatement ps) throws Exception {
         if (!this.update) {
             this.delete("DELETE FROM wz_mobskilldata");
-            System.out.println("Deleted wz_mobskilldata successfully.");
+            logger.info("Deleted wz_mobskilldata successfully.");
         }
         final MapleData skillz = this.skill.getData("MobSkill.img");
-        System.out.println("Adding into wz_mobskilldata.....");
+        logger.info("Adding into wz_mobskilldata.....");
         for (final MapleData ids : skillz.getChildren()) {
             for (final MapleData lvlz : ids.getChildByPath("level").getChildren()) {
                 this.id = Integer.parseInt(ids.getName());
@@ -154,11 +155,11 @@ public class DumpMobSkills {
                     ps.setInt(16, 0);
                 }
                 ps.setByte(17, (byte) ((MapleDataTool.getInt("summonOnce", lvlz, 0) > 0) ? 1 : 0));
-                System.out.println("Added skill: " + this.id + " level " + lvl);
+                logger.info("Added skill: " + this.id + " level " + lvl);
                 ps.addBatch();
             }
         }
-        System.out.println("Done wz_mobskilldata...");
+        logger.info("Done wz_mobskilldata...");
     }
 
     public int currentId() {

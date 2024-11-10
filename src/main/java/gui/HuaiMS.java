@@ -13,6 +13,8 @@ import handling.SendPacketOpcode;
 import handling.channel.ChannelServer;
 import handling.login.handler.AutoRegister;
 import handling.world.World;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import scripting.PortalScriptManager;
 import scripting.ReactorScriptManager;
 import server.Timer;
@@ -31,10 +33,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.concurrent.ScheduledFuture;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class HuaiMS extends JFrame {
+    private static final Logger logger = LoggerFactory.getLogger(HuaiMS.class);
+    
     private static HuaiMS instance;
     private static ScheduledFuture<?> ts;
     private int minutesLeft;
@@ -783,7 +785,7 @@ public class HuaiMS extends JFrame {
                             return;
                         }
                         World.Broadcast.broadcastMessage(MaplePacketCreator.serverNotice(0, "服务器將在 " + HuaiMS.this.minutesLeft + "分钟后关闭. 请尽快关闭雇佣商人安全下线.").getBytes());
-                        System.out.println("服务器將在 " + HuaiMS.this.minutesLeft + "分钟后关闭.");
+                        logger.info("服务器將在 " + HuaiMS.this.minutesLeft + "分钟后关闭.");
                         HuaiMS.this.minutesLeft--;
                     }
                 }, 60000L);
@@ -1138,14 +1140,8 @@ public class HuaiMS extends JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(HuaiMS.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InstantiationException ex2) {
-            Logger.getLogger(HuaiMS.class.getName()).log(Level.SEVERE, null, ex2);
-        } catch (IllegalAccessException ex3) {
-            Logger.getLogger(HuaiMS.class.getName()).log(Level.SEVERE, null, ex3);
-        } catch (UnsupportedLookAndFeelException ex4) {
-            Logger.getLogger(HuaiMS.class.getName()).log(Level.SEVERE, null, ex4);
+        } catch (Exception ex) {
+            logger.error("set look and feel failed", ex);
         }
         EventQueue.invokeLater(new Runnable() {
             @Override

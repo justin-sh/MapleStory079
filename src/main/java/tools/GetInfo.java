@@ -1,5 +1,8 @@
 package tools;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -10,6 +13,9 @@ import java.util.Map;
 import java.util.Properties;
 
 public class GetInfo {
+
+    private static final Logger logger = LoggerFactory.getLogger(GetInfo.class);
+
     public static void main(String[] args) {
         Config();
         getConfig();
@@ -24,40 +30,40 @@ public class GetInfo {
 
     public static void getIpconfig() {
         Map<String, String> map = System.getenv();
-        System.out.println(map);
-        System.out.println(map.get("USERNAME"));
-        System.out.println(map.get("COMPUTERNAME"));
-        System.out.println(map.get("USERDOMAIN"));
-        System.out.println(map.get("USER"));
+        logger.info(map.toString());
+        logger.info(map.get("USERNAME"));
+        logger.info(map.get("COMPUTERNAME"));
+        logger.info(map.get("USERDOMAIN"));
+        logger.info(map.get("USER"));
     }
 
     public static void all() {
-        Properties 設定檔 = System.getProperties();
-        System.out.println("Java的運行環境版本：" + 設定檔.getProperty("java.version"));
-        System.out.println("Java的運行環境供應商：" + 設定檔.getProperty("java.vendor"));
-        System.out.println("Java供應商的URL：" + 設定檔.getProperty("java.vendor.url"));
-        System.out.println("Java的安裝路徑：" + 設定檔.getProperty("java.home"));
-        System.out.println("Java的虛擬機規範版本：" + 設定檔.getProperty("java.vm.specification.version"));
-        System.out.println("Java的虛擬機規範供應商：" + 設定檔.getProperty("java.vm.specification.vendor"));
-        System.out.println("Java的虛擬機規範名稱：" + 設定檔.getProperty("java.vm.specification.name"));
-        System.out.println("Java的虛擬機實現版本：" + 設定檔.getProperty("java.vm.version"));
-        System.out.println("Java的虛擬機實現供應商：" + 設定檔.getProperty("java.vm.vendor"));
-        System.out.println("Java的虛擬機實現名稱：" + 設定檔.getProperty("java.vm.name"));
-        System.out.println("Java運行時環境規範版本：" + 設定檔.getProperty("java.specification.version"));
-        System.out.println("Java運行時環境規範名稱：" + 設定檔.getProperty("java.specification.name"));
-        System.out.println("Java的類格式版本號：" + 設定檔.getProperty("java.class.version"));
-        System.out.println("Java的類路徑：" + 設定檔.getProperty("java.class.path"));
-        System.out.println("加載庫時搜索的路徑列表：" + 設定檔.getProperty("java.library.path"));
-        System.out.println("默認的臨時文件路徑：" + 設定檔.getProperty("java.io.tmpdir"));
-        System.out.println("一個或多個擴展目錄的路徑：" + 設定檔.getProperty("java.ext.dirs"));
-        System.out.println("操作系統的構架：" + 設定檔.getProperty("os.arch"));
-        System.out.println("操作系統的版本：" + 設定檔.getProperty("os.version"));
-        System.out.println("文件分隔符：" + 設定檔.getProperty("file.separator"));
-        System.out.println("路徑分隔符：" + 設定檔.getProperty("path.separator"));
-        System.out.println("行分隔符：" + 設定檔.getProperty("line.separator"));
-        System.out.println("用戶的賬戶名稱：" + 設定檔.getProperty("user.name"));
-        System.out.println("用戶的主目錄：" + 設定檔.getProperty("user.home"));
-        System.out.println("用戶的當前工作目錄：" + 設定檔.getProperty("user.dir"));
+        Properties sysProps = System.getProperties();
+        logger.info("Java的運行環境版本：" + sysProps.getProperty("java.version"));
+        logger.info("Java的運行環境供應商：" + sysProps.getProperty("java.vendor"));
+        logger.info("Java供應商的URL：" + sysProps.getProperty("java.vendor.url"));
+        logger.info("Java的安裝路徑：" + sysProps.getProperty("java.home"));
+        logger.info("Java的虛擬機規範版本：" + sysProps.getProperty("java.vm.specification.version"));
+        logger.info("Java的虛擬機規範供應商：" + sysProps.getProperty("java.vm.specification.vendor"));
+        logger.info("Java的虛擬機規範名稱：" + sysProps.getProperty("java.vm.specification.name"));
+        logger.info("Java的虛擬機實現版本：" + sysProps.getProperty("java.vm.version"));
+        logger.info("Java的虛擬機實現供應商：" + sysProps.getProperty("java.vm.vendor"));
+        logger.info("Java的虛擬機實現名稱：" + sysProps.getProperty("java.vm.name"));
+        logger.info("Java運行時環境規範版本：" + sysProps.getProperty("java.specification.version"));
+        logger.info("Java運行時環境規範名稱：" + sysProps.getProperty("java.specification.name"));
+        logger.info("Java的類格式版本號：" + sysProps.getProperty("java.class.version"));
+        logger.info("Java的類路徑：" + sysProps.getProperty("java.class.path"));
+        logger.info("加載庫時搜索的路徑列表：" + sysProps.getProperty("java.library.path"));
+        logger.info("默認的臨時文件路徑：" + sysProps.getProperty("java.io.tmpdir"));
+        logger.info("一個或多個擴展目錄的路徑：" + sysProps.getProperty("java.ext.dirs"));
+        logger.info("操作系統的構架：" + sysProps.getProperty("os.arch"));
+        logger.info("操作系統的版本：" + sysProps.getProperty("os.version"));
+        logger.info("文件分隔符：" + sysProps.getProperty("file.separator"));
+        logger.info("路徑分隔符：" + sysProps.getProperty("path.separator"));
+        logger.info("行分隔符：" + sysProps.getProperty("line.separator"));
+        logger.info("用戶的賬戶名稱：" + sysProps.getProperty("user.name"));
+        logger.info("用戶的主目錄：" + sysProps.getProperty("user.home"));
+        logger.info("用戶的當前工作目錄：" + sysProps.getProperty("user.dir"));
     }
 
     public static void Config() {
@@ -65,12 +71,12 @@ public class GetInfo {
             InetAddress addr = InetAddress.getLocalHost();
             String ip = addr.getHostAddress();
             String hostName = addr.getHostName();
-            System.out.println("本機IP：" + ip + "\n本機名稱:" + hostName);
-            Properties 設定檔 = System.getProperties();
-            System.out.println("操作系統的名稱：" + 設定檔.getProperty("os.name"));
-            System.out.println("操作系統的版本：" + 設定檔.getProperty("os.version"));
+            logger.info("本機IP：" + ip + ", 本機名稱:" + hostName);
+            Properties sysProps = System.getProperties();
+            logger.info("操作系統的名稱：" + sysProps.getProperty("os.name"));
+            logger.info("操作系統的版本：" + sysProps.getProperty("os.version"));
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            logger.error("unknown host", e);
         }
     }
 
@@ -87,10 +93,10 @@ public class GetInfo {
             for (int i = 0; i < mac.length; i++) {
                 sMAC = formatter.format(Locale.getDefault(), "%02X%s", new Object[]{Byte.valueOf(mac[i]), (i < mac.length - 1) ? "-" : ""}).toString();
             }
-            System.out.println("IP：" + sIP);
-            System.out.println("MAC：" + sMAC);
+            logger.info("IP：" + sIP);
+            logger.info("MAC：" + sMAC);
         } catch (SocketException | UnknownHostException e) {
-            e.printStackTrace();
+            logger.error("socket|host exception", e);
         }
     }
 }

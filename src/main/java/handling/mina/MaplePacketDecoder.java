@@ -47,7 +47,7 @@ public class MaplePacketDecoder extends CumulativeProtocolDecoder {
             client.getReceiveCrypto().crypt(decryptedPacket);
             MapleCustomEncryption.decryptData(decryptedPacket);
             out.write(decryptedPacket);
-            if (ServerConstants.封包显示) {
+            if (ServerConstants.isShowPacket) {
                 final int packetLen = decryptedPacket.length;
                 final int pHeader = this.readFirstShort(decryptedPacket);
                 final String pHeaderStr = Integer.toHexString(pHeader).toUpperCase();
@@ -74,7 +74,6 @@ public class MaplePacketDecoder extends CumulativeProtocolDecoder {
                     final String SendTo = Send + HexTool.toString(decryptedPacket) + "\r\n" + HexTool.toStringFromAscii(decryptedPacket);
                     if (show) {
                         FileoutputUtil.packetLog("logs/客户端封包.log", SendTo);
-                        System.out.println(SendTo);
                     }
                     final String SendTos = "\r\n时间：" + FileoutputUtil.CurrentReadable_Time() + "  ";
                     if (op.equals("UNKNOWN")) {

@@ -16,6 +16,8 @@ import handling.world.World;
 import handling.world.family.MapleFamily;
 import handling.world.guild.MapleGuild;
 import org.apache.mina.core.session.IoSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import scripting.EventManager;
 import scripting.NPCScriptManager;
 import scripting.PortalScriptManager;
@@ -31,6 +33,7 @@ import server.quest.MapleQuest;
 import tools.*;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.MobPacket;
+import tools.wztosql.ConvertOpcodes;
 
 import java.awt.*;
 import java.io.File;
@@ -46,6 +49,8 @@ import java.util.*;
 import java.util.concurrent.ScheduledFuture;
 
 public class AdminCommand {
+    private static final Logger logger = LoggerFactory.getLogger(AdminCommand.class);
+    
     public static ServerConstants.PlayerGMRank getPlayerLevelRequired() {
         return ServerConstants.PlayerGMRank.ADMIN;
     }
@@ -3462,7 +3467,7 @@ public class AdminCommand {
             try {
                 con = DatabaseConnection.getConnection();
             } catch (Exception ex) {
-                System.out.println(ex);
+                logger.info(ex);
                 return 0;
             }
             try (final PreparedStatement ps = (PreparedStatement) con.prepareStatement("INSERT INTO accounts (name, password) VALUES (?, ?)")) {
@@ -3471,7 +3476,7 @@ public class AdminCommand {
                 ps.executeUpdate();
                 ps.close();
             } catch (SQLException ex2) {
-                System.out.println(ex2);
+                logger.info(ex2);
                 return 0;
             }
             c.getPlayer().dropMessage("[注册完成]账号: " + acc + " 密码: " + password);

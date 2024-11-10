@@ -8,6 +8,7 @@ import client.inventory.MapleInventoryType;
 import constants.GameConstants;
 import constants.MapConstants;
 import handling.channel.ChannelServer;
+import org.slf4j.LoggerFactory;
 import scripting.NPCScriptManager;
 import server.*;
 import server.events.MapleSnowball;
@@ -29,6 +30,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerHandler {
+
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(PlayerHandler.class);
+    
     private static boolean isFinisher(final int skillid) {
         switch (skillid) {
             case 1111003:
@@ -962,14 +966,13 @@ public class PlayerHandler {
         try {
             res = MovementParse.parseMovement(slea, 1);
         } catch (ArrayIndexOutOfBoundsException e) {
-            System.out.println("AIOBE Type1:\n");
-//            System.out.println("AIOBE Type1:\n" + slea.toString(true));
+            logger.info("AIOBE Type1:\n");
             return;
         }
         if (res != null && c.getPlayer().getMap() != null) {
             if (slea.available() < 13L || slea.available() > 26L) {
-//                System.out.println("slea.available != 13-26 (movement parsing error)\n" + slea.toString(true));
-                System.out.println("slea.available != 13-26 (movement parsing error)\n");
+//                logger.info("slea.available != 13-26 (movement parsing error)\n" + slea.toString(true));
+                logger.info("slea.available != 13-26 (movement parsing error)\n");
                 return;
             }
             final List<LifeMovementFragment> res2 = new ArrayList<LifeMovementFragment>(res);
@@ -1095,7 +1098,7 @@ public class PlayerHandler {
                     chr.changeMap(to, pto);
                 } else {
                     c.getSession().write(MaplePacketCreator.enableActions());
-                    System.out.println("[服务端]玩家[" + c.getPlayer().getName() + "]试图以非法形式切换地图！");
+                    logger.info("[服务端]玩家[" + c.getPlayer().getName() + "]试图以非法形式切换地图！");
                 }
             } else if (portal != null) {
                 portal.enterPortal(c);
@@ -1164,7 +1167,7 @@ public class PlayerHandler {
                     chr.changeMap(to, pto);
                 } else {
                     c.getSession().write(MaplePacketCreator.enableActions());
-                    System.out.println("[服务端]玩家[" + c.getPlayer().getName() + "]试图以非法形式切换地图！");
+                    logger.info("[服务端]玩家[" + c.getPlayer().getName() + "]试图以非法形式切换地图！");
                 }
             } else if (portal != null) {
                 portal.enterPortal(c);

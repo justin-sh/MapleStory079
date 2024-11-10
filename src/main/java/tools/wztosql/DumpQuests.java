@@ -1,6 +1,8 @@
 package tools.wztosql;
 
 import database.DatabaseConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
@@ -17,6 +19,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class DumpQuests {
+    
+    private static final Logger logger = LoggerFactory.getLogger(DumpQuests.class);
+    
     private final MapleDataProvider quest;
     protected boolean hadError;
     protected boolean update;
@@ -51,7 +56,7 @@ public class DumpQuests {
             try {
                 this.dumpQuests(psai, psas, psaq, ps, psr, psq, psa);
             } catch (Exception e) {
-                System.out.println(this.id + " quest.");
+                logger.info(this.id + " quest.");
                 e.printStackTrace();
                 this.hadError = true;
             } finally {
@@ -97,13 +102,13 @@ public class DumpQuests {
             this.delete("DELETE FROM wz_questactquestdata");
             this.delete("DELETE FROM wz_questreqdata");
             this.delete("DELETE FROM wz_questpartydata");
-            System.out.println("Deleted wz_questdata successfully.");
+            logger.info("Deleted wz_questdata successfully.");
         }
         final MapleData checkz = this.quest.getData("Check.img");
         final MapleData actz = this.quest.getData("Act.img");
         final MapleData infoz = this.quest.getData("QuestInfo.img");
         final MapleData pinfoz = this.quest.getData("PQuest.img");
-        System.out.println("Adding into wz_questdata.....");
+        logger.info("Adding into wz_questdata.....");
         int uniqueid = 0;
         for (final MapleData qz : checkz.getChildren()) {
             this.id = Integer.parseInt(qz.getName());
@@ -302,9 +307,9 @@ public class DumpQuests {
                     }
                 }
             }
-            System.out.println("Added quest: " + this.id);
+            logger.info("Added quest: " + this.id);
         }
-        System.out.println("Done wz_questdata...");
+        logger.info("Done wz_questdata...");
     }
 
     public int currentId() {
@@ -323,14 +328,14 @@ public class DumpQuests {
         int currentQuest = 0;
         try {
             final DumpQuests dq = new DumpQuests(update);
-            System.out.println("Dumping quests");
+            logger.info("Dumping quests");
             dq.dumpQuests();
             hadError |= dq.isHadError();
             currentQuest = dq.currentId();
         } catch (Exception e) {
             hadError = true;
             e.printStackTrace();
-            System.out.println(currentQuest + " quest.");
+            logger.info(currentQuest + " quest.");
         }
         final long endTime = System.currentTimeMillis();
         final double elapsedSeconds = (endTime - startTime) / 1000.0;
@@ -340,6 +345,6 @@ public class DumpQuests {
         if (hadError) {
             withErrors = " with errors";
         }
-        System.out.println("Finished" + withErrors + " in " + elapsedMinutes + " minutes " + elapsedSecs + " seconds");
+        logger.info("Finished" + withErrors + " in " + elapsedMinutes + " minutes " + elapsedSecs + " seconds");
     }
 }

@@ -1,5 +1,8 @@
 package tools.wztosql;
 
+import handling.channel.handler.InventoryHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
@@ -19,6 +22,9 @@ import java.rmi.NotBoundException;
 import java.util.*;
 
 public class MonsterDropCreator {
+
+    private static final Logger logger = LoggerFactory.getLogger(MonsterDropCreator.class);
+    
     private static final int lastmonstercardid = 2388070;
 
     private static boolean addFlagData = false;
@@ -36,14 +42,14 @@ public class MonsterDropCreator {
     protected static MapleDataProvider mobData = MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzPath") + "/Mob.wz"));
 
     public static void main(String[] args) throws FileNotFoundException, IOException, NotBoundException, InstanceAlreadyExistsException, MBeanRegistrationException, NotCompliantMBeanException, MalformedObjectNameException {
-        System.out.println("准备提取怪物爆率数据!");
-        System.out.println("请按任意键继续...");
+        logger.info("准备提取怪物爆率数据!");
+        logger.info("请按任意键继续...");
         System.console().readLine();
         long currtime = System.currentTimeMillis();
         addFlagData = false;
-        System.out.println("载入: 物品名称.");
+        logger.info("载入: 物品名称.");
         getAllItems();
-        System.out.println("载入: 怪物数据.");
+        logger.info("载入: 怪物数据.");
         getAllMobs();
         StringBuilder sb = new StringBuilder();
         FileOutputStream out = new FileOutputStream("数据库怪物爆率表.sql", true);
@@ -93,7 +99,7 @@ public class MonsterDropCreator {
             out.write(sb.toString().getBytes());
             sb.delete(0, 2147483647);
         }
-        System.out.println("载入: 爆率 从 String.wz/MonsterBook.img.");
+        logger.info("载入: 爆率 从 String.wz/MonsterBook.img.");
         for (MapleData dataz : data.getData("MonsterBook.img").getChildren()) {
             int monsterId = Integer.parseInt(dataz.getName());
             int idtoLog = monsterId;
@@ -161,7 +167,7 @@ public class MonsterDropCreator {
             out.write(sb.toString().getBytes());
             sb.delete(0, 2147483647);
         }
-        System.out.println("载入: 怪物书数据.");
+        logger.info("载入: 怪物书数据.");
         StringBuilder SQL = new StringBuilder();
         StringBuilder bookName = new StringBuilder();
         for (tools.Pair<Integer, String> Pair : itemNameCache) {
@@ -191,7 +197,7 @@ public class MonsterDropCreator {
                 bookName.delete(0, 2147483647);
             }
         }
-        System.out.println("载入: 怪物卡数据.");
+        logger.info("载入: 怪物卡数据.");
         SQL.append("\n");
         int i = 1;
         int lastmonsterbookid = 0;
@@ -221,7 +227,7 @@ public class MonsterDropCreator {
         out.close();
         long time = System.currentTimeMillis() - currtime;
         time /= 1000L;
-        System.out.println("Time taken : " + time);
+        logger.info("Time taken : " + time);
     }
 
     private static void retriveNLogItemName(StringBuilder sb, int id) {
@@ -578,7 +584,7 @@ public class MonsterDropCreator {
                 }
                 return 2000;
         }
-        System.out.println("未处理的数据, ID : " + id);
+        logger.info("未处理的数据, ID : " + id);
         return 999999;
     }
 

@@ -99,7 +99,6 @@ public class DatabaseConnection {
         if (!DatabaseConnection.propsInited) {
             try {
                 String path = System.getProperty("server_property_db_path");
-//                System.out.println("load db pro"+path);
                 final FileReader fR = new FileReader(path);
                 DatabaseConnection.dbProps.load(fR);
                 fR.close();

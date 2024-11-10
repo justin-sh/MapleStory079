@@ -6,10 +6,13 @@ import handling.world.MapleParty;
 import handling.world.MaplePartyCharacter;
 import handling.world.PartyOperation;
 import handling.world.World;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public class PartyHandler {
+    private static final Logger logger = LoggerFactory.getLogger(PartyHandler.class);
     public static void DenyPartyRequest(final SeekableLittleEndianAccessor slea, final MapleClient c) {
         final int action = slea.readByte();
         final int partyid = slea.readInt();
@@ -159,7 +162,7 @@ public class PartyHandler {
                 break;
             }
             default: {
-                System.out.println("未知的队伍操作. 0x0" + operation);
+                logger.info("未知的队伍操作. 0x0" + operation);
                 break;
             }
         }

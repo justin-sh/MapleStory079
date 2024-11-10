@@ -67,8 +67,7 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
                     fw.flush();
                     fw.close();
                 } catch (IOException ex) {
-                    System.out.println("Error closing Packet Log.");
-                    System.out.println(ex);
+                    logger.warn("Error closing Packet Log.", ex);
                 }
             }
         }
@@ -288,7 +287,7 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
                     if (MapleServerHandler.debugMode && !RecvPacketOpcode.isSpamHeader(recv)) {
                         final StringBuilder sb = new StringBuilder("Received data 已處理 :" + String.valueOf(recv) + "\n");
                         sb.append(HexTool.toString((byte[]) message)).append("\n").append(HexTool.toStringFromAscii((byte[]) message));
-                        System.out.println(sb.toString());
+                        logger.info(sb.toString());
                     }
                     final MapleClient c = (MapleClient) session.getAttribute(MapleClient.CLIENT_KEY);
                     if (!c.isReceiving()) {
@@ -517,7 +516,7 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
             }
             case CHANGE_MAP: {
                 if (cs) {
-                    if (ServerConstants.调试输出封包) {
+                    if (ServerConstants.isDebugPacket) {
                         logger.info("退出商城");
                     }
                     CashShopOperation.LeaveCS(slea, c, c.getPlayer());
@@ -780,7 +779,7 @@ public class MapleServerHandler extends IoHandlerAdapter implements MapleServerH
             }
             case COUPON_CODE: {
                 FileoutputUtil.log(FileoutputUtil.PacketEx_Log, "Coupon : \n" + slea.toString(true));
-                System.out.println(slea.toString());
+                logger.info(slea.toString());
                 slea.skip(2);
                 CashShopOperation.CouponCode(slea.readMapleAsciiString(), c);
                 break;

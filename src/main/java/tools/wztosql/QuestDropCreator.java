@@ -1,6 +1,8 @@
 package tools.wztosql;
 
 import database.DatabaseConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
@@ -20,6 +22,9 @@ import java.util.List;
 import java.util.Map;
 
 public class QuestDropCreator {
+    
+    private static final Logger logger = LoggerFactory.getLogger(QuestDropCreator.class);
+    
     protected static String monsterQueryData;
     protected static List<Pair<Integer, String>> itemNameCache;
     protected static Map<Integer, Boolean> bossCache;
@@ -96,18 +101,18 @@ public class QuestDropCreator {
     }
 
     public static void main(final String[] args) throws Exception {
-        System.out.println("任务物品爆率更新");
-        System.out.println("...");
+        logger.info("任务物品爆率更新");
+        logger.info("...");
         System.console().readLine();
         final long timeStart = System.currentTimeMillis();
-        System.out.println("加载开始.\r\n");
-        System.out.println("加载任务信息。。。");
+        logger.info("加载开始.");
+        logger.info("加载任务信息。。。");
         loadQuests();
-        System.out.println("加载任务道具信息...");
+        logger.info("加载任务道具信息...");
         loadQuestItems();
-        System.out.println("初始化到 MySQL...");
+        logger.info("初始化到 MySQL...");
         initializeMySQL();
-        System.out.println("加载信息完成.");
+        logger.info("加载信息完成.");
         try {
             final PreparedStatement ps = QuestDropCreator.con.prepareStatement("UPDATE drop_data SET questid = ? WHERE itemid = ?");
             final PreparedStatement psr = QuestDropCreator.con.prepareStatement("UPDATE reactordrops SET questid = ? WHERE itemid = ?");
@@ -120,16 +125,16 @@ public class QuestDropCreator {
                     psr.setInt(2, itemid);
                     ps.executeUpdate();
                     psr.executeUpdate();
-                    System.out.println("任务道具更新: " + itemid + " 任务ID: " + questId);
+                    logger.info("任务道具更新: " + itemid + " 任务ID: " + questId);
                 }
             }
             ps.close();
             psr.close();
         } catch (SQLException sqle) {
-            System.out.println(sqle.getMessage());
+            logger.info(sqle.getMessage());
         }
         final long timeEnd = System.currentTimeMillis() - timeStart;
-        System.out.println("更新任务爆率数据完成 耗时 " + (int) (timeEnd / 1000L) + " 秒.");
+        logger.info("更新任务爆率数据完成 耗时 " + (int) (timeEnd / 1000L) + " 秒.");
     }
 
     static {

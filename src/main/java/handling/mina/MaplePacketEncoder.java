@@ -27,7 +27,7 @@ public class MaplePacketEncoder implements ProtocolEncoder {
         if (client != null) {
             final MapleAESOFB send_crypto = client.getSendCrypto();
             final byte[] inputInitialPacket = ((MaplePacket) message).getBytes();
-            if (ServerConstants.封包显示) {
+            if (ServerConstants.isShowPacket) {
                 final int packetLen = inputInitialPacket.length;
                 final int pHeader = this.readFirstShort(inputInitialPacket);
                 final String pHeaderStr = Integer.toHexString(pHeader).toUpperCase();

@@ -10,6 +10,8 @@ import database.DatabaseConnection;
 import handling.MaplePacket;
 import handling.channel.ChannelServer;
 import handling.world.World;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import server.maps.AbstractMapleMapObject;
 import server.maps.MapleMap;
 import server.maps.MapleMapObjectType;
@@ -26,6 +28,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractPlayerStore extends AbstractMapleMapObject implements IMaplePlayerShop {
+    
+    protected static final Logger logger = LoggerFactory.getLogger(AbstractPlayerStore.class);
+    
     protected boolean open;
     protected boolean available;
     protected String ownerName;
@@ -167,7 +172,7 @@ public abstract class AbstractPlayerStore extends AbstractMapleMapObject impleme
                     rs.close();
                     rs2.close();
                     ps2.close();
-                    System.out.println("[SaveItems] 保存雇佣商店信息出错 - 1");
+                    logger.info("[SaveItems] 保存雇佣商店信息出错 - 1");
                     throw new RuntimeException("保存雇佣商店信息出错.");
                 }
                 packageid = rs2.getInt(1);
@@ -176,7 +181,7 @@ public abstract class AbstractPlayerStore extends AbstractMapleMapObject impleme
             rs.close();
             ps.close();
             if (packageid == 0) {
-                System.out.println("[SaveItems] 保存雇佣商店信息出错 - 1");
+                logger.info("[SaveItems] 保存雇佣商店信息出错 - 1");
                 throw new RuntimeException("保存雇佣商店信息出错.");
             }
             final List<Pair<IItem, MapleInventoryType>> iters = new ArrayList<Pair<IItem, MapleInventoryType>>();
@@ -194,7 +199,7 @@ public abstract class AbstractPlayerStore extends AbstractMapleMapObject impleme
             return true;
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("[SaveItems] 保存雇佣商店信息出错 - 2 " + e);
+            logger.info("[SaveItems] 保存雇佣商店信息出错 - 2 " + e);
             return false;
         }
     }

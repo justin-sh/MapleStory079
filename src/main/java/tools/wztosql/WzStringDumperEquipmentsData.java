@@ -1,5 +1,7 @@
 package tools.wztosql;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
@@ -7,6 +9,9 @@ import provider.MapleDataProviderFactory;
 import java.io.*;
 
 public class WzStringDumperEquipmentsData {
+    
+    private static final Logger logger = LoggerFactory.getLogger(WzStringDumperEquipmentsData.class);
+    
     public static void main(final String[] args) throws FileNotFoundException, IOException {
         final File stringFile = MapleDataProviderFactory.fileInwzPath("string.wz");
         final MapleDataProvider stringProvider = MapleDataProviderFactory.getDataProvider(stringFile);
@@ -43,7 +48,7 @@ public class WzStringDumperEquipmentsData {
         mobTxt.createNewFile();
         skillTxt.createNewFile();
         npcTxt.createNewFile();
-        System.out.println("提取 Cash.img 數據...");
+        logger.info("提取 Cash.img 數據...");
         PrintWriter writer = new PrintWriter(new FileOutputStream(cashTxt));
         for (final MapleData child : cash.getChildren()) {
             final MapleData nameData = child.getChildByPath("name");
@@ -60,8 +65,8 @@ public class WzStringDumperEquipmentsData {
         }
         writer.flush();
         writer.close();
-        System.out.println("Cash.img 提取完成.");
-        System.out.println("提取 Consume.img 數據...");
+        logger.info("Cash.img 提取完成.");
+        logger.info("提取 Consume.img 數據...");
         writer = new PrintWriter(new FileOutputStream(useTxt));
         for (final MapleData child : consume.getChildren()) {
             final MapleData nameData = child.getChildByPath("name");
@@ -78,10 +83,10 @@ public class WzStringDumperEquipmentsData {
         }
         writer.flush();
         writer.close();
-        System.out.println("Consume.img 提取完成.");
-        System.out.println("提取 Eqp.img 數據...");
+        logger.info("Consume.img 提取完成.");
+        logger.info("提取 Eqp.img 數據...");
         for (final MapleData child : eqp.getChildren()) {
-            System.out.println("提取 " + child.getName() + " 數據...");
+            logger.info("提取 " + child.getName() + " 數據...");
             final File eqpFile = new File(output + "/Equip/" + child.getName() + ".txt");
             eqpFile.createNewFile();
             final PrintWriter eqpWriter = new PrintWriter(new FileOutputStream(eqpFile));
@@ -100,10 +105,10 @@ public class WzStringDumperEquipmentsData {
             }
             eqpWriter.flush();
             eqpWriter.close();
-            System.out.println(child.getName() + " 提取完成.");
+            logger.info(child.getName() + " 提取完成.");
         }
-        System.out.println("Eqp.img 提取完成.");
-        System.out.println("提取 Etc.img 數據...");
+        logger.info("Eqp.img 提取完成.");
+        logger.info("提取 Etc.img 數據...");
         writer = new PrintWriter(new FileOutputStream(etcTxt));
         for (final MapleData child : etc.getChildren()) {
             final MapleData nameData = child.getChildByPath("name");
@@ -120,8 +125,8 @@ public class WzStringDumperEquipmentsData {
         }
         writer.flush();
         writer.close();
-        System.out.println("Etc.img 提取完成.");
-        System.out.println("提取 Ins.img 數據...");
+        logger.info("Etc.img 提取完成.");
+        logger.info("提取 Ins.img 數據...");
         writer = new PrintWriter(new FileOutputStream(insTxt));
         for (final MapleData child : ins.getChildren()) {
             final MapleData nameData = child.getChildByPath("name");
@@ -138,8 +143,8 @@ public class WzStringDumperEquipmentsData {
         }
         writer.flush();
         writer.close();
-        System.out.println("Ins.img 提取完成.");
-        System.out.println("提取 Pet.img 數據...");
+        logger.info("Ins.img 提取完成.");
+        logger.info("提取 Pet.img 數據...");
         writer = new PrintWriter(new FileOutputStream(petTxt));
         for (final MapleData child : pet.getChildren()) {
             final MapleData nameData = child.getChildByPath("name");
@@ -156,8 +161,8 @@ public class WzStringDumperEquipmentsData {
         }
         writer.flush();
         writer.close();
-        System.out.println("Pet.img 提取完成.");
-        System.out.println("提取 Map.img 數據...");
+        logger.info("Pet.img 提取完成.");
+        logger.info("提取 Map.img 數據...");
         writer = new PrintWriter(new FileOutputStream(mapTxt));
         for (final MapleData child : map.getChildren()) {
             writer.println(child.getName());
@@ -179,8 +184,8 @@ public class WzStringDumperEquipmentsData {
         }
         writer.flush();
         writer.close();
-        System.out.println("Map.img 提取完成.");
-        System.out.println("提取 Mob.img 數據...");
+        logger.info("Map.img 提取完成.");
+        logger.info("提取 Mob.img 數據...");
         writer = new PrintWriter(new FileOutputStream(mobTxt));
         for (final MapleData child : mob.getChildren()) {
             final MapleData nameData = child.getChildByPath("name");
@@ -192,8 +197,8 @@ public class WzStringDumperEquipmentsData {
         }
         writer.flush();
         writer.close();
-        System.out.println("Mob.img 提取完成.");
-        System.out.println("提取 Skill.img 數據...");
+        logger.info("Mob.img 提取完成.");
+        logger.info("提取 Skill.img 數據...");
         writer = new PrintWriter(new FileOutputStream(skillTxt));
         for (final MapleData child : skill.getChildren()) {
             final MapleData nameData = child.getChildByPath("name");
@@ -213,8 +218,8 @@ public class WzStringDumperEquipmentsData {
         }
         writer.flush();
         writer.close();
-        System.out.println("Skill.img 提取完成.");
-        System.out.println("提取 Npc.img 數據...");
+        logger.info("Skill.img 提取完成.");
+        logger.info("提取 Npc.img 數據...");
         writer = new PrintWriter(new FileOutputStream(npcTxt));
         for (final MapleData child : npc.getChildren()) {
             final MapleData nameData = child.getChildByPath("name");
@@ -226,6 +231,6 @@ public class WzStringDumperEquipmentsData {
         }
         writer.flush();
         writer.close();
-        System.out.println("Npc.img 提取完成.");
+        logger.info("Npc.img 提取完成.");
     }
 }

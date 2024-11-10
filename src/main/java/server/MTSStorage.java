@@ -7,6 +7,7 @@ import constants.GameConstants;
 import constants.ServerConstants;
 import database.DatabaseConnection;
 import handling.MaplePacket;
+import org.slf4j.LoggerFactory;
 import tools.Pair;
 import tools.packet.MTSCSPacket;
 
@@ -19,6 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class MTSStorage {
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(MTSStorage.class);
     private static final long serialVersionUID = 231541893513228L;
     private static MTSStorage instance;
     private long lastUpdate;
@@ -42,7 +44,7 @@ public class MTSStorage {
     public MTSStorage() {
         this.lastUpdate = System.currentTimeMillis();
         this.end = false;
-        System.out.println("Loading MTSStorage :::");
+        logger.info("Loading MTSStorage :::");
         this.idToCart = new LinkedHashMap<Integer, MTSCart>();
         this.buyNow = new LinkedHashMap<Integer, MTSItemInfo>();
         this.packageId = new AtomicInteger(1);
@@ -144,7 +146,7 @@ public class MTSStorage {
         }
         this.end = isShutDown;
         if (isShutDown) {
-            System.out.println("Saving MTS...");
+            logger.info("Saving MTS...");
         }
         final Map<Integer, ArrayList<IItem>> expire = new HashMap<Integer, ArrayList<IItem>>();
         final List<Integer> toRemove = new ArrayList<Integer>();
@@ -189,7 +191,7 @@ public class MTSStorage {
             this.mutex.writeLock().unlock();
         }
         if (isShutDown) {
-            System.out.println("Saving MTS items...");
+            logger.info("Saving MTS items...");
         }
         try {
             for (final Map.Entry<Integer, ArrayList<Pair<IItem, MapleInventoryType>>> ite : items.entrySet()) {
@@ -199,7 +201,7 @@ public class MTSStorage {
             e.printStackTrace();
         }
         if (isShutDown) {
-            System.out.println("Saving MTS carts...");
+            logger.info("Saving MTS carts...");
         }
         this.cart_mutex.writeLock().lock();
         try {

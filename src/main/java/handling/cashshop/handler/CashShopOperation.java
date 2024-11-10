@@ -8,9 +8,12 @@ import constants.GameConstants;
 import constants.OtherSettings;
 import handling.cashshop.CashShopServer;
 import handling.channel.ChannelServer;
+import handling.channel.handler.HiredMerchantHandler;
 import handling.login.LoginServer;
 import handling.world.CharacterTransfer;
 import handling.world.World;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import server.CashItemFactory;
 import server.CashItemInfo;
 import server.MapleInventoryManipulator;
@@ -29,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 public class CashShopOperation {
+    private static final Logger logger = LoggerFactory.getLogger(CashShopOperation.class);
     public static void LeaveCS(final SeekableLittleEndianAccessor slea, final MapleClient c, final MapleCharacter chr) {
         final String[] socket = c.getChannelServer().getIP().split(":");
         CashShopServer.getPlayerStorageMTS().deregisterPlayer(chr);
@@ -251,7 +255,7 @@ public class CashShopOperation {
                 final CashItemInfo item2 = CashItemFactory.getInstance().getItem(snCS2);
                 final IItem itemz2 = chr.getCashInventory().toItem(item2);
                 if (c.getPlayer().isAdmin()) {
-                    System.out.println("包裹购买 ID: " + snCS2);
+                    logger.info("包裹购买 ID: " + snCS2);
                 }
                 if (item2.getPrice() < 100) {
                     c.getPlayer().dropMessage(1, "价格低于100点卷的物品是禁止购买的.");
@@ -329,7 +333,7 @@ public class CashShopOperation {
                     }
                     final MapleInventoryType type2 = MapleInventoryType.getByType(types);
                     if (chr.isAdmin()) {
-                        System.out.println("增加道具栏  snCS " + snCS3 + " 扩充: " + types);
+                        logger.info("增加道具栏  snCS " + snCS3 + " 扩充: " + types);
                     }
                     if (chr.getCSPoints(yue) >= 1100 && chr.getInventory(type2).getSlotLimit() < 96) {
                         chr.modifyCSPoints(yue, -1100, false);
@@ -517,7 +521,7 @@ public class CashShopOperation {
                     }
                 }
                 if (c.getPlayer().isAdmin()) {
-                    System.out.println("礼包购买 ID: " + snID);
+                    logger.info("礼包购买 ID: " + snID);
                 }
                 switch (snID) {
                     case 10001818: {

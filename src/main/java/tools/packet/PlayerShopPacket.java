@@ -6,6 +6,8 @@ import client.inventory.IItem;
 import constants.ServerConstants;
 import handling.MaplePacket;
 import handling.SendPacketOpcode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import server.MerchItemPackage;
 import server.shops.*;
 import tools.Pair;
@@ -14,10 +16,11 @@ import tools.data.output.MaplePacketLittleEndianWriter;
 import java.util.List;
 
 public class PlayerShopPacket {
+    private static final Logger logger = LoggerFactory.getLogger(PlayerShopPacket.class);
     public static MaplePacket addCharBox(final MapleCharacter c, final int type) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("addCharBox--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("addCharBox--------------------");
         }
         mplew.writeShort(SendPacketOpcode.UPDATE_CHAR_BOX.getValue());
         mplew.writeInt(c.getId());
@@ -31,8 +34,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket removeCharBox(final MapleCharacter c) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("removeCharBox--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("removeCharBox--------------------");
         }
         mplew.writeShort(SendPacketOpcode.UPDATE_CHAR_BOX.getValue());
         mplew.writeInt(c.getId());
@@ -46,8 +49,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket sendTitleBox() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("sendTitleBox--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("sendTitleBox--------------------");
         }
         mplew.writeShort(SendPacketOpcode.SEND_TITLE_BOX.getValue());
         mplew.write(7);
@@ -60,8 +63,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket sendPlayerShopBox(final MapleCharacter c) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("sendPlayerShopBox--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("sendPlayerShopBox--------------------");
         }
         mplew.writeShort(SendPacketOpcode.UPDATE_CHAR_BOX.getValue());
         mplew.writeInt(c.getId());
@@ -75,8 +78,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket getHiredMerch(final MapleCharacter chr, final HiredMerchant merch, final boolean firstTime) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("getHiredMerch--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("getHiredMerch--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(5);
@@ -124,8 +127,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket getPlayerStore(final MapleCharacter chr, final boolean firstTime) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("getPlayerStore--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("getPlayerStore--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         final IMaplePlayerShop ips = chr.getPlayerShop();
@@ -176,8 +179,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket shopChat(final String message, final int slot) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("shopChat--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("shopChat--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(6);
@@ -193,8 +196,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket shopErrorMessage(final int error, final int type) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("shopErrorMessage--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("shopErrorMessage--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(10);
@@ -209,8 +212,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket spawnHiredMerchant(final HiredMerchant hm) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("spawnHiredMerchant--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("spawnHiredMerchant--------------------");
         }
         mplew.writeShort(SendPacketOpcode.SPAWN_HIRED_MERCHANT.getValue());
         mplew.writeInt(hm.getOwnerId());
@@ -228,8 +231,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket destroyHiredMerchant(final int id) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("destroyHiredMerchant--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("destroyHiredMerchant--------------------");
         }
         mplew.writeShort(SendPacketOpcode.DESTROY_HIRED_MERCHANT.getValue());
         mplew.writeInt(id);
@@ -242,8 +245,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket shopItemUpdate(final IMaplePlayerShop shop) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("shopItemUpdate--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("shopItemUpdate--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(23);
@@ -266,8 +269,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket shopVisitorAdd(final MapleCharacter chr, final int slot) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("shopVisitorAdd--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("shopVisitorAdd--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(4);
@@ -283,8 +286,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket shopVisitorLeave(final byte slot) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("shopVisitorLeave--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("shopVisitorLeave--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(10);
@@ -302,8 +305,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket Merchant_Buy_Error(final byte message) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("Merchant_Buy_Error--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("Merchant_Buy_Error--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(23);
@@ -317,8 +320,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket updateHiredMerchant(final HiredMerchant shop) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("updateHiredMerchant--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("updateHiredMerchant--------------------");
         }
         mplew.writeShort(SendPacketOpcode.UPDATE_HIRED_MERCHANT.getValue());
         mplew.writeInt(shop.getOwnerId());
@@ -332,8 +335,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket merchItem_Message(final byte op) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("merchItem_Message--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("merchItem_Message--------------------");
         }
         mplew.writeShort(SendPacketOpcode.MERCH_ITEM_MSG.getValue());
         mplew.write(op);
@@ -346,8 +349,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket merchItemStore(final byte op) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("merchItemStore--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("merchItemStore--------------------");
         }
         mplew.writeShort(SendPacketOpcode.MERCH_ITEM_STORE.getValue());
         mplew.write(op);
@@ -370,8 +373,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket merchItemStore_ItemData(final MerchItemPackage pack) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("merchItemStore_ItemData--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("merchItemStore_ItemData--------------------");
         }
         mplew.writeShort(SendPacketOpcode.MERCH_ITEM_STORE.getValue());
         mplew.write(35);
@@ -394,8 +397,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket getMiniGame(final MapleClient c, final MapleMiniGame minigame) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("getMiniGame--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("getMiniGame--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(5);
@@ -428,8 +431,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket getMiniGameReady(final boolean ready) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("getMiniGameReady--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("getMiniGameReady--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(ready ? 57 : 58);
@@ -442,8 +445,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket getMiniGameExitAfter(final boolean ready) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("getMiniGameExitAfter--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("getMiniGameExitAfter--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(ready ? 55 : 56);
@@ -456,8 +459,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket getMiniGameStart(final int loser) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("getMiniGameStart--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("getMiniGameStart--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(60);
@@ -471,8 +474,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket getMiniGameSkip(final int slot) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("getMiniGameSkip--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("getMiniGameSkip--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(62);
@@ -486,8 +489,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket getMiniGameSkip1(final int slot) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("getMiniGameSkip1--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("getMiniGameSkip1--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(62);
@@ -501,8 +504,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket getMiniGameRequestTie() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("getMiniGameRequestTie--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("getMiniGameRequestTie--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(48);
@@ -515,8 +518,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket getMiniGameRequestREDO() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("getMiniGameRequestREDO--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("getMiniGameRequestREDO--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(53);
@@ -529,8 +532,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket getMiniGameDenyTie() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("getMiniGameDenyTie--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("getMiniGameDenyTie--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(49);
@@ -543,8 +546,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket getMiniGameDenyREDO() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("getMiniGameDenyREDO--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("getMiniGameDenyREDO--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(48);
@@ -557,8 +560,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket getMiniGameFull() {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("getMiniGameFull--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("getMiniGameFull--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.writeShort(5);
@@ -572,8 +575,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket getMiniGameMoveOmok(final int move1, final int move2, final int move3) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("getMiniGameMoveOmok--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("getMiniGameMoveOmok--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(63);
@@ -589,8 +592,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket getMiniGameNewVisitor(final MapleCharacter c, final int slot, final MapleMiniGame game) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("getMiniGameNewVisitor--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("getMiniGameNewVisitor--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(4);
@@ -615,8 +618,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket getMiniGameClose(final byte number) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("getMiniGameClose--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("getMiniGameClose--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(10);
@@ -631,8 +634,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket getMatchCardStart(final MapleMiniGame game, final int loser) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("getMatchCardStart--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("getMatchCardStart--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(60);
@@ -651,8 +654,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket getMatchCardSelect(final int turn, final int slot, final int firstslot, final int type) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("getMatchCardSelect--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("getMatchCardSelect--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(67);
@@ -671,8 +674,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket getMiniGameResult(final MapleMiniGame game, final int type, final int x) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("getMiniGameResult--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("getMiniGameResult--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(61);
@@ -701,8 +704,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket MerchantVisitorView(final List<String> visitor) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("MerchantVisitorView--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("MerchantVisitorView--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(44);
@@ -720,8 +723,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket MerchantBlackListView(final List<String> blackList) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("MerchantBlackListView--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("MerchantBlackListView--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(45);
@@ -740,8 +743,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket sendHiredMerchantMessage(final byte type) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("sendHiredMerchantMessage--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("sendHiredMerchantMessage--------------------");
         }
         mplew.writeShort(SendPacketOpcode.MERCH_ITEM_MSG.getValue());
         mplew.write(type);
@@ -754,8 +757,8 @@ public class PlayerShopPacket {
 
     public static MaplePacket shopMessage(final int type) {
         final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.调试输出封包) {
-            System.out.println("shopMessage--------------------");
+        if (ServerConstants.isDebugPacket) {
+            logger.info("shopMessage--------------------");
         }
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(type);

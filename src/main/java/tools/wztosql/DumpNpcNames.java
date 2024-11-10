@@ -1,6 +1,8 @@
 package tools.wztosql;
 
 import database.DatabaseConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
@@ -15,18 +17,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DumpNpcNames {
+
+    private static final Logger logger = LoggerFactory.getLogger(DumpNpcNames.class);
+
     private final Connection con;
-    private static final Map<Integer, String> npcNames;
+    private static final Map<Integer, String> npcNames = new HashMap<>();
 
     public DumpNpcNames() {
         this.con = DatabaseConnection.getConnection();
     }
 
     public static void main(final String[] args) throws SQLException {
-        System.out.println("Dumping npc name data.");
+        logger.info("Dumping npc name data.");
         final DumpNpcNames dump = new DumpNpcNames();
         dump.dumpNpcNameData();
-        System.out.println("Dump complete.");
+        logger.info("Dump complete.");
     }
 
     public void dumpNpcNameData() throws SQLException {
@@ -61,14 +66,10 @@ public class DumpNpcNames {
                     ps2.setString(2, DumpNpcNames.npcNames.get(key));
                     ps2.execute();
                 }
-                System.out.println("key: " + key + " name: " + DumpNpcNames.npcNames.get(key));
+                logger.info("key: " + key + " name: " + DumpNpcNames.npcNames.get(key));
             } catch (Exception ex) {
-                System.out.println("Failed to save key " + key);
+                logger.warn("Failed to save key " + key, ex);
             }
         }
-    }
-
-    static {
-        npcNames = new HashMap<Integer, String>();
     }
 }

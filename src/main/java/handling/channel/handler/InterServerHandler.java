@@ -190,11 +190,10 @@ public class InterServerHandler {
             }
         }
         if (!allowLogin) {
-            final String msg = "检测账号下已有角色登陆游戏 服务端断开这个连接 [角色ID: " + player.getId() + " 名字: " + player.getName() + " ]\r\n" + allowLoginTip;
-            System.out.print("自动断开连接2");
+            final String msg = "检测账号下已有角色登陆游戏 服务端断开这个连接 [角色ID: " + player.getId() + " 名字: " + player.getName() + " ]" + allowLoginTip;
+            logger.info("自动断开连接2:" + msg);
             c.setPlayer(null);
-            c.getSession().close(true);
-            logger.info(msg);
+            c.getSession().closeNow();
             return;
         }
         c.updateLoginState(MapleClient.LOGIN_LOGGEDIN, c.getSessionIPAddress());
@@ -233,11 +232,9 @@ public class InterServerHandler {
                 final MapleGuild gs = World.Guild.getGuild(player.getGuildId());
                 if (gs != null) {
                     final List<MaplePacket> packetList = World.Alliance.getAllianceInfo(gs.getAllianceId(), true);
-                    if (packetList != null) {
-                        for (final MaplePacket pack : packetList) {
-                            if (pack != null) {
-                                c.getSession().write(pack);
-                            }
+                    for (final MaplePacket pack : packetList) {
+                        if (pack != null) {
+                            c.getSession().write(pack);
                         }
                     }
                 }
@@ -371,14 +368,14 @@ public class InterServerHandler {
         } else {
             c.getPlayer().resetBossLog("普通黑龙");
         }
-        final int 扎昆祭台地图 = 280030000;
-        if (c.getPlayer().getHp() != 50 && (c.getPlayer().getBossLog("普通扎昆") >= 1 || c.getPlayer().getBossLogChannel("普通扎昆") > 0) && c.getPlayer().getMap().getId() != 扎昆祭台地图 && c.getPlayer().获取怪物数量(扎昆祭台地图) >= 1 && c.getPlayer().getBossLogChannel("普通扎昆") == c.getChannel()) {
-            c.getPlayer().changeMap(扎昆祭台地图);
+        final int mapIdOfZakun = 280030000;
+        if (c.getPlayer().getHp() != 50 && (c.getPlayer().getBossLog("普通扎昆") >= 1 || c.getPlayer().getBossLogChannel("普通扎昆") > 0) && c.getPlayer().getMap().getId() != mapIdOfZakun && c.getPlayer().获取怪物数量(mapIdOfZakun) >= 1 && c.getPlayer().getBossLogChannel("普通扎昆") == c.getChannel()) {
+            c.getPlayer().changeMap(mapIdOfZakun);
         } else {
             c.getPlayer().resetBossLog("普通扎昆");
         }
         player.checkCopyItems();
-        logger.info("login: " + DateUtil.getCurrentDateStr() + "[服务端-用户:][名字:" + c.getPlayer().getName() + "][  等级:" + c.getPlayer().getLevel() + "] 进入游戏.");
+        logger.info("[服务端-用户:][名字:" + c.getPlayer().getName() + "][  等级:" + c.getPlayer().getLevel() + "] 进入游戏.");
     }
 
     public static void ChangeChannel(final SeekableLittleEndianAccessor slea, final MapleClient c, final MapleCharacter chr) {

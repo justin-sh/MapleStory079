@@ -7,7 +7,7 @@
 
     <Appenders>
         <Console name="CONSOLE">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%20.20t] %-5p %18.18c - %m%n"/>
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%16.16t] %-5p %18.18c - %m%n"/>
         </Console>
         <RollingFile name="FILE"
                      fileName="logs/mxd079.log"

@@ -1,7 +1,7 @@
 package com.justin.game.ms079;
 
 import com.justin.game.ms079.config.ServerProperties;
-import com.justin.game.ms079.dao.AccountDAO;
+import gui.RoyMS;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +9,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.util.StringUtils;
 import server.Start;
+
+import java.util.Arrays;
 
 @EnableConfigurationProperties(ServerProperties.class)
 @SpringBootApplication
@@ -27,8 +30,11 @@ public class Application implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        logger.info(String.valueOf(serverProperties.isLoadGui()));
-
-//        Start.instance.startServer();
+        if (Arrays.stream(args).anyMatch(s -> StringUtils.endsWithIgnoreCase("--gui", s))) {
+            logger.info("start GUI Console");
+            new RoyMS().setVisible(true);
+        } else {
+            Start.instance.startServer();
+        }
     }
 }

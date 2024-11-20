@@ -10,16 +10,19 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.util.StringUtils;
-import server.Start;
 
 import java.util.Arrays;
 
+//@ComponentScan
 @EnableConfigurationProperties(ServerProperties.class)
 @SpringBootApplication
 public class Application implements CommandLineRunner {
 
     @Resource
     private ServerProperties serverProperties;
+
+    @Resource
+    private Starter starter;
 
     private static final Logger logger = LoggerFactory.getLogger(Application.class);
 
@@ -31,10 +34,10 @@ public class Application implements CommandLineRunner {
     public void run(String... args) throws Exception {
 
         if (Arrays.stream(args).anyMatch(s -> StringUtils.endsWithIgnoreCase("--gui", s))) {
-            logger.info("start GUI Console");
+            logger.info("Start GUI Console");
             new RoyMS().setVisible(true);
         } else {
-            Start.instance.startServer();
+            starter.startServer();
         }
     }
 }

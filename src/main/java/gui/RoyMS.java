@@ -5,6 +5,7 @@ import client.MapleCharacter;
 import client.inventory.Equip;
 import client.inventory.ItemFlag;
 import client.inventory.MapleInventoryType;
+import com.justin.game.ms079.Starter;
 import constants.GameConstants;
 import constants.ServerConstants;
 import database.DatabaseConnection;
@@ -582,7 +583,7 @@ public class RoyMS extends JFrame {
 
     private void btnStartServerActionPerformed(final ActionEvent evt) {
         try {
-            Start.instance.startServer();
+            Starter.instance.startServer();
             final String msg = "[服务器] 服务器启动成功！";
             this.printChatLog(msg);
         } catch (Exception ex) {

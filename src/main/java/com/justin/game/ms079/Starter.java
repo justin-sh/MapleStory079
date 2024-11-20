@@ -1,4 +1,4 @@
-package server;
+package com.justin.game.ms079;
 
 import client.MapleCharacter;
 import client.MapleClient;
@@ -19,6 +19,9 @@ import handling.world.family.MapleFamilyBuff;
 import handling.world.guild.MapleGuild;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import server.*;
+import server.Timer;
 import server.events.MapleOxQuizFactory;
 import server.life.MapleLifeFactory;
 import server.life.MapleMonsterInformationProvider;
@@ -37,20 +40,21 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-public class Start {
+@Component
+public class Starter {
 
-    private static final Logger logger = LoggerFactory.getLogger(Start.class);
+    private static final Logger logger = LoggerFactory.getLogger(Starter.class);
 
     public static boolean init;
     private static RoyMS CashGui;
-    public static Start instance;
+    public static Starter instance;
     private static int maxUsers;
     private static final int srvPort = 6350;
     private MapleClient c;
 
     public static void main(final String[] args) throws InterruptedException {
-        Start.instance.init();
-        Start.instance.run();
+        Starter.instance.init();
+        Starter.instance.run();
         boolean loadGui = Boolean.parseBoolean(ServerProperties.getProperty("RoyMS.loadGui", "false"));
         if (loadGui) {
             CashGui();
@@ -58,10 +62,10 @@ public class Start {
     }
 
     private void init(){
-        if(Start.init){
+        if(Starter.init){
             return;
         }
-        Start.init = true;
+        Starter.init = true;
 
         String homePath = System.getProperty("homePath", "./config/");
         String scriptsPath = System.getProperty("scriptsPath", "./scripts/");
@@ -114,7 +118,7 @@ public class Start {
         CashShopServer.run_startup_configurations();
         logger.info(sectionString("刷怪线程"));
         World.registerRespawn();
-        Timer.CheatTimer.getInstance().register(AutobanManager.getInstance(), 60000L);
+        server.Timer.CheatTimer.getInstance().register(AutobanManager.getInstance(), 60000L);
         onlineTime(1);
         memoryRecical(10);
         MapleServerHandler.registerMBean();
@@ -136,18 +140,18 @@ public class Start {
 
     public static void runThread() {
         logger.info("正在加载线程");
-        Timer.WorldTimer.getInstance().start();
-        Timer.EtcTimer.getInstance().start();
-        Timer.MapTimer.getInstance().start();
-        Timer.MobTimer.getInstance().start();
-        Timer.CloneTimer.getInstance().start();
-        Timer.CheatTimer.getInstance().start();
+        server.Timer.WorldTimer.getInstance().start();
+        server.Timer.EtcTimer.getInstance().start();
+        server.Timer.MapTimer.getInstance().start();
+        server.Timer.MobTimer.getInstance().start();
+        server.Timer.CloneTimer.getInstance().start();
+        server.Timer.CheatTimer.getInstance().start();
         logger.info("............");
-        Timer.EventTimer.getInstance().start();
-        Timer.BuffTimer.getInstance().start();
-        Timer.TimerManager.getInstance().start();
-        Timer.PingTimer.getInstance().start();
-        Timer.PGTimer.getInstance().start();
+        server.Timer.EventTimer.getInstance().start();
+        server.Timer.BuffTimer.getInstance().start();
+        server.Timer.TimerManager.getInstance().start();
+        server.Timer.PingTimer.getInstance().start();
+        server.Timer.PGTimer.getInstance().start();
         logger.info("正在加载线程完成.");
     }
 
@@ -193,7 +197,7 @@ public class Start {
 
     public static void 自动存档(final int time) {
         logger.info("服务端启用自动存档." + time + "分钟自动执行数据存档.");
-        Timer.WorldTimer.getInstance().register(() -> {
+        server.Timer.WorldTimer.getInstance().register(() -> {
             try {
                 for (final ChannelServer cserv : ChannelServer.getAllInstances()) {
                     for (final MapleCharacter chr : cserv.getPlayerStorage().getAllCharacters()) {
@@ -211,7 +215,7 @@ public class Start {
     //在线时间
     public static void onlineTime(final int time) {
         logger.info("服务端启用在线时间统计." + time + "分钟记录一次在线时间.");
-        Timer.WorldTimer.getInstance().register(() -> {
+        server.Timer.WorldTimer.getInstance().register(() -> {
             try {
                 for (final ChannelServer chan : ChannelServer.getAllInstances()) {
                     for (final MapleCharacter chr : chan.getPlayerStorage().getAllCharacters()) {
@@ -308,16 +312,16 @@ public class Start {
 
     public static void CashGui() {
         logger.info("加载GUI工具");
-        if (Start.CashGui != null) {
-            Start.CashGui.dispose();
+        if (Starter.CashGui != null) {
+            Starter.CashGui.dispose();
         }
-        (Start.CashGui = new RoyMS()).setVisible(true);
+        (Starter.CashGui = new RoyMS()).setVisible(true);
     }
 
     //在线统计
     public static void onlineStatistics(final int time) {
         logger.info("服务端启用在线统计." + time + "分钟统计一次在线的人数信息.");
-        Timer.WorldTimer.getInstance().register(new Runnable() {
+        server.Timer.WorldTimer.getInstance().register(new Runnable() {
             @Override
             public void run() {
                 final Map<Integer, Integer> connected = World.getConnected();
@@ -326,16 +330,16 @@ public class Start {
                     if (i == 0) {
                         final int users = connected.get(i);
                         conStr.append(StringUtil.padRight(String.valueOf(users), ' ', 3));
-                        if (users > Start.maxUsers) {
-                            Start.maxUsers = users;
+                        if (users > Starter.maxUsers) {
+                            Starter.maxUsers = users;
                         }
                         conStr.append(" 最高在线: ");
-                        conStr.append(Start.maxUsers);
+                        conStr.append(Starter.maxUsers);
                         break;
                     }
                 }
                 logger.info(conStr.toString());
-                if (Start.maxUsers > 0) {
+                if (Starter.maxUsers > 0) {
                     FileoutputUtil.log("logs/在线统计.log", conStr.toString());
                 }
             }
@@ -350,7 +354,7 @@ public class Start {
 
     public static void startCheck() {
         logger.info("服务端启用检测.30秒检测一次角色是否与登录器断开连接.");
-        Timer.WorldTimer.getInstance().register(new Runnable() {
+        server.Timer.WorldTimer.getInstance().register(new Runnable() {
             @Override
             public void run() {
                 for (final ChannelServer cserv_ : ChannelServer.getAllInstances()) {
@@ -375,8 +379,8 @@ public class Start {
     }
 
     static {
-        Start.instance = new Start();
-        Start.maxUsers = 0;
+        Starter.instance = new Starter();
+        Starter.maxUsers = 0;
     }
 
     public static class Shutdown implements Runnable {
